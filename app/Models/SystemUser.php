@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\SystemUserRole;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,6 +25,7 @@ class SystemUser extends Authenticatable implements HasMedia
     {
         return [
             'password' => 'hashed',
+            'role' => SystemUserRole::class,
         ];
     }
 

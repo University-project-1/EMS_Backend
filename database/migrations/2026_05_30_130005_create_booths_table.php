@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('number');
             $table->float('area');
             $table->decimal('price', 10, 2);
-            $table->decimal('avg_rating', 2, 1)->default(0);
-            $table->boolean('is_booked')->default(false); // if company_id is not null so it is not booked
             $table->string('svg_id')->nullable();
             $table->unique(['hall_id', 'number']);
             $table->timestamps();

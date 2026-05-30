@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->foreignId('resolved_by')->nullable()->constrained('system_users')->nullOnDelete();
-            $table->string('status')->default('pending'); // pending resolved rejected
+            $table->string('status')->default('pending');
             $table->text('admin_notes')->nullable();
             $table->timestamps();
         });

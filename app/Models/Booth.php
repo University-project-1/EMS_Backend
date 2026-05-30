@@ -23,7 +23,6 @@ class Booth extends Model implements HasMedia
         return [
             'area' => 'float',
             'price' => 'decimal:2',
-            'is_booked' => 'boolean',
         ];
     }
 

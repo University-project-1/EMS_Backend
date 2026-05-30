@@ -14,7 +14,8 @@ return new class extends Migration
             $table->foreignId('event_hall_id')->constrained('event_halls');
             $table->string('title');
             $table->text('description');
-            $table->string('type');
+            $table->decimal('avg_rating', 3, 2)->default(0);
+            $table->string('type')->default('other');
             $table->string('status')->default('pending');
             $table->string('qr_token')->unique();
             $table->dateTime('date');

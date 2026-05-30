@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enum\EventType;
+use App\Enum\Status;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +25,8 @@ class Event extends Model implements HasMedia
         return [
             'date' => 'datetime',
             'duration' => 'integer',
+            'status' => Status::class,
+            'type' => EventType::class,
         ];
     }
 

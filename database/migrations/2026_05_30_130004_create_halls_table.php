@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('number')->unique();
             $table->float('area');
-            $table->string('type'); //delete it
+            $table->string('type')->default('exhibition');
             $table->string('svg_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
