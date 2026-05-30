@@ -20,6 +20,7 @@
         "barryvdh/laravel-ide-helper": "*",
         "fakerphp/faker": "^1.23",
         "knuckleswtf/scribe": "*",
+        "larastan/larastan": "^3.10",
         "laravel/boost": "^2.2",
         "laravel/pail": "^1.2.5",
         "laravel/pao": "^1.0.6",
