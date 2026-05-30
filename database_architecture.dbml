@@ -1,0 +1,301 @@
+// Mobile Users (Visitors)
+Table users {
+  id integer [primary key]
+  first_name varchar
+  last_name varchar
+  email varchar [unique]
+  phone varchar [unique]
+  password varchar
+  job varchar
+  location varchar
+  birthday date
+  gender varchar
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp [note: 'Soft Delete']
+}
+
+// Admins & Exhibitors
+Table system_users {
+  id integer [primary key]
+  name varchar
+  email varchar [unique]
+  password varchar
+  role varchar [note: 'admin, exhibitor']
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp [note: 'Soft Delete']
+}
+
+// Core Exhibition Entities
+Table companies {
+  id integer [primary key]
+  name varchar
+  business_sector varchar
+  social_links json [note: 'JSON object for website, facebook, twitter, linkedin, etc.']
+  phone varchar [unique, note: 'Company public phone']
+  year_founded integer
+  description text
+  headquarters_lat float
+  headquarters_lng float
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp [note: 'Soft Delete']
+}
+
+// Pivot Table for Exhibitor -> Companies
+Table company_system_users {
+  company_id integer
+  system_user_id integer
+  Indexes {
+    (company_id, system_user_id) [pk]
+  }
+}
+
+Table booth_system_users {
+  booth_id integer
+  system_user_id integer
+  assigned_by integer [note: 'Admin or Owner who assigned this user']
+  created_at timestamp
+  Indexes {
+    (booth_id, system_user_id) [pk]
+  }
+}
+
+Table halls {
+  id integer [primary key]
+  number varchar [unique]
+  area float
+  type varchar [note: 'company, restaurant']
+  deleted_at timestamp [note: 'Soft Delete']
+}
+
+Table booths {
+  id integer [primary key]
+  hall_id integer
+  company_id integer [note: 'Nullable. Set automatically when a request is approved']
+  qr_token varchar [unique, note: 'Secure Token for QR Generation']
+  number varchar
+  area float
+  price decimal
+  is_booked boolean [default: false]
+  deleted_at timestamp [note: 'Soft Delete']
+  Indexes {
+    (hall_id, number) [unique, note: 'Booth number must be unique within the same hall']
+  }
+}
+
+// Booking System
+Table booth_requests {
+  id integer [primary key]
+  booth_id integer
+  company_id integer
+  system_user_id integer [note: 'The exhibitor who initiated the request']
+  final_price decimal
+  status varchar [default: 'pending', note: 'pending, approved, rejected']
+  reason_for_booking text
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp [note: 'Soft Delete']
+}
+
+Table services {
+  id integer [primary key]
+  name varchar [unique]
+  price decimal
+  is_active boolean [default: true]
+}
+
+Table booth_request_services {
+  id integer [primary key]
+  request_id integer
+  service_id integer
+  quantity integer
+  unit_price decimal [note: 'Snapshot of service price at booking time']
+}
+
+// Events System
+Table event_halls {
+  id integer [primary key]
+  number varchar [unique]
+  area float
+  price_per_hour decimal
+}
+
+Table events {
+  id integer [primary key]
+  eventable_type varchar [note: 'App\\Models\\Company or App\\Models\\SystemUser']
+  eventable_id integer
+  event_hall_id integer
+  type varchar
+  status varchar [default: 'pending']
+  qr_token varchar [unique, note: 'Secure Token for QR Generation']
+  date datetime
+  duration integer
+  title varchar
+  description text
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp [note: 'Soft Delete']
+}
+
+Table event_speakers {
+  id integer [primary key]
+  event_id integer
+  name varchar
+}
+
+// General Info & Interactions
+Table announcements {
+  id integer [primary key]
+  title varchar
+  description text
+  is_active boolean [default: true]
+  created_at timestamp
+}
+
+// User Interactions (Leads, Saved, Reviews)
+Table leads {
+  id integer [primary key]
+  user_id integer
+  leadable_type varchar [note: 'App\\Models\\Booth or App\\Models\\Event']
+  leadable_id integer
+  created_at timestamp
+  Indexes {
+    (user_id, leadable_type, leadable_id) [unique, note: 'Prevent duplicate scans']
+  }
+}
+
+Table saved {
+  id integer [primary key]
+  user_id integer
+  savedable_type varchar [note: 'App\\Models\\Company or App\\Models\\Event']
+  savedable_id integer
+  created_at timestamp
+  Indexes {
+    (user_id, savedable_type, savedable_id) [unique, note: 'Prevent duplicate saves']
+  }
+}
+
+Table reviews {
+  id integer [primary key]
+  user_id integer
+  reviewable_type varchar [note: 'App\\Models\\Event or App\\Models\\Booth']
+  reviewable_id integer
+  rating integer [note: 'Value between 1 and 5']
+  comment text
+  created_at timestamp
+  updated_at timestamp
+  Indexes {
+    (user_id, reviewable_type, reviewable_id) [unique, note: 'Prevent multiple reviews']
+  }
+}
+
+// Laravel Native Database Notifications Table
+Table notifications {
+  id uuid [primary key]
+  type varchar
+  notifiable_type varchar [note: 'App\\Models\\User or App\\Models\\SystemUser']
+  notifiable_id integer
+  data text [note: 'JSON payload containing title, message, action_url, etc.']
+  read_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+// Advanced Reports System (Complaints)
+Table reports {
+  id integer [primary key]
+  reporter_type varchar [note: 'App\\Models\\User or App\\Models\\SystemUser (Who sent the report)']
+  reporter_id integer
+  reportable_type varchar [note: 'App\\Models\\Booth, App\\Models\\Event, App\\Models\\Review, etc. Nullable if general complaint']
+  reportable_id integer [note: 'Nullable']
+  title varchar
+  description text
+  resolved_by integer [note: 'FK to system_users.id (The admin who handled it)']
+  status varchar [default: 'pending', note: 'pending, resolved, dismissed']
+  admin_notes text [note: 'Internal notes written by the admin']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table bus_catalog {
+  id integer [primary key]
+  location varchar
+  start_time time
+  end_time time
+  duration integer
+}
+
+Table facilities {
+  id integer [primary key]
+  number varchar [unique]
+  gender varchar
+  latitude float
+  longitude float
+  type varchar [note: 'toilet, mosque, etc.']
+}
+
+// Polymorphic & Auth Meta
+Table device_tokens {
+  id integer [primary key]
+  tokenable_type varchar [note: 'App\\Models\\User or App\\Models\\SystemUser']
+  tokenable_id integer
+  fcm_token varchar [unique]
+  device_type varchar
+}
+
+Table otp_codes {
+  id integer [primary key]
+  phone varchar
+  otp varchar
+  type varchar
+  attempts integer [default: 0]
+  is_used boolean [default: false]
+  expires_at timestamp
+  session_id varchar [unique]
+  Indexes {
+    phone [name: 'idx_phone']
+  }
+}
+
+// Spatie Media Library (For Centralized Media Management)
+Table media {
+  id integer [primary key]
+  model_type varchar
+  model_id integer
+  collection_name varchar
+  name varchar
+  file_name varchar
+  mime_type varchar
+  disk varchar
+  size integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+// Relationships
+Ref: company_system_users.system_user_id > system_users.id [delete: cascade]
+Ref: company_system_users.company_id > companies.id [delete: cascade]
+
+Ref: booth_system_users.booth_id > booths.id [delete: cascade]
+Ref: booth_system_users.system_user_id > system_users.id [delete: cascade]
+Ref: booth_system_users.assigned_by > system_users.id [delete: set null]
+
+Ref: booths.hall_id > halls.id [delete: cascade]
+Ref: booths.company_id > companies.id [delete: set null]
+
+Ref: booth_requests.booth_id > booths.id
+Ref: booth_requests.company_id > companies.id
+Ref: booth_requests.system_user_id > system_users.id
+
+Ref: booth_request_services.request_id > booth_requests.id [delete: cascade]
+Ref: booth_request_services.service_id > services.id
+
+Ref: events.event_hall_id > event_halls.id
+Ref: event_speakers.event_id > events.id [delete: cascade]
+
+Ref: leads.user_id > users.id [delete: cascade]
+Ref: saved.user_id > users.id [delete: cascade]
+Ref: reviews.user_id > users.id [delete: cascade]
+Ref: reports.resolved_by > system_users.id [delete: set null]
