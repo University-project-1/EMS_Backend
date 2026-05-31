@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['booth_id', 'system_user_id', 'assigned_by'])]
+#[Table('booth_system_users')]
 class BoothSystemUser extends Model
 {
-    protected $table = 'booth_system_users';
-
-    public $timestamps = false;
+    public const UPDATED_AT = null;
 }

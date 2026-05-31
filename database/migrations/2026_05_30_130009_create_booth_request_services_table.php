@@ -16,4 +16,9 @@ return new class extends Migration
             $table->decimal('unit_price', 10, 2);
         });
     }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('booth_request_services');
+    }
 };

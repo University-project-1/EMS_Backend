@@ -14,4 +14,8 @@ return new class extends Migration
             $table->primary(['company_id', 'system_user_id']);
         });
     }
+    public function down(): void
+    {
+        Schema::dropIfExists('company_system_users');
+    }
 };

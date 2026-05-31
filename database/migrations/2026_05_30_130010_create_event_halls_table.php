@@ -16,4 +16,9 @@ return new class extends Migration
             $table->decimal('price_per_hour', 10, 2);
         });
     }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('event_halls');
+    }
 };

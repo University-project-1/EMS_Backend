@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum SystemUserRole: string
+enum SystemUserType: string
 {
     case ADMIN = 'admin';
     case EXHIBITOR = 'exhibitor';

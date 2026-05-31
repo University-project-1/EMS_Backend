@@ -12,8 +12,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->morphs('leadable');
-            $table->timestamp('created_at')->nullable();
+            $table->timestamp('created_at');
             $table->unique(['user_id', 'leadable_type', 'leadable_id']);
         });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('leads');
     }
 };

@@ -20,4 +20,9 @@ return new class extends Migration
             $table->index('phone', 'idx_phone');
         });
     }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('otp_codes');
+    }
 };

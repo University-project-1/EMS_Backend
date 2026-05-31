@@ -14,4 +14,9 @@ return new class extends Migration
             $table->string('name');
         });
     }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('event_speakers');
+    }
 };

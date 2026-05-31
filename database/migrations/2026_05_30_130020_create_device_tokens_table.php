@@ -15,4 +15,9 @@ return new class extends Migration
             $table->string('device_type');
         });
     }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('device_tokens');
+    }
 };

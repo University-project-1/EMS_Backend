@@ -14,7 +14,12 @@ return new class extends Migration
             $table->string('gender');
             $table->float('latitude');
             $table->float('longitude');
-            $table->string('type'); // restaurant mosque bathroom ...
+            $table->string('type'); // mosque bathroom ...
         });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('facilities');
     }
 };

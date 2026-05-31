@@ -12,8 +12,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->morphs('savedable');
-            $table->timestamp('created_at')->nullable();
+            $table->timestamp('created_at');
             $table->unique(['user_id', 'savedable_type', 'savedable_id']);
         });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('saved');
     }
 };

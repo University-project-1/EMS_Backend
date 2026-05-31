@@ -6,6 +6,6 @@ enum EventType: string
 {
     case CONFERENCE = 'conference';
     case WORKSHOP = 'workshop';
-    case lECTURE = 'lecture';
+    case LECTURE = 'lecture';
     case OTHER = 'other';
 }

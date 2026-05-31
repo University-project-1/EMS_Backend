@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\SystemUser;
 use App\Models\User;
 
 return [
@@ -17,7 +18,7 @@ return [
 
     'defaults' => [
         'guard' => env('AUTH_GUARD', 'web'),
-        'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
+        'passwords' => env('AUTH_PASSWORD_BROKER', 'system_users'),
     ],
 
     /*
@@ -40,6 +41,11 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
+            'provider' => 'system_users',
+        ],
+        
+        'api' => [
+            'driver' => 'passport',
             'provider' => 'users',
         ],
     ],
@@ -65,6 +71,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+
+        'system_users' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', SystemUser::class),
         ],
 
         // 'users' => [
