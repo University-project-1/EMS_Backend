@@ -40,7 +40,7 @@ return [
 
     'guards' => [
         'web' => [
-            'driver' => 'session',
+            'driver' => 'passport',
             'provider' => 'system_users',
         ],
         
