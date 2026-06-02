@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-#[Fillable(['title', 'description', 'is_active'])]
+#[Fillable(['title', 'receiver', 'description', 'is_active'])]
 class Announcement extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;

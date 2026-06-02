@@ -12,8 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('number')->unique();
             $table->string('gender');
-            $table->float('latitude');
-            $table->float('longitude');
+            $table->string('svg_id')->nullable();
             $table->string('type'); // mosque bathroom ...
         });
     }

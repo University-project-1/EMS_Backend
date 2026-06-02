@@ -60,4 +60,9 @@ class Booth extends Model implements HasMedia
     {
         return $this->morphMany(Report::class, 'reportable');
     }
+
+    public function savedItems(): MorphMany
+    {
+        return $this->morphMany(Saved::class, 'savedable');
+    }
 }

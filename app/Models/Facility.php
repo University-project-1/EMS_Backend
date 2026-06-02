@@ -5,16 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['number', 'gender', 'latitude', 'longitude', 'type'])]
+#[Fillable(['number', 'gender', 'svg_id', 'type'])]
 class Facility extends Model
 {
     public $timestamps = false;
-
-    protected function casts(): array
-    {
-        return [
-            'latitude' => 'float',
-            'longitude' => 'float',
-        ];
-    }
 }

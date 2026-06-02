@@ -46,9 +46,4 @@ class Company extends Model implements HasMedia
     {
         return $this->morphMany(Event::class, 'eventable');
     }
-
-    public function savedItems(): MorphMany
-    {
-        return $this->morphMany(Saved::class, 'savedable');
-    }
 }
