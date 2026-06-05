@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 #[Fillable(['tokenable_type', 'tokenable_id', 'fcm_token', 'device_type'])]
 class DeviceToken extends Model
 {
-    public $timestamps = false;
-
     public function tokenable(): MorphTo
     {
         return $this->morphTo();
