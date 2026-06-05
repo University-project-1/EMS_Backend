@@ -53,8 +53,8 @@ class AuthService
                     'user' => ['Registration session expired or not found']
                 ]);
 
-            $user = User::where('phone', $userDataCache['phone'])->first();
-            if ($user) {
+            $userIsFound = User::where('phone', $userDataCache['phone'])->first();
+            if ($userIsFound) {
                 throw ValidationException::withMessages([
                     'phone' => ['invalid registration state']
                 ]);
@@ -95,7 +95,14 @@ class AuthService
 
     public function logout()
     {
-        auth('mobile')->user()->token()->revoke();
+         $token = auth('mobile')->user()->token();
+
+        auth('mobile')->user()
+            ->deviceTokens()
+            ->where('oauth_access_token_id', $token->id)
+            ->delete();
+
+    $token->revoke();
     }
 
     public function forgotPassword(array $data)
@@ -171,7 +178,7 @@ class AuthService
         }
 
         $latestOtp = OtpCode::query()
-            ->where('p`hone', $data['phone'])
+            ->where('phone', $data['phone'])
             ->where('type', $otp->type)
             ->latest()
             ->first();

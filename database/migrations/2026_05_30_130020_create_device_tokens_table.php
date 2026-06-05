@@ -13,6 +13,8 @@ return new class extends Migration
             $table->morphs('tokenable');
             $table->string('fcm_token')->unique();
             $table->string('device_type');
+            $table->char('oauth_access_token_id', 80)->nullable();
+            $table->timestamps();
         });
     }
 

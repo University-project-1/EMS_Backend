@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Mobile\Auth;
 
+use App\Enum\Gender;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class RegisterRequest extends FormRequest
 {
@@ -31,6 +33,7 @@ class RegisterRequest extends FormRequest
             'job' => ['required', 'string', 'max:255'],
             'location' => ['required', 'string', 'max:255'],
             'birthday' => ['required', 'date', 'before:today'],
+            'gender' => ['required' , new Enum(Gender::class)],
         ];
     }
 }

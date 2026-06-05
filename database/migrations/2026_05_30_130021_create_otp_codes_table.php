@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('expires_at');
             $table->string('session_id')->unique();
             $table->index('phone', 'idx_phone');
+            $table->timestamps();
         });
     }
 
