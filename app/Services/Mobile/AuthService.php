@@ -102,7 +102,7 @@ class AuthService
             ->where('oauth_access_token_id', $token->id)
             ->delete();
 
-    $token->revoke();
+        $token->revoke();
     }
 
     public function forgotPassword(array $data)
