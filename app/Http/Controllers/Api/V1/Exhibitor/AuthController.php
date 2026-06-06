@@ -1,0 +1,68 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1\Exhibitor;
+
+use App\DTOs\SystemUser\LoginDTO;
+use App\DTOs\SystemUser\RegisterDTO;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\SystemAuth\LoginSystemUserRequest;
+use App\Http\Requests\SystemAuth\RegisterExhibitorRequest;
+use App\Models\SystemUser;
+use App\Services\Exhibitor\AuthService;
+use Illuminate\Http\Request;
+
+class AuthController extends Controller
+{
+    public function __construct(
+        private readonly AuthService $authService,
+    ){}
+
+    public function register(RegisterExhibitorRequest $request){
+        $dto = RegisterDTO::fromRequest($request);
+        $result = $this->authService->register($dto);
+        return successResponse(
+            data: ['user'  => $result['user'], 'token' => $result['token']],
+            message: 'verify your account',
+            code: 200
+        );
+    }
+
+    public function verify(Request $request, $id, $hash)
+    {
+        $user = SystemUser::findOrFail($id);
+
+        if (!$this->authService->verifyEmail($user, $hash)) {
+            return errorResponse(
+                message: 'Invalid verification link or hash.',
+            );
+        }
+        return successResponse(
+            data: $user,
+            message: 'Email verified successfully',
+
+        );
+    }
+    public function login(LoginSystemUserRequest $request){
+        $dto = LoginDTO::fromRequest($request);
+        $result = $this->authService->login($dto);
+        if(isset($result['error'])){
+            return errorResponse(
+                message: $result['error'],
+                data: null,
+                code: 401,
+            );
+        }
+        return successResponse(
+            message: 'login successfully',
+            data: ['user' => $result['user'], 'token'=>$result['token']],
+        );
+    }
+
+    public function logout(Request $request){
+        $request->user()->token()->revoke();
+        return successResponse(
+            data: null,
+            message: 'logged out successfully',
+        );
+    }
+}

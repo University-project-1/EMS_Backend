@@ -3,6 +3,10 @@
 namespace App\Models;
 
 use App\Enum\SystemUserType;
+use App\Notifications\Auth\ResetApiPassword;
+use App\Notifications\Auth\VerifyApiEmail;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,14 +16,16 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
+use Override;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[Fillable(['name', 'email', 'password', 'type'])]
 #[Hidden(['password'])]
-class SystemUser extends Authenticatable implements HasMedia
+class SystemUser extends Authenticatable implements HasMedia, MustVerifyEmail
 {
-    use HasFactory, InteractsWithMedia, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, InteractsWithMedia, Notifiable, CanResetPassword,  SoftDeletes;
 
     protected function casts(): array
     {
@@ -57,5 +63,15 @@ class SystemUser extends Authenticatable implements HasMedia
     public function resolvedReports(): HasMany
     {
         return $this->hasMany(Report::class, 'resolved_by');
+    }
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyApiEmail);
+    }
+    #[Override]
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetApiPassword($token));
     }
 }

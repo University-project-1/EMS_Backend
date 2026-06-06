@@ -1,11 +1,24 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\ResetPasswordController;
+use App\Http\Controllers\Api\V1\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('exhibitor')->middleware('auth:web')->group(function(){
-    // store fcm token 
+Route::prefix('exhibitor')->middleware('auth:system')->group(function(){
+    // store fcm token
     Route::post('fcm/register-token', [FCMController::class, 'store'])
         ->defaults('guardName', 'web')->name('exhibitor.fcm.store');
+});
+
+Route::prefix('exhibitor')->group(function(){
+    Route::post('login', [AuthController::class, 'login'])->name('login');
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('register', [AuthController::class, 'register']);
+    Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
+
+    Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink']);
+    Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
+    Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('auth:system');
 });
