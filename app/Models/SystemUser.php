@@ -21,7 +21,7 @@ use Override;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-#[Fillable(['name', 'email', 'password', 'type'])]
+#[Fillable(['name', 'email', 'password', 'type', 'google_id'])]
 #[Hidden(['password'])]
 class SystemUser extends Authenticatable implements HasMedia, MustVerifyEmail
 {

@@ -9,12 +9,15 @@ use App\Http\Requests\SystemAuth\LoginSystemUserRequest;
 use App\Http\Requests\SystemAuth\RegisterExhibitorRequest;
 use App\Models\SystemUser;
 use App\Services\Exhibitor\AuthService;
+use App\Services\Exhibitor\GoogleAuthService;
+use Exception;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
     public function __construct(
         private readonly AuthService $authService,
+        private readonly GoogleAuthService $googleAuthService,
     ){}
 
     public function register(RegisterExhibitorRequest $request){
@@ -64,5 +67,29 @@ class AuthController extends Controller
             data: null,
             message: 'logged out successfully',
         );
+    }
+
+    public function googleAuth(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string', // The Access Token from Frontend Google SDK
+        ]);
+
+        try {
+            $result = $this->googleAuthService->handleGoogleProviderToken($request->token);
+
+            return successResponse(
+                message: 'Authenticated successfully.',
+                data: [
+                    'user' => $result['user'],
+                    'access_token' => $result['token']
+                ]
+            );
+
+        } catch (Exception $e) {
+            return errorResponse(
+                message: $e->getMessage(),
+            );
+        }
     }
 }

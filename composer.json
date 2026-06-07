@@ -13,6 +13,7 @@
         "dedoc/scramble": "^0.13.24",
         "laravel/framework": "^13.7",
         "laravel/passport": "^13.0",
+        "laravel/socialite": "^5.27",
         "laravel/tinker": "^3.0",
         "spatie/laravel-medialibrary": "^11.22",
         "spatie/laravel-query-builder": "*"

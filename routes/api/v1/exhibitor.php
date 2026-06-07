@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\V1\Admin\ResetPasswordController;
 use App\Http\Controllers\Api\V1\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('exhibitor')->middleware('auth:system')->group(function(){
@@ -16,6 +15,7 @@ Route::prefix('exhibitor')->group(function(){
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('register', [AuthController::class, 'register']);
+    Route::post('/auth/system/google', [AuthController::class, 'googleAuth']);
     Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
 
     Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink']);
