@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Mobile\Auth;
+namespace App\Http\Requests\Shared;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class VerifyRegisterRequest extends FormRequest
+class UpdatePasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,8 @@ class VerifyRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => ['required'],
-            'otp' => ['required', 'string', 'digits:6'],
-            'registration_id' => ['required', 'string']
+            'current_password' => 'required',
+            'new_password' => 'required|string|min:8|confirmed',
         ];
     }
 }
