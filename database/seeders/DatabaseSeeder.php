@@ -21,8 +21,20 @@ class DatabaseSeeder extends Seeder
             '--name' => 'System Access Client',
             '--provider' => 'system_users',
         ]);
-
         $this->command->info('Personal access client "System Access Client" created successfully.');
+        
+        User::create([
+            'first_name' => 'Wasem',
+            'last_name' => 'Alhariri',
+            'email' => 'wasemalhariri13@gmail.com',
+            'phone' => '+963994801706',
+            'location' => 'Syria,Damascus',
+            'job' => 'Software Engineer',
+            'gender' => 'male',
+            'password' => '12345678',
+            'birthday' => '2006-02-06',
+        ]);
+
     }
 
 }
