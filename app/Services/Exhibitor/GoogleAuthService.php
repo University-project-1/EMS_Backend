@@ -7,6 +7,9 @@ use App\Models\SystemUser;
 use Laravel\Socialite\Facades\Socialite;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class GoogleAuthService
 {
@@ -22,7 +25,6 @@ class GoogleAuthService
         }
 
         return DB::transaction(function () use ($googleUser) {
-            // Find user by email
             $user = SystemUser::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
@@ -34,7 +36,6 @@ class GoogleAuthService
                     ]);
                 }
             } else {
-                // Create brand new Exhibitor
                 $user = SystemUser::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
@@ -42,6 +43,9 @@ class GoogleAuthService
                     'email_verified_at' => now(),
                 ]);
 
+                if ($googleUser->getAvatar()) {
+                    $this->downloadAndAssignAvatar($user, $googleUser->getAvatar());
+                }
             }
 
             $tokenResult = $user->createToken('exhibitor_token');
@@ -51,5 +55,18 @@ class GoogleAuthService
                 'token' => $tokenResult->accessToken,
             ];
         });
+    }
+    private function downloadAndAssignAvatar($user, $avatarUrl)
+    {
+        try {
+            $response = Http::get($avatarUrl);
+            if ($response->successful()) {
+                $physicalPath = storage_path('app/temp_google_avatar_' . $user->id . '.jpg');
+                File::put($physicalPath, $response->body());
+                $user->addMedia($physicalPath)->toMediaCollection('avatar');
+            }
+        } catch (Exception $e) {
+            Log::error('Google Avatar Error: ' . $e->getMessage());
+        }
     }
 }

@@ -17,9 +17,9 @@ class RegisterDTO
 
     public static function fromRequest(RegisterExhibitorRequest $request){
         return new self(
-            name: $request->validated('name'),
-            email: $request->validated('email'),
-            password: $request->validated('password'),
+            name: $request->validated['name'],
+            email: $request->validated['email'],
+            password: $request->validated['password'],
         );
     }
 }

@@ -74,4 +74,9 @@ class SystemUser extends Authenticatable implements HasMedia, MustVerifyEmail
     {
         $this->notify(new ResetApiPassword($token));
     }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')->singleFile();
+    }
 }

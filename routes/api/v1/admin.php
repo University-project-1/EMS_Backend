@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Admin\AuthController;
 use App\Http\Controllers\Api\V1\Admin\ResetPasswordController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
+use App\Http\Controllers\SystemUser\Shared\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,4 +19,9 @@ Route::prefix('admin')->group(function(){
     Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink']);
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
     Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('auth:system');
+});
+
+Route::middleware('auth:system')->group(function(){
+    Route::get('admin/profile', [ProfileController::class, 'show']);
+    Route::post('admin/profile', [ProfileController::class, 'update']);
 });
