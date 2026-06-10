@@ -13,7 +13,9 @@ use App\Http\Resources\Mobile\UserResource;
 use App\Services\Mobile\OtpService;
 use App\Services\Mobile\ProfileService;
 use App\Services\Shared\PasswordService;
+use Dedoc\Scramble\Attributes\Group;
 
+#[Group('Visitor/Profile')]
 class ProfileController extends Controller
 {
     public function __construct(
