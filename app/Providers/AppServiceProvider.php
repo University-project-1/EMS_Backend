@@ -51,5 +51,23 @@ class AppServiceProvider extends ServiceProvider
                 return errorResponse('Daily or hourly OTP limit reached for this phone number. Try again later.', [], 429);
             });
         });
+
+        RateLimiter::for('profile_update', function (Request $request) {
+            return Limit::perMinute(20)->by($request->user()->id)->response(function () {
+                return errorResponse('Too many profile update requests. Please wait a moment.', [], 429);
+            });
+        });
+
+        RateLimiter::for('password_update', function (Request $request) {
+            return Limit::perMinute(3)->by($request->user()->id)->response(function () {
+                return errorResponse('Too many password change attempts. Account actions slowed down for security.', [], 429);
+            });
+        });
+
+        RateLimiter::for('phone_update_request', function (Request $request) {
+            return Limit::perHour(2)->by($request->user()->id)->response(function () {
+                return errorResponse('You can only request a phone number update twice per hour.', [], 429);
+            });
+        });
     }
 }

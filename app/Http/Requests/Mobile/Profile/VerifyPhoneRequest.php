@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Mobile\Auth;
+namespace App\Http\Requests\Mobile\Profile;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class VerifyRegisterRequest extends FormRequest
+class VerifyPhoneRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,9 @@ class VerifyRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => ['required'],
+            'phone' => ['required', 'string', 'max:20', 'unique:users,phone,' . $this->user()->id],
+            'registration_id' => ['required', 'string'],
             'otp' => ['required', 'string', 'digits:6'],
-            'registration_id' => ['required', 'string']
         ];
     }
 }

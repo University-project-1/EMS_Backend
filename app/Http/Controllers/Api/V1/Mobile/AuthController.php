@@ -12,7 +12,6 @@ use App\Http\Requests\Mobile\Auth\VerifyForgotPasswordOtpRequest;
 use App\Http\Requests\Mobile\Auth\VerifyRegisterRequest;
 use App\Http\Resources\Mobile\UserResource;
 use App\Services\Mobile\AuthService;
-use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -47,24 +46,6 @@ class AuthController extends Controller
         $this->auth->logout();
 
         return successResponse();
-    }
-
-    public function forgotPassword(ForgotPasswordRequest $request)
-    {
-        $resetId = $this->auth->forgotPassword($request->validated());
-        return successResponse(['reset_id' => $resetId]);
-    }
-
-    public function verifyForgotPasswordOtp(VerifyForgotPasswordOtpRequest $request)
-    {
-        $tempToken = $this->auth->verifyForgotPasswordOtp($request->validated());
-        return successResponse(['reset_token' => $tempToken]);
-    }
-
-    public function resetPassword(ResetPasswordRequest $request)
-    {
-        $this->auth->resetPassword($request->validated());
-        return successResponse(['message' => 'Password has been reset successfully.']);
     }
 
     public function resendOtp(ResendOtpRequest $request)
