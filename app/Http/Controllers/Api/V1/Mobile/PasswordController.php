@@ -6,7 +6,9 @@ use App\Http\Requests\Mobile\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Mobile\Auth\ResetPasswordRequest;
 use App\Http\Requests\Mobile\Auth\VerifyForgotPasswordOtpRequest;
 use App\Services\Mobile\AuthService;
+use Dedoc\Scramble\Attributes\Group;
 
+#[Group('Visitor/ForgotPassword')]
 class PasswordController extends Controller
 {
     public function __construct(protected AuthService $auth) {}

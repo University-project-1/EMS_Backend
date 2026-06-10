@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\Api\V1\Mobile;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Mobile\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Mobile\Auth\LoginRequest;
 use App\Http\Requests\Mobile\Auth\RegisterRequest;
 use App\Http\Requests\Mobile\Auth\ResendOtpRequest;
-use App\Http\Requests\Mobile\Auth\ResetPasswordRequest;
-use App\Http\Requests\Mobile\Auth\VerifyForgotPasswordOtpRequest;
 use App\Http\Requests\Mobile\Auth\VerifyRegisterRequest;
 use App\Http\Resources\Mobile\UserResource;
 use App\Services\Mobile\AuthService;
+use Dedoc\Scramble\Attributes\Group;
 
+#[Group('Visitor/Auth')]
 class AuthController extends Controller
 {
     public function __construct(protected AuthService $auth) {}
