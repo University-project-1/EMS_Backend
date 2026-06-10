@@ -36,11 +36,11 @@ return [
          * API version.
          */
         'version' => env('API_VERSION', '0.0.1'),
-    
+
         /*
          * Description rendered on the home page of the API documentation (`/docs/api`).
          */
-        'description' => 'The official API documentation for the Enterprise Management System.',
+        'description' => 'The official API documentation for the Exhibition Management System.',
     ],
 
     /*
@@ -166,6 +166,6 @@ return [
      *     ],
      * ],
      */
-    // 'security_strategy' => \Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy::class,
-    'security_strategy' => null,
+    'security_strategy' => \Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy::class,
+    // 'security_strategy' => null,
 ];

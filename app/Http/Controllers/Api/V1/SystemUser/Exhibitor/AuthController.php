@@ -10,9 +10,10 @@ use App\Http\Requests\SystemUser\Shared\LoginSystemUserRequest;
 use App\Models\SystemUser;
 use App\Services\SystemUser\Exhibitor\AuthService;
 use App\Services\SystemUser\Exhibitor\GoogleAuthService;
+use Dedoc\Scramble\Attributes\Group;
 use Exception;
 use Illuminate\Http\Request;
-
+#[Group('SystemUser/Exhibitor/Auth')]
 class AuthController extends Controller
 {
     public function __construct(
@@ -20,6 +21,9 @@ class AuthController extends Controller
         private readonly GoogleAuthService $googleAuthService,
     ){}
 
+    /**
+     * register
+     */
     public function register(RegisterExhibitorRequest $request){
         $dto = RegisterDTO::fromRequest($request->validated());
         $result = $this->authService->register($dto);
@@ -30,7 +34,12 @@ class AuthController extends Controller
         );
     }
 
-    public function verify(Request $request, $id, $hash)
+    /**
+     * verify
+     * @param mixed $id
+     * @param mixed $hash
+     */
+    public function verify(string $id, string  $hash)
     {
         $user = SystemUser::findOrFail($id);
 
@@ -45,6 +54,9 @@ class AuthController extends Controller
 
         );
     }
+    /**
+     * login
+     */
     public function login(LoginSystemUserRequest $request){
         $dto = LoginDTO::fromRequest($request->validated());
         $result = $this->authService->login($dto);
@@ -61,6 +73,9 @@ class AuthController extends Controller
         );
     }
 
+    /**
+     * logout
+     */
     public function logout(Request $request){
         $request->user()->token()->revoke();
         return successResponse(
@@ -69,6 +84,9 @@ class AuthController extends Controller
         );
     }
 
+    /**
+     * googleAuth
+     */
     public function googleAuth(Request $request)
     {
         $request->validate([

@@ -8,14 +8,19 @@ use App\Http\Requests\SystemUser\Admin\ForgotPasswordRequest;
 use App\Http\Requests\SystemUser\Admin\ResetPasswordRequest;
 use App\Http\Requests\SystemUser\Shared\ChangePasswordRequest;
 use App\Services\Shared\ResetSystemUserPasswordService;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Support\Facades\Password;
 
+#[Group('SystemUser/resset_password')]
 class ResetPasswordController extends Controller
 {
     public function __construct(
         private readonly ResetSystemUserPasswordService $resetPasswordService,
     ){}
 
+    /**
+     * change password
+     */
     public function changePassword(ChangePasswordRequest $request){
         $this->resetPasswordService->changePassword($request->user(), $request->validated(['new_password']));
         return successResponse(
@@ -25,6 +30,9 @@ class ResetPasswordController extends Controller
         );
     }
 
+    /**
+     * send reset link
+     */
     public function sendResetLink(ForgotPasswordRequest $request)
     {
         $status = $this->resetPasswordService->sendResetLink($request->validated());
@@ -41,6 +49,9 @@ class ResetPasswordController extends Controller
         );
     }
 
+    /**
+     * reset password
+     */
     public function resetPassword(ResetPasswordRequest $request)
     {
         $status = $this->resetPasswordService->resetPassword($request->validated());
@@ -51,7 +62,6 @@ class ResetPasswordController extends Controller
                 message: __($status),
             );
         }
-
         return successResponse(
             data: null,
             message: __($status),

@@ -8,14 +8,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Shared\UpdateProfileRequest;
 use App\Http\Resources\SystemUser\Shared\ProfileResource;
 use App\Services\SystemUser\Shared\ProfileService;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\Request;
 
+#[Group('SystemUser/Profile')]
 class ProfileController extends Controller
 {
     public function __construct(
         private readonly ProfileService $profileService
     ) {}
 
+    /**
+     * show
+     */
     public function show(Request $request)
     {
         $user = $request->user()->load('media');
@@ -26,6 +31,9 @@ class ProfileController extends Controller
         );
     }
 
+    /**
+     * update
+     */
     public function update(UpdateProfileRequest $request)
     {
         $user = $request->user();

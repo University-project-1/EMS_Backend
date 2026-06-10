@@ -3,31 +3,106 @@
     "info": {
         "title": "EMS API Documentation",
         "version": "0.0.1",
-        "description": "The official API documentation for the Enterprise Management System."
+        "description": "The official API documentation for the Exhibition Management System."
     },
     "servers": [
         {
-            "url": "http://localhost/api"
+            "url": "http:\/\/127.0.0.1:8000\/api"
+        }
+    ],
+    "tags": [
+        {
+            "name": "SystemUser\/Admin\/Auth"
+        },
+        {
+            "name": "SystemUser\/resset_password"
+        },
+        {
+            "name": "SystemUser\/Profile"
+        },
+        {
+            "name": "SystemUser\/Exhibitor\/Auth"
         }
     ],
     "security": [
         {
             "http": []
+        },
+        {
+            "http": []
         }
     ],
     "paths": {
-        "/v1/exhibitor/login": {
+        "\/v1\/admin\/login": {
+            "post": {
+                "operationId": "v1.systemUser.admin.auth.login",
+                "summary": "login",
+                "tags": [
+                    "SystemUser\/Admin\/Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/LoginSystemUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/admin\/logout": {
+            "post": {
+                "operationId": "v1.systemUser.admin.auth.logout",
+                "summary": "logout",
+                "tags": [
+                    "SystemUser\/Admin\/Auth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/exhibitor\/login": {
             "post": {
                 "operationId": "v1.systemUser.exhibitor.auth.login",
+                "summary": "login",
                 "tags": [
-                    "Auth"
+                    "SystemUser\/Exhibitor\/Auth"
                 ],
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/LoginSystemUserRequest"
+                                "$ref": "#\/components\/schemas\/LoginSystemUserRequest"
                             }
                         }
                     }
@@ -36,7 +111,7 @@
                     "200": {
                         "description": "",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "type": "object"
                                 }
@@ -44,43 +119,47 @@
                         }
                     },
                     "422": {
-                        "$ref": "#/components/responses/ValidationException"
+                        "$ref": "#\/components\/responses\/ValidationException"
                     }
-                }
+                },
+                "security": []
             }
         },
-        "/v1/exhibitor/logout": {
+        "\/v1\/exhibitor\/logout": {
             "post": {
                 "operationId": "v1.systemUser.exhibitor.auth.logout",
+                "summary": "logout",
                 "tags": [
-                    "Auth"
+                    "SystemUser\/Exhibitor\/Auth"
                 ],
                 "responses": {
                     "200": {
                         "description": "",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "type": "object"
                                 }
                             }
                         }
                     }
-                }
+                },
+                "security": []
             }
         },
-        "/v1/exhibitor/register": {
+        "\/v1\/exhibitor\/register": {
             "post": {
                 "operationId": "auth.register",
+                "summary": "register",
                 "tags": [
-                    "Auth"
+                    "SystemUser\/Exhibitor\/Auth"
                 ],
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RegisterExhibitorRequest"
+                                "$ref": "#\/components\/schemas\/RegisterExhibitorRequest"
                             }
                         }
                     }
@@ -89,7 +168,7 @@
                     "200": {
                         "description": "",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "type": "object"
                                 }
@@ -97,21 +176,23 @@
                         }
                     },
                     "422": {
-                        "$ref": "#/components/responses/ValidationException"
+                        "$ref": "#\/components\/responses\/ValidationException"
                     }
-                }
+                },
+                "security": []
             }
         },
-        "/v1/exhibitor/auth/system/google": {
+        "\/v1\/exhibitor\/auth\/system\/google": {
             "post": {
                 "operationId": "auth.googleAuth",
+                "summary": "googleAuth",
                 "tags": [
-                    "Auth"
+                    "SystemUser\/Exhibitor\/Auth"
                 ],
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
                                 "type": "object",
                                 "properties": {
@@ -130,7 +211,7 @@
                     "200": {
                         "description": "",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "type": "object"
                                 }
@@ -138,16 +219,18 @@
                         }
                     },
                     "422": {
-                        "$ref": "#/components/responses/ValidationException"
+                        "$ref": "#\/components\/responses\/ValidationException"
                     }
-                }
+                },
+                "security": []
             }
         },
-        "/v1/exhibitor/email/verify/{id}/{hash}": {
+        "\/v1\/exhibitor\/email\/verify\/{id}\/{hash}": {
             "get": {
                 "operationId": "verification.verify",
+                "summary": "verify",
                 "tags": [
-                    "Auth"
+                    "SystemUser\/Exhibitor\/Auth"
                 ],
                 "parameters": [
                     {
@@ -171,17 +254,360 @@
                     "200": {
                         "description": "",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "type": "object"
                                 }
                             }
                         }
                     }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/admin\/profile": {
+            "get": {
+                "operationId": "v1.systemUser.shared.profile.show_0",
+                "summary": "show",
+                "tags": [
+                    "SystemUser\/Profile"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "v1.systemUser.shared.profile.update_1",
+                "summary": "update",
+                "tags": [
+                    "SystemUser\/Profile"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart\/form-data": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/UpdateProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#\/components\/responses\/AuthorizationException"
+                    }
                 }
             }
         },
-        "/v1/admin/fcm/register-token": {
+        "\/v1\/exhibitor\/profile": {
+            "get": {
+                "operationId": "v1.systemUser.shared.profile.show_0",
+                "summary": "show",
+                "tags": [
+                    "SystemUser\/Profile"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "v1.systemUser.shared.profile.update_1",
+                "summary": "update",
+                "tags": [
+                    "SystemUser\/Profile"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart\/form-data": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/UpdateProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#\/components\/responses\/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "\/v1\/admin\/forgot-password": {
+            "post": {
+                "operationId": "v1.systemUser.shared.resetPassword.sendResetLink_0",
+                "summary": "send reset link",
+                "tags": [
+                    "SystemUser\/resset_password"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/ForgotPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/admin\/reset-password": {
+            "post": {
+                "operationId": "v1.systemUser.shared.resetPassword.resetPassword_0",
+                "summary": "reset password",
+                "tags": [
+                    "SystemUser\/resset_password"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/ResetPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/admin\/change-password": {
+            "post": {
+                "operationId": "v1.systemUser.shared.resetPassword.changePassword_0",
+                "summary": "change password",
+                "tags": [
+                    "SystemUser\/resset_password"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/ChangePasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#\/components\/responses\/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "\/v1\/exhibitor\/forgot-password": {
+            "post": {
+                "operationId": "v1.systemUser.shared.resetPassword.sendResetLink_0",
+                "summary": "send reset link",
+                "tags": [
+                    "SystemUser\/resset_password"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/ForgotPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/exhibitor\/reset-password": {
+            "post": {
+                "operationId": "v1.systemUser.shared.resetPassword.resetPassword_0",
+                "summary": "reset password",
+                "tags": [
+                    "SystemUser\/resset_password"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/ResetPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/exhibitor\/change-password": {
+            "post": {
+                "operationId": "v1.systemUser.shared.resetPassword.changePassword_0",
+                "summary": "change password",
+                "tags": [
+                    "SystemUser\/resset_password"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/ChangePasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#\/components\/responses\/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "\/v1\/admin\/fcm\/register-token": {
             "post": {
                 "operationId": "admin.fcm.store",
                 "tags": [
@@ -190,9 +616,9 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/StoreFCMRequest"
+                                "$ref": "#\/components\/schemas\/StoreFCMRequest"
                             }
                         }
                     }
@@ -201,7 +627,7 @@
                     "200": {
                         "description": "",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "type": "object"
                                 }
@@ -209,15 +635,15 @@
                         }
                     },
                     "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
+                        "$ref": "#\/components\/responses\/AuthenticationException"
                     },
                     "422": {
-                        "$ref": "#/components/responses/ValidationException"
+                        "$ref": "#\/components\/responses\/ValidationException"
                     }
                 }
             }
         },
-        "/v1/exhibitor/fcm/register-token": {
+        "\/v1\/exhibitor\/fcm\/register-token": {
             "post": {
                 "operationId": "exhibitor.fcm.store",
                 "tags": [
@@ -226,9 +652,9 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/StoreFCMRequest"
+                                "$ref": "#\/components\/schemas\/StoreFCMRequest"
                             }
                         }
                     }
@@ -237,7 +663,7 @@
                     "200": {
                         "description": "",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "type": "object"
                                 }
@@ -245,15 +671,15 @@
                         }
                     },
                     "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
+                        "$ref": "#\/components\/responses\/AuthenticationException"
                     },
                     "422": {
-                        "$ref": "#/components/responses/ValidationException"
+                        "$ref": "#\/components\/responses\/ValidationException"
                     }
                 }
             }
         },
-        "/v1/visitor/fcm/register-token": {
+        "\/v1\/visitor\/fcm\/register-token": {
             "post": {
                 "operationId": "visitor.fcm.store",
                 "tags": [
@@ -262,9 +688,9 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "application\/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/StoreFCMRequest"
+                                "$ref": "#\/components\/schemas\/StoreFCMRequest"
                             }
                         }
                     }
@@ -273,7 +699,7 @@
                     "200": {
                         "description": "",
                         "content": {
-                            "application/json": {
+                            "application\/json": {
                                 "schema": {
                                     "type": "object"
                                 }
@@ -281,393 +707,10 @@
                         }
                     },
                     "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
+                        "$ref": "#\/components\/responses\/AuthenticationException"
                     },
                     "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    }
-                }
-            }
-        },
-        "/v1/admin/profile": {
-            "get": {
-                "operationId": "v1.systemUser.shared.profile.show_0",
-                "tags": [
-                    "Profile"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            },
-            "post": {
-                "operationId": "v1.systemUser.shared.profile.update_1",
-                "tags": [
-                    "Profile"
-                ],
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateProfileRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    }
-                }
-            }
-        },
-        "/v1/exhibitor/profile": {
-            "get": {
-                "operationId": "v1.systemUser.shared.profile.show_0",
-                "tags": [
-                    "Profile"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            },
-            "post": {
-                "operationId": "v1.systemUser.shared.profile.update_1",
-                "tags": [
-                    "Profile"
-                ],
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateProfileRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    }
-                }
-            }
-        },
-        "/v1/admin/forgot-password": {
-            "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.sendResetLink_0",
-                "tags": [
-                    "ResetPassword"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ForgotPasswordRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    }
-                }
-            }
-        },
-        "/v1/admin/reset-password": {
-            "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.resetPassword_0",
-                "tags": [
-                    "ResetPassword"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ResetPasswordRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    }
-                }
-            }
-        },
-        "/v1/admin/change-password": {
-            "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.changePassword_0",
-                "tags": [
-                    "ResetPassword"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ChangePasswordRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    }
-                }
-            }
-        },
-        "/v1/exhibitor/forgot-password": {
-            "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.sendResetLink_0",
-                "tags": [
-                    "ResetPassword"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ForgotPasswordRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    }
-                }
-            }
-        },
-        "/v1/exhibitor/reset-password": {
-            "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.resetPassword_0",
-                "tags": [
-                    "ResetPassword"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ResetPasswordRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    }
-                }
-            }
-        },
-        "/v1/exhibitor/change-password": {
-            "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.changePassword_0",
-                "tags": [
-                    "ResetPassword"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ChangePasswordRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    }
-                }
-            }
-        },
-        "/v1/admin/login": {
-            "post": {
-                "operationId": "v1.systemUser.admin.auth.login",
-                "tags": [
-                    "System/Admin/Auth",
-                    "Auth"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/LoginSystemUserRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    }
-                }
-            }
-        },
-        "/v1/admin/logout": {
-            "post": {
-                "operationId": "v1.systemUser.admin.auth.logout",
-                "tags": [
-                    "System/Admin/Auth",
-                    "Auth"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "$ref": "#\/components\/responses\/ValidationException"
                     }
                 }
             }
@@ -802,7 +845,7 @@
                         "type": "string"
                     },
                     "device_type": {
-                        "$ref": "#/components/schemas/DeviceType"
+                        "$ref": "#\/components\/schemas\/DeviceType"
                     }
                 },
                 "required": [
@@ -824,7 +867,7 @@
                             "null"
                         ],
                         "format": "binary",
-                        "contentMediaType": "application/octet-stream",
+                        "contentMediaType": "application\/octet-stream",
                         "maxLength": 4096
                     }
                 },
@@ -835,7 +878,7 @@
             "AuthenticationException": {
                 "description": "Unauthenticated",
                 "content": {
-                    "application/json": {
+                    "application\/json": {
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -854,7 +897,7 @@
             "ValidationException": {
                 "description": "Validation error",
                 "content": {
-                    "application/json": {
+                    "application\/json": {
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -884,7 +927,7 @@
             "AuthorizationException": {
                 "description": "Authorization error",
                 "content": {
-                    "application/json": {
+                    "application\/json": {
                         "schema": {
                             "type": "object",
                             "properties": {
