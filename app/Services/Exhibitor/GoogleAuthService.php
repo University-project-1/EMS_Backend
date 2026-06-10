@@ -44,7 +44,13 @@ class GoogleAuthService
                 ]);
 
                 if ($googleUser->getAvatar()) {
-                    $this->downloadAndAssignAvatar($user, $googleUser->getAvatar());
+                    try {
+                        $user->addMediaFromUrl($googleUser->getAvatar())
+                             ->usingFileName('google_avatar_' . $user->id . '.jpg')
+                             ->toMediaCollection('avatar');
+                    } catch (Exception $e) {
+                        Log::error('Google Avatar Error: ' . $e->getMessage());
+                    }
                 }
             }
 

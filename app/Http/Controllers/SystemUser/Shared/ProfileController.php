@@ -28,7 +28,7 @@ class ProfileController extends Controller
     public function update(UpdateProfileRequest $request)
     {
         $user = $request->user();
-        $dto = ProfileUpdateDTO::fromRequest($request->validated());
+        $dto = ProfileUpdateDTO::fromRequest($request);
 
         $updatedUser = $this->profileService->update($user, $dto);
 
