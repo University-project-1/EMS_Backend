@@ -2,8 +2,6 @@
 
 namespace App\DTOs\SystemUser;
 
-use App\Http\Requests\SystemAuth\LoginSystemUserRequest;
-
 class LoginDTO
 {
     /**
@@ -14,10 +12,10 @@ class LoginDTO
         public readonly string $password,
     ){}
 
-    public static function fromRequest(LoginSystemUserRequest $request){
+    public static function fromRequest(array $data){
         return new self(
-            email: $request->validated('email'),
-            password: $request->validated('password'),
+            email: $data['email'],
+            password: $data['password'],
         );
     }
 }

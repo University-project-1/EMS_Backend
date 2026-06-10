@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin;
+namespace App\Services\SystemUser\Admin;
 
 use App\DTOs\SystemUser\LoginDTO;
 use App\Models\SystemUser;

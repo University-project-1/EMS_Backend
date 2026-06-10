@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\SystemUser\Shared;
+namespace App\Http\Controllers\Api\V1\SystemUser\Shared;
+
 
 use App\DTOs\SystemUser\ProfileUpdateDTO;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\System\Shared\UpdateProfileRequest;
+use App\Http\Requests\SystemUser\Shared\UpdateProfileRequest;
 use App\Http\Resources\SystemUser\Shared\ProfileResource;
 use App\Services\SystemUser\Shared\ProfileService;
 use Illuminate\Http\Request;
@@ -28,7 +29,7 @@ class ProfileController extends Controller
     public function update(UpdateProfileRequest $request)
     {
         $user = $request->user();
-        $dto = ProfileUpdateDTO::fromRequest($request);
+        $dto = ProfileUpdateDTO::fromRequest($request->validated());
 
         $updatedUser = $this->profileService->update($user, $dto);
 

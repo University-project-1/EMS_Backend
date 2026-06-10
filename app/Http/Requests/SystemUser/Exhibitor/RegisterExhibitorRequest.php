@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\SystemAuth;
+namespace App\Http\Requests\SystemUser\Exhibitor;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;

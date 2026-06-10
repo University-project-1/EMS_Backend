@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Exhibitor;
+namespace App\Http\Controllers\Api\V1\SystemUser\Exhibitor;
 
 use App\DTOs\SystemUser\LoginDTO;
 use App\DTOs\SystemUser\RegisterDTO;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SystemAuth\LoginSystemUserRequest;
-use App\Http\Requests\SystemAuth\RegisterExhibitorRequest;
+use App\Http\Requests\SystemUser\Exhibitor\RegisterExhibitorRequest;
+use App\Http\Requests\SystemUser\Shared\LoginSystemUserRequest;
 use App\Models\SystemUser;
-use App\Services\Exhibitor\AuthService;
-use App\Services\Exhibitor\GoogleAuthService;
+use App\Services\SystemUser\Exhibitor\AuthService;
+use App\Services\SystemUser\Exhibitor\GoogleAuthService;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -21,7 +21,7 @@ class AuthController extends Controller
     ){}
 
     public function register(RegisterExhibitorRequest $request){
-        $dto = RegisterDTO::fromRequest($request);
+        $dto = RegisterDTO::fromRequest($request->validated());
         $result = $this->authService->register($dto);
         return successResponse(
             data: ['user'  => $result['user'], 'token' => $result['token']],
@@ -46,7 +46,7 @@ class AuthController extends Controller
         );
     }
     public function login(LoginSystemUserRequest $request){
-        $dto = LoginDTO::fromRequest($request);
+        $dto = LoginDTO::fromRequest($request->validated());
         $result = $this->authService->login($dto);
         if(isset($result['error'])){
             return errorResponse(

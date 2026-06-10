@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Exhibitor;
+namespace App\Services\SystemUser\Exhibitor;
 
 use App\DTOs\SystemUser\LoginDTO;
 use App\DTOs\SystemUser\RegisterDTO;

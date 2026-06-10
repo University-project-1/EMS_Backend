@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Admin;
+namespace App\Http\Controllers\Api\V1\SystemUser\Shared;
+
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\ForgotPasswordRequest;
-use App\Http\Requests\Admin\ResetPasswordRequest;
-use App\Http\Requests\Shared\ChangePasswordRequest;
+use App\Http\Requests\SystemUser\Admin\ForgotPasswordRequest;
+use App\Http\Requests\SystemUser\Admin\ResetPasswordRequest;
+use App\Http\Requests\SystemUser\Shared\ChangePasswordRequest;
 use App\Services\Shared\ResetSystemUserPasswordService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 
 class ResetPasswordController extends Controller

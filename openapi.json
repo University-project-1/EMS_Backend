@@ -18,7 +18,7 @@
     "paths": {
         "\/v1\/admin\/login": {
             "post": {
-                "operationId": "v1.admin.auth.login",
+                "operationId": "v1.systemUser.admin.auth.login",
                 "tags": [
                     "Auth"
                 ],
@@ -51,7 +51,7 @@
         },
         "\/v1\/admin\/logout": {
             "post": {
-                "operationId": "v1.admin.auth.logout",
+                "operationId": "v1.systemUser.admin.auth.logout",
                 "tags": [
                     "Auth"
                 ],
@@ -71,7 +71,7 @@
         },
         "\/v1\/exhibitor\/login": {
             "post": {
-                "operationId": "v1.exhibitor.auth.login",
+                "operationId": "v1.systemUser.exhibitor.auth.login",
                 "tags": [
                     "Auth"
                 ],
@@ -104,7 +104,7 @@
         },
         "\/v1\/exhibitor\/logout": {
             "post": {
-                "operationId": "v1.exhibitor.auth.logout",
+                "operationId": "v1.systemUser.exhibitor.auth.logout",
                 "tags": [
                     "Auth"
                 ],
@@ -342,9 +342,127 @@
                 }
             }
         },
+        "\/v1\/admin\/profile": {
+            "get": {
+                "operationId": "v1.systemUser.shared.profile.show_0",
+                "tags": [
+                    "Profile"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "v1.systemUser.shared.profile.update_1",
+                "tags": [
+                    "Profile"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart\/form-data": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/UpdateProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#\/components\/responses\/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "\/v1\/exhibitor\/profile": {
+            "get": {
+                "operationId": "v1.systemUser.shared.profile.show_0",
+                "tags": [
+                    "Profile"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "v1.systemUser.shared.profile.update_1",
+                "tags": [
+                    "Profile"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart\/form-data": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/UpdateProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#\/components\/responses\/AuthorizationException"
+                    }
+                }
+            }
+        },
         "\/v1\/admin\/forgot-password": {
             "post": {
-                "operationId": "v1.admin.resetPassword.sendResetLink_0",
+                "operationId": "v1.systemUser.shared.resetPassword.sendResetLink_0",
                 "tags": [
                     "ResetPassword"
                 ],
@@ -377,7 +495,7 @@
         },
         "\/v1\/admin\/reset-password": {
             "post": {
-                "operationId": "v1.admin.resetPassword.resetPassword_0",
+                "operationId": "v1.systemUser.shared.resetPassword.resetPassword_0",
                 "tags": [
                     "ResetPassword"
                 ],
@@ -410,7 +528,7 @@
         },
         "\/v1\/admin\/change-password": {
             "post": {
-                "operationId": "v1.admin.resetPassword.changePassword_0",
+                "operationId": "v1.systemUser.shared.resetPassword.changePassword_0",
                 "tags": [
                     "ResetPassword"
                 ],
@@ -449,7 +567,7 @@
         },
         "\/v1\/exhibitor\/forgot-password": {
             "post": {
-                "operationId": "v1.admin.resetPassword.sendResetLink_0",
+                "operationId": "v1.systemUser.shared.resetPassword.sendResetLink_0",
                 "tags": [
                     "ResetPassword"
                 ],
@@ -482,7 +600,7 @@
         },
         "\/v1\/exhibitor\/reset-password": {
             "post": {
-                "operationId": "v1.admin.resetPassword.resetPassword_0",
+                "operationId": "v1.systemUser.shared.resetPassword.resetPassword_0",
                 "tags": [
                     "ResetPassword"
                 ],
@@ -515,7 +633,7 @@
         },
         "\/v1\/exhibitor\/change-password": {
             "post": {
-                "operationId": "v1.admin.resetPassword.changePassword_0",
+                "operationId": "v1.systemUser.shared.resetPassword.changePassword_0",
                 "tags": [
                     "ResetPassword"
                 ],
@@ -629,7 +747,7 @@
                 "properties": {
                     "name": {
                         "type": "string",
-                        "maxLength": 50
+                        "maxLength": 255
                     },
                     "email": {
                         "type": "string",
@@ -690,6 +808,25 @@
                     "device_type"
                 ],
                 "title": "StoreFCMRequest"
+            },
+            "UpdateProfileRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "avatar": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "binary",
+                        "contentMediaType": "application\/octet-stream",
+                        "maxLength": 4096
+                    }
+                },
+                "title": "UpdateProfileRequest"
             }
         },
         "responses": {

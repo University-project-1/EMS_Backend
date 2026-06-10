@@ -2,7 +2,6 @@
 
 namespace App\DTOs\SystemUser;
 
-use App\Http\Requests\System\Shared\UpdateProfileRequest;
 use App\Trait\HasFilteredArray;
 use Illuminate\Http\UploadedFile;
 
@@ -17,10 +16,10 @@ class ProfileUpdateDTO
         public readonly ?UploadedFile $avatar,
     ){}
 
-    public static function fromRequest(UpdateProfileRequest $request){
+    public static function fromRequest(array $data){
         return new self(
-            name: $request->validated('name') ?? null,
-            avatar: $request->validated('avatar') ?? null,
+            name: $data['name'] ?? null,
+            avatar: $data['avatar'] ?? null,
         );
     }
 }

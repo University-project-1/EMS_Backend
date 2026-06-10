@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Requests\System\Shared;
+namespace App\Http\Requests\SystemUser\Shared;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateProfileRequest extends FormRequest
+class LoginSystemUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return true;
     }
 
     /**
@@ -23,8 +23,8 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'string', 'max:255'],
-            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:4096'],
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'password' => ['required', 'string'],
         ];
     }
 }

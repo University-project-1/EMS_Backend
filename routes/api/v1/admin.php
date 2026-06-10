@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\V1\Admin\AuthController;
-use App\Http\Controllers\Api\V1\Admin\ResetPasswordController;
+
 use App\Http\Controllers\Api\V1\Shared\FCMController;
-use App\Http\Controllers\SystemUser\Shared\ProfileController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\AuthController;
+use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
+use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

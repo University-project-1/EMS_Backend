@@ -2,8 +2,6 @@
 
 namespace App\DTOs\SystemUser;
 
-use App\Http\Requests\SystemAuth\RegisterExhibitorRequest;
-
 class RegisterDTO
 {
     /**
@@ -15,11 +13,11 @@ class RegisterDTO
         public readonly string $password,
     ){}
 
-    public static function fromRequest(RegisterExhibitorRequest $request){
+    public static function fromRequest(array $data){
         return new self(
-            name: $request->validated['name'],
-            email: $request->validated['email'],
-            password: $request->validated['password'],
+            name: $data['name'],
+            email: $data['email'],
+            password: $data['password'],
         );
     }
 }
