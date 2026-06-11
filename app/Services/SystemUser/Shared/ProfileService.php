@@ -13,10 +13,9 @@ class ProfileService
     public function __construct(){}
 
     public function update(SystemUser $user, ProfileUpdateDTO $dto){
-        $updatedData = $dto->toFilteredArray();
-        if (!empty($updatedData)) {
-            $user->update($updatedData);
-        }
+        $updatedData = $dto->updatePayload();
+        $user->update($updatedData);
+
         if ($dto->avatar !== null) {
             $user->addMedia($dto->avatar)->toMediaCollection('avatar');
         }

@@ -22,6 +22,15 @@
         },
         {
             "name": "SystemUser\/Exhibitor\/Auth"
+        },
+        {
+            "name": "Visitor\/Auth"
+        },
+        {
+            "name": "Visitor\/ForgotPassword"
+        },
+        {
+            "name": "Visitor\/Profile"
         }
     ],
     "security": [
@@ -149,7 +158,7 @@
         },
         "\/v1\/exhibitor\/register": {
             "post": {
-                "operationId": "auth.register",
+                "operationId": "v1.systemUser.exhibitor.auth.register",
                 "summary": "register",
                 "tags": [
                     "SystemUser\/Exhibitor\/Auth"
@@ -607,6 +616,433 @@
                 }
             }
         },
+        "\/v1\/auth\/register": {
+            "post": {
+                "operationId": "v1.mobile.auth.register",
+                "tags": [
+                    "Visitor\/Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/RegisterRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/auth\/login": {
+            "post": {
+                "operationId": "v1.mobile.auth.login",
+                "tags": [
+                    "Visitor\/Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/auth\/register\/verify": {
+            "post": {
+                "operationId": "auth.verifyRegister",
+                "tags": [
+                    "Visitor\/Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/VerifyRegisterRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/auth\/otp\/resend": {
+            "post": {
+                "operationId": "auth.resendOtp",
+                "tags": [
+                    "Visitor\/Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/ResendOtpRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/visitor\/auth\/logout": {
+            "delete": {
+                "operationId": "v1.mobile.auth.logout",
+                "tags": [
+                    "Visitor\/Auth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "\/v1\/auth\/password\/forgot": {
+            "post": {
+                "operationId": "password.forgotPassword",
+                "tags": [
+                    "Visitor\/ForgotPassword"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/App.Http.Requests.Mobile.Auth.ForgotPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/auth\/password\/otp\/verify": {
+            "post": {
+                "operationId": "password.verifyForgotPasswordOtp",
+                "tags": [
+                    "Visitor\/ForgotPassword"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/VerifyForgotPasswordOtpRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/auth\/password\/reset": {
+            "post": {
+                "operationId": "password.resetPassword",
+                "tags": [
+                    "Visitor\/ForgotPassword"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/App.Http.Requests.Mobile.Auth.ResetPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "\/v1\/visitor\/profile": {
+            "get": {
+                "operationId": "v1.mobile.profile.show",
+                "tags": [
+                    "Visitor\/Profile"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "\/v1\/visitor\/profile\/update": {
+            "post": {
+                "operationId": "profile.updateProfile",
+                "tags": [
+                    "Visitor\/Profile"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart\/form-data": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/App.Http.Requests.Mobile.Profile.UpdateProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                }
+            }
+        },
+        "\/v1\/visitor\/profile\/password\/update": {
+            "put": {
+                "operationId": "profile.updatePassword",
+                "tags": [
+                    "Visitor\/Profile"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/UpdatePasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                }
+            }
+        },
+        "\/v1\/visitor\/profile\/phone\/request": {
+            "post": {
+                "operationId": "profile.requestPhoneUpdate",
+                "tags": [
+                    "Visitor\/Profile"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/UpdatePhoneRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                }
+            }
+        },
+        "\/v1\/visitor\/profile\/phone\/verify": {
+            "post": {
+                "operationId": "profile.verifyPhoneUpdate",
+                "tags": [
+                    "Visitor\/Profile"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "$ref": "#\/components\/schemas\/VerifyPhoneRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#\/components\/responses\/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#\/components\/responses\/ValidationException"
+                    }
+                }
+            }
+        },
         "\/v1\/admin\/fcm\/register-token": {
             "post": {
                 "operationId": "admin.fcm.store",
@@ -724,6 +1160,73 @@
             }
         },
         "schemas": {
+            "App.Http.Requests.Mobile.Auth.ForgotPasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "phone": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "phone"
+                ],
+                "title": "App.Http.Requests.Mobile.Auth.ForgotPasswordRequest"
+            },
+            "App.Http.Requests.Mobile.Auth.ResetPasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "reset_token": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 8
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "minLength": 8
+                    }
+                },
+                "required": [
+                    "reset_token",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "App.Http.Requests.Mobile.Auth.ResetPasswordRequest"
+            },
+            "App.Http.Requests.Mobile.Profile.UpdateProfileRequest": {
+                "type": "object",
+                "properties": {
+                    "first_name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "job": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "location": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "avatar": {
+                        "type": "string",
+                        "format": "binary",
+                        "contentMediaType": "application\/octet-stream",
+                        "maxLength": 4096
+                    }
+                },
+                "title": "App.Http.Requests.Mobile.Profile.UpdateProfileRequest"
+            },
             "ChangePasswordRequest": {
                 "type": "object",
                 "properties": {
@@ -769,6 +1272,30 @@
                 ],
                 "title": "ForgotPasswordRequest"
             },
+            "Gender": {
+                "type": "string",
+                "enum": [
+                    "male",
+                    "female"
+                ],
+                "title": "Gender"
+            },
+            "LoginRequest": {
+                "type": "object",
+                "properties": {
+                    "phone": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "phone",
+                    "password"
+                ],
+                "title": "LoginRequest"
+            },
             "LoginSystemUserRequest": {
                 "type": "object",
                 "properties": {
@@ -810,6 +1337,76 @@
                     "password"
                 ],
                 "title": "RegisterExhibitorRequest"
+            },
+            "RegisterRequest": {
+                "type": "object",
+                "properties": {
+                    "first_name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 8
+                    },
+                    "job": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "location": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "birthday": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "gender": {
+                        "$ref": "#\/components\/schemas\/Gender"
+                    }
+                },
+                "required": [
+                    "first_name",
+                    "last_name",
+                    "email",
+                    "phone",
+                    "password",
+                    "job",
+                    "location",
+                    "birthday",
+                    "gender"
+                ],
+                "title": "RegisterRequest"
+            },
+            "ResendOtpRequest": {
+                "type": "object",
+                "properties": {
+                    "phone": {
+                        "type": "string"
+                    },
+                    "session_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                "required": [
+                    "phone",
+                    "session_id"
+                ],
+                "title": "ResendOtpRequest"
             },
             "ResetPasswordRequest": {
                 "type": "object",
@@ -854,6 +1451,41 @@
                 ],
                 "title": "StoreFCMRequest"
             },
+            "UpdatePasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "current_password": {
+                        "type": "string"
+                    },
+                    "new_password": {
+                        "type": "string",
+                        "minLength": 8
+                    },
+                    "new_password_confirmation": {
+                        "type": "string",
+                        "minLength": 8
+                    }
+                },
+                "required": [
+                    "current_password",
+                    "new_password",
+                    "new_password_confirmation"
+                ],
+                "title": "UpdatePasswordRequest"
+            },
+            "UpdatePhoneRequest": {
+                "type": "object",
+                "properties": {
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 20
+                    }
+                },
+                "required": [
+                    "phone"
+                ],
+                "title": "UpdatePhoneRequest"
+            },
             "UpdateProfileRequest": {
                 "type": "object",
                 "properties": {
@@ -872,6 +1504,68 @@
                     }
                 },
                 "title": "UpdateProfileRequest"
+            },
+            "VerifyForgotPasswordOtpRequest": {
+                "type": "object",
+                "properties": {
+                    "phone": {
+                        "type": "string"
+                    },
+                    "reset_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "otp": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "phone",
+                    "reset_id",
+                    "otp"
+                ],
+                "title": "VerifyForgotPasswordOtpRequest"
+            },
+            "VerifyPhoneRequest": {
+                "type": "object",
+                "properties": {
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "registration_id": {
+                        "type": "string"
+                    },
+                    "otp": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "phone",
+                    "registration_id",
+                    "otp"
+                ],
+                "title": "VerifyPhoneRequest"
+            },
+            "VerifyRegisterRequest": {
+                "type": "object",
+                "properties": {
+                    "phone": {
+                        "type": "string"
+                    },
+                    "otp": {
+                        "type": "string"
+                    },
+                    "registration_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "phone",
+                    "otp",
+                    "registration_id"
+                ],
+                "title": "VerifyRegisterRequest"
             }
         },
         "responses": {

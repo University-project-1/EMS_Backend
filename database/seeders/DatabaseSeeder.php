@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SystemUser;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -22,7 +23,14 @@ class DatabaseSeeder extends Seeder
             '--provider' => 'system_users',
         ]);
         $this->command->info('Personal access client "System Access Client" created successfully.');
-        
+
+        Artisan::call('passport:client', [
+            '--personal' => true,
+            '--name' => 'System Access Client',
+            '--provider' => 'users',
+        ]);
+        $this->command->info('Personal access client "User Access Client" created successfully.');
+
         User::create([
             'first_name' => 'Wasem',
             'last_name' => 'Alhariri',
@@ -35,6 +43,11 @@ class DatabaseSeeder extends Seeder
             'birthday' => '2006-02-06',
         ]);
 
+        SystemUser::create([
+            'name' => 'Fawzy',
+            'email' => 'fawzy.sukkar2005@gmail.com',
+            'password' => '12345678',
+        ]);
     }
 
 }

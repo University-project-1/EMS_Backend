@@ -10,19 +10,15 @@ class ProfileService
 {
     public function __construct(protected OtpService $otp) {}
 
-     public function updateProfile(Authenticatable $user, UpdateProfileDTO $data, string $collectionName = 'user-avatars')
+    public function updateProfile(Authenticatable $user, UpdateProfileDTO $dto, string $collectionName = 'user-avatars')
     {
-            $user->update([
-                'first_name' => $data->first_name ?? $user->first_name,
-                'last_name' => $data->last_name ?? $user->last_name,
-                'email' => $data->email ?? $user->email,
-                'job' => $data->job ?? $user->job,
-                'location' => $data->location ?? $user->location,
-            ]);
+        $updatedData = $dto->updatePayload();
 
-        if (isset($data->avatar)) {
+        $user->update($updatedData);
+
+        if (isset($dto->avatar)) {
             $user->clearMediaCollection($collectionName);
-            $user->addMedia($data->avatar)->toMediaCollection($collectionName);
+            $user->addMedia($dto->avatar)->toMediaCollection($collectionName);
         }
     }
 

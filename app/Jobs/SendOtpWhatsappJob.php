@@ -38,7 +38,7 @@ class SendOtpWhatsappJob implements ShouldQueue
             Http::post("https://api.ultramsg.com/{$instanceId}/messages/chat", [
                 'token' => $token,
                 'to' => $this->phone,
-                'body' => "your otp is {$this->otp} please do not shar with any one."
+                'body' => "your otp is {$this->otp} please do not share with any one."
             ]);
 
         if ($response->failed()) {

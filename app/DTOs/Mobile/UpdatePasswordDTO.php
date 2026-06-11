@@ -2,7 +2,6 @@
 
 namespace App\DTOs\Mobile;
 
-use App\Http\Requests\Shared\UpdatePasswordRequest;
 
 class UpdatePasswordDTO
 {
@@ -10,15 +9,15 @@ class UpdatePasswordDTO
      * Create a new class instance.
      */
     public function __construct(
-        public string $current_password,
-        public string $new_password,
+        public readonly string $current_password,
+        public readonly string $new_password,
     ){}
 
-    public static function fromRequest(UpdatePasswordRequest $request): self
+    public static function fromRequest(array $data): self
     {
         return new self(
-            current_password: $request->validated('current_password'),
-            new_password: $request->validated('new_password'),
+            current_password: $data['current_password'],
+            new_password: $data['new_password'],
         );
     }
 }

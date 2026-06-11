@@ -31,14 +31,14 @@ class ProfileController extends Controller
 
     public function updateProfile(UpdateProfileRequest $request)
     {
-        $this->profile->updateProfile(auth('mobile')->user(), UpdateProfileDTO::fromRequest($request), 'user-avatars');
+        $this->profile->updateProfile(auth('mobile')->user(), UpdateProfileDTO::fromRequest($request->validated()), 'user-avatars');
 
         return successResponse(UserResource::make(auth('mobile')->user()->refresh()));
     }
 
     public function updatePassword(UpdatePasswordRequest $request)
     {
-        $this->password->updatePassword($request->user(), UpdatePasswordDTO::fromRequest($request));
+        $this->password->updatePassword($request->user(), UpdatePasswordDTO::fromRequest($request->validated()));
 
         return successResponse();
     }

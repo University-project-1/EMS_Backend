@@ -2,24 +2,28 @@
 
 namespace App\DTOs\SystemUser;
 
-use App\Trait\HasFilteredArray;
+use App\DTOs\PatchDTO;
+use App\Trait\HasUpdatePayload;
 use Illuminate\Http\UploadedFile;
 
-class ProfileUpdateDTO
+class ProfileUpdateDTO extends PatchDTO
 {
-    use HasFilteredArray;
-    /**
-     * Create a new class instance.
-     */
+    use HasUpdatePayload;
+
     public function __construct(
         public readonly ?string $name,
         public readonly ?UploadedFile $avatar,
-    ){}
+        array $payload,
+    ) {
+        parent::__construct($payload);
+    }
 
-    public static function fromRequest(array $data){
+    public static function fromRequest(array $data): self
+    {
         return new self(
             name: $data['name'] ?? null,
             avatar: $data['avatar'] ?? null,
+            payload: $data,
         );
     }
 }
