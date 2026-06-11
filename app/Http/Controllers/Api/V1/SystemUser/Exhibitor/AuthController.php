@@ -39,19 +39,15 @@ class AuthController extends Controller
      * @param mixed $id
      * @param mixed $hash
      */
-    public function verify(string $id, string  $hash)
+    public function verify(string $id, string $hash)
     {
         $user = SystemUser::findOrFail($id);
 
-        if (!$this->authService->verifyEmail($user, $hash)) {
-            return errorResponse(
-                message: 'Invalid verification link or hash.',
-            );
-        }
+        $this->authService->verifyEmail($user, $hash);
+
         return successResponse(
             data: $user,
-            message: 'Email verified successfully',
-
+            message: 'Email verified successfully'
         );
     }
     /**
@@ -60,13 +56,7 @@ class AuthController extends Controller
     public function login(LoginSystemUserRequest $request){
         $dto = LoginDTO::fromRequest($request->validated());
         $result = $this->authService->login($dto);
-        if(isset($result['error'])){
-            return errorResponse(
-                message: $result['error'],
-                data: null,
-                code: 401,
-            );
-        }
+
         return successResponse(
             message: 'login successfully',
             data: ['user' => $result['user'], 'token'=>$result['token']],

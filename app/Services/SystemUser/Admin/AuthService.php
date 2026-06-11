@@ -4,6 +4,7 @@ namespace App\Services\SystemUser\Admin;
 
 use App\DTOs\SystemUser\LoginDTO;
 use App\Models\SystemUser;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Hash;
 
 class AuthService
@@ -16,10 +17,10 @@ class AuthService
     public function login(LoginDTO $dto){
         $exhibitor = SystemUser::where('email', $dto->email)->first();
         if(!$exhibitor || !Hash::check($dto->password, $exhibitor->password)){
-            return ['error'=>'no match', 'statusCode'=>401];
+            throw new AuthenticationException();
         }
         $token = $exhibitor->createToken('exhibitor_token')->accessToken;
-        return ['success', 'token'=>$token, 'user' => $exhibitor];
+        return ['token'=>$token, 'user' => $exhibitor];
     }
 
 }

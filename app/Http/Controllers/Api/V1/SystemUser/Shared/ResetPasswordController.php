@@ -7,11 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Admin\ForgotPasswordRequest;
 use App\Http\Requests\SystemUser\Admin\ResetPasswordRequest;
 use App\Http\Requests\SystemUser\Shared\ChangePasswordRequest;
-use App\Services\Shared\ResetSystemUserPasswordService;
+use App\Services\SystemUser\Shared\ResetSystemUserPasswordService;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Support\Facades\Password;
 
-#[Group('SystemUser/resset_password')]
+#[Group('SystemUser/reset_password')]
 class ResetPasswordController extends Controller
 {
     public function __construct(
@@ -33,39 +33,35 @@ class ResetPasswordController extends Controller
     /**
      * send reset link
      */
-    public function sendResetLink(ForgotPasswordRequest $request)
-    {
-        $status = $this->resetPasswordService->sendResetLink($request->validated());
+    public function sendResetLink(ForgotPasswordRequest $request){
+        $status = $this->resetPasswordService
+            ->sendResetLink($request->validated());
 
-        if ($status === Password::RESET_LINK_SENT) {
-            return successResponse(
-                data: null,
-                message:  __($status),
+        if ($status !== Password::RESET_LINK_SENT) {
+            return errorResponse(
+                message: __($status)
             );
         }
 
-        return errorResponse(
-            message: __($status),
+        return successResponse(
+            message: __($status)
         );
     }
 
     /**
      * reset password
      */
-    public function resetPassword(ResetPasswordRequest $request)
-    {
+    public function resetPassword(ResetPasswordRequest $request){
         $status = $this->resetPasswordService->resetPassword($request->validated());
 
-        if (!$status === Password::PASSWORD_RESET) {
+        if ($status !== Password::PASSWORD_RESET) {
             return errorResponse(
-                data: null,
-                message: __($status),
+                message: __($status)
             );
         }
         return successResponse(
-            data: null,
-            message: __($status),
+            message: __($status)
         );
     }
-}
+    }
 

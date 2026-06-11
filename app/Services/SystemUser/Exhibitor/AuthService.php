@@ -5,6 +5,7 @@ namespace App\Services\SystemUser\Exhibitor;
 use App\DTOs\SystemUser\LoginDTO;
 use App\DTOs\SystemUser\RegisterDTO;
 use App\Models\SystemUser;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,7 @@ class AuthService
     public function login(LoginDTO $dto){
         $exhibitor = SystemUser::where('email', $dto->email)->first();
         if(!Hash::check($dto->password, $exhibitor->password)){
-            return ['error' => 'no match'];
+            throw new AuthenticationException();
         }
         $token = $exhibitor->createToken('exhibitor_token')->accessToken;
         return ['success', 'token'=>$token, 'user' => $exhibitor];
@@ -45,22 +46,19 @@ class AuthService
         });
     }
 
-    public function verifyEmail(SystemUser $user, string $hash): bool
-    {
-        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            return false;
-        }
-
-        if ($user->hasVerifiedEmail()) {
-            return true;
-        }
-
-        if ($user->markEmailAsVerified()) {
-            event(new Verified($user));
-            return true;
-        }
-
-        return false;
+    public function verifyEmail(SystemUser $user, string $hash)
+{
+    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        return errorResponse('invalid verification link or hash.');
     }
+
+    if ($user->hasVerifiedEmail()) {
+        return;
+    }
+
+    $user->markEmailAsVerified();
+
+    event(new Verified($user));
+}
 
 }

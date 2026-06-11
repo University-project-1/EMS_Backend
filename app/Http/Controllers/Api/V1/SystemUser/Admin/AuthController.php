@@ -21,13 +21,7 @@ class AuthController extends Controller
     public function login(LoginSystemUserRequest $request){
         $dto = LoginDTO::fromRequest($request->validated());
         $result = $this->authService->login($dto);
-        if(isset($result['error'])){
-            return errorResponse(
-                message: $result['error'],
-                data: null,
-                code: $result['statusCode'],
-            );
-        }
+        
         return successResponse(
             message: 'login successfully',
             data: ['user' => $result['user'], 'token'=>$result['token']],
