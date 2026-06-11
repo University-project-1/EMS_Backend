@@ -32,7 +32,7 @@ jobs:
         run: php artisan key:generate
 
       - name: Export Scramble OpenAPI spec
-        run: php artisan scramble:export > api.json
+        run: php artisan scramble:export --path=api.json
 
       - name: Commit and Push changes
         uses: stefanzweifel/git-auto-commit-action@v5
