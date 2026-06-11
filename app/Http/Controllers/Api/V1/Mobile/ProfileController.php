@@ -24,11 +24,17 @@ class ProfileController extends Controller
         protected OtpService $otp
     ) {}
 
+    /**
+     * show
+     */
     public function show()
     {
         return successResponse(UserResource::make(auth('mobile')->user()));
     }
 
+    /**
+     * updateProfile
+     */
     public function updateProfile(UpdateProfileRequest $request)
     {
         $this->profile->updateProfile(auth('mobile')->user(), UpdateProfileDTO::fromRequest($request->validated()), 'user-avatars');
@@ -36,6 +42,10 @@ class ProfileController extends Controller
         return successResponse(UserResource::make(auth('mobile')->user()->refresh()));
     }
 
+
+    /**
+     * updatePassword
+     */
     public function updatePassword(UpdatePasswordRequest $request)
     {
         $this->password->updatePassword($request->user(), UpdatePasswordDTO::fromRequest($request->validated()));
@@ -43,6 +53,9 @@ class ProfileController extends Controller
         return successResponse();
     }
 
+    /**
+     * requestPhoneUpdate
+     */
     public function requestPhoneUpdate(UpdatePhoneRequest $request)
     {
         $registrationId = $this->otp->generateOtp($request->only('phone'), 'phone_update');
@@ -50,6 +63,9 @@ class ProfileController extends Controller
         return successResponse(['registration_id' => $registrationId]);
     }
 
+    /**
+     * verifyPhoneUpdate
+     */
     public function verifyPhoneUpdate(VerifyPhoneRequest $request)
     {
         $this->profile->verifyPhoneUpdate(auth('mobile')->user(), $request->validated());

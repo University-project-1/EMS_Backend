@@ -431,41 +431,6 @@
                 "security": []
             }
         },
-        "\/v1\/admin\/reset-password": {
-            "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.resetPassword_0",
-                "summary": "reset password",
-                "tags": [
-                    "SystemUser\/resset_password"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application\/json": {
-                            "schema": {
-                                "$ref": "#\/components\/schemas\/ResetPasswordRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application\/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "$ref": "#\/components\/responses\/ValidationException"
-                    }
-                },
-                "security": []
-            }
-        },
         "\/v1\/admin\/change-password": {
             "post": {
                 "operationId": "v1.systemUser.shared.resetPassword.changePassword_0",

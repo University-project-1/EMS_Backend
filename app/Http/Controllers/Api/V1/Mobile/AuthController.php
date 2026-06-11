@@ -15,12 +15,18 @@ use Dedoc\Scramble\Attributes\Group;
 class AuthController extends Controller
 {
     public function __construct(protected AuthService $auth) {}
+    /**
+     * register
+     */
     public function register(RegisterRequest $request)
     {
         $registrationId = $this->auth->register($request->validated());
         return successResponse(['registration_id' => $registrationId]);
     }
 
+    /**
+     * verify register
+     */
     public function verifyRegister(VerifyRegisterRequest $request)
     {
         $data = $this->auth->verifyRegister($request->validated());
@@ -30,6 +36,9 @@ class AuthController extends Controller
             'token' => $data['token']
         ]);
     }
+    /**
+     * login
+     */
     public function login(LoginRequest $request)
     {
         $data = $this->auth->login($request->validated());
@@ -40,6 +49,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * logout
+     */
     public function logout()
     {
         $this->auth->logout();
@@ -47,6 +59,9 @@ class AuthController extends Controller
         return successResponse();
     }
 
+    /**
+     * resend otp
+     */
     public function resendOtp(ResendOtpRequest $request)
     {
         $session_id = $this->auth->resendOtp($request->validated());
