@@ -94,9 +94,11 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
-                },
-                "security": []
+                }
             }
         },
         "/v1/exhibitor/login": {
@@ -129,28 +131,6 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
-                    }
-                },
-                "security": []
-            }
-        },
-        "/v1/exhibitor/logout": {
-            "post": {
-                "operationId": "v1.systemUser.exhibitor.auth.logout",
-                "summary": "logout",
-                "tags": [
-                    "SystemUser/Exhibitor/Auth"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
                     }
                 },
                 "security": []
@@ -272,6 +252,30 @@
                     }
                 },
                 "security": []
+            }
+        },
+        "/v1/exhibitor/logout": {
+            "post": {
+                "operationId": "v1.systemUser.exhibitor.auth.logout",
+                "summary": "logout",
+                "tags": [
+                    "SystemUser/Exhibitor/Auth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
             }
         },
         "/v1/admin/profile": {
@@ -1214,7 +1218,10 @@
                         "maxLength": 255
                     },
                     "avatar": {
-                        "type": "string",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
                         "format": "binary",
                         "contentMediaType": "application/octet-stream",
                         "maxLength": 4096
@@ -1530,25 +1537,6 @@
             }
         },
         "responses": {
-            "AuthenticationException": {
-                "description": "Unauthenticated",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "message": {
-                                    "type": "string",
-                                    "description": "Error overview."
-                                }
-                            },
-                            "required": [
-                                "message"
-                            ]
-                        }
-                    }
-                }
-            },
             "ValidationException": {
                 "description": "Validation error",
                 "content": {
@@ -1574,6 +1562,25 @@
                             "required": [
                                 "message",
                                 "errors"
+                            ]
+                        }
+                    }
+                }
+            },
+            "AuthenticationException": {
+                "description": "Unauthenticated",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
                             ]
                         }
                     }
