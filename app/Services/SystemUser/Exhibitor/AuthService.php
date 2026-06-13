@@ -47,18 +47,18 @@ class AuthService
     }
 
     public function verifyEmail(SystemUser $user, string $hash)
-{
-    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-        return errorResponse('invalid verification link or hash.');
+    {
+        if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return errorResponse('invalid verification link or hash.');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return;
+        }
+
+        $user->markEmailAsVerified();
+
+        event(new Verified($user));
     }
-
-    if ($user->hasVerifiedEmail()) {
-        return;
-    }
-
-    $user->markEmailAsVerified();
-
-    event(new Verified($user));
-}
 
 }

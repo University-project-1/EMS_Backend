@@ -4,6 +4,7 @@ namespace App\DTOs\Mobile;
 
 use App\DTOs\PatchDTO;
 use App\Trait\HasUpdatePayload;
+use Illuminate\Http\UploadedFile;
 
 class UpdateProfileDTO extends PatchDTO
 {
@@ -13,7 +14,7 @@ class UpdateProfileDTO extends PatchDTO
         public readonly ?string $last_name,
         public readonly ?string $email,
         public readonly ?string $location,
-        public readonly ?string $avatar,
+        public readonly ?UploadedFile $avatar,
         public readonly ?string $job,
         protected array $payload,
     ) {

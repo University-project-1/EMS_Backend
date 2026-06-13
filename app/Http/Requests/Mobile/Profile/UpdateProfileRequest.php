@@ -28,7 +28,7 @@ class UpdateProfileRequest extends FormRequest
             'email' => ['sometimes', 'email', 'max:255'],
             'job' => ['sometimes', 'string', 'max:255'],
             'location' => ['sometimes', 'string', 'max:255'],
-            'avatar' => 'sometimes|image|mimes:jpeg,png,jpg|max:4096', 
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:4096'],
         ];
     }
 }

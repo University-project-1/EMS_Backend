@@ -4,6 +4,7 @@ namespace App\Services\SystemUser\Shared;
 
 use App\DTOs\SystemUser\ProfileUpdateDTO;
 use App\Models\SystemUser;
+use Illuminate\Http\UploadedFile;
 
 class ProfileService
 {
@@ -16,7 +17,8 @@ class ProfileService
         $updatedData = $dto->updatePayload();
         $user->update($updatedData);
 
-        if ($dto->avatar !== null) {
+        if ($dto->avatar instanceof UploadedFile) {
+            $user->clearMediaCollection('avatar');
             $user->addMedia($dto->avatar)->toMediaCollection('avatar');
         }
 

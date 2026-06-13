@@ -5,6 +5,7 @@ namespace App\Services\Mobile;
 use App\DTOs\Mobile\UpdateProfileDTO;
 use App\Services\Mobile\OtpService;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Http\UploadedFile;
 
 class ProfileService
 {
@@ -16,7 +17,7 @@ class ProfileService
 
         $user->update($updatedData);
 
-        if (isset($dto->avatar)) {
+        if ($dto->avatar instanceof UploadedFile) {
             $user->clearMediaCollection($collectionName);
             $user->addMedia($dto->avatar)->toMediaCollection($collectionName);
         }
