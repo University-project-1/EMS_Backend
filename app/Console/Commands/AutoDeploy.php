@@ -20,6 +20,9 @@ class AutoDeploy extends Command
         exec('git pull origin dev');
         exec('php artisan migrate');
         exec('php artisan optimize:clear');
+
+        $this->info("pulled succeccfully and Backend developers are your uncles");
+
         return self::SUCCESS;
     }
 }
