@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTOs\Mobile;
+namespace App\DTOs\Shared;
 
 
 class UpdatePasswordDTO

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1\SystemUser\Shared;
 
-
+use App\DTOs\Shared\UpdatePasswordDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Shared\UpdatePasswordRequest;
 use App\Http\Requests\SystemUser\Admin\ForgotPasswordRequest;
 use App\Http\Requests\SystemUser\Admin\ResetPasswordRequest;
-use App\Http\Requests\SystemUser\Shared\ChangePasswordRequest;
+use App\Services\Shared\PasswordService;
 use App\Services\SystemUser\Shared\ResetSystemUserPasswordService;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Support\Facades\Password;
@@ -16,13 +17,15 @@ class ResetPasswordController extends Controller
 {
     public function __construct(
         private readonly ResetSystemUserPasswordService $resetPasswordService,
+        private readonly PasswordService $passwordService,
     ){}
 
     /**
      * change password
      */
-    public function changePassword(ChangePasswordRequest $request){
-        $this->resetPasswordService->changePassword($request->user(), $request->validated(['new_password']));
+    public function changePassword(UpdatePasswordRequest $request){
+        $dto = UpdatePasswordDTO::fromRequest($request->validated());
+        $this->passwordService->updatePassword($request->user(), $dto);
         return successResponse(
             data: null,
             message: 'password changed successfully',
@@ -63,5 +66,5 @@ class ResetPasswordController extends Controller
             message: __($status)
         );
     }
-    }
+}
 

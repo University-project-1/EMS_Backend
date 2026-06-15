@@ -2,7 +2,7 @@
 
 namespace App\Services\Shared;
 
-use App\DTOs\Mobile\UpdatePasswordDTO;
+use App\DTOs\Shared\UpdatePasswordDTO;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;

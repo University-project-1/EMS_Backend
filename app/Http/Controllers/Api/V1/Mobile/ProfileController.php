@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1\Mobile;
 
-use App\DTOs\Mobile\UpdatePasswordDTO;
 use App\DTOs\Mobile\UpdateProfileDTO;
+use App\DTOs\Shared\UpdatePasswordDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mobile\Profile\UpdatePhoneRequest;
 use App\Http\Requests\Mobile\Profile\UpdateProfileRequest;
