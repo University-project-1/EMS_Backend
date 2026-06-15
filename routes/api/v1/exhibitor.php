@@ -13,7 +13,7 @@ Route::prefix('exhibitor')->group(function(){
     Route::post('/auth/system/google', [AuthController::class, 'googleAuth']);
     Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
 
-    Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->name('exhibitor.sendResetLink');
+    Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->name('exhibitor.sendResetLink')->middleware('throttle:password_update');
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword'])->name('exhibitor.resetPassword');
     });
 
@@ -22,7 +22,7 @@ Route::prefix('exhibitor')->group(function(){
         Route::post('fcm/register-token', [FCMController::class, 'store'])
         ->defaults('guardName', 'web')->name('exhibitor.fcm.store');
 
-    Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->name('exhibitor.change-password');
+    Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->name('exhibitor.change-password')->middleware('throttle:password_update');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('profile', [ProfileController::class, 'show'])->name('admin.exhibitor.show');

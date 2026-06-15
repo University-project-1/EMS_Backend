@@ -10,4 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('cleanup:unverified')->daily();
 
-Schedule::command('auto-deploy')->everyThreeHours();
+Schedule::command('app:auto-deploy')->everyMinute();

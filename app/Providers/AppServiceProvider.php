@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
         if (! app()->isLocal()) {
             URL::forceScheme('https');
         }
-        
+
         RateLimiter::for('login_register', function (Request $request) {
             return Limit::perMinute(10)->by($request->ip())->response(function () {
                 return errorResponse('Too many login or register attempts. Please try again later.', [], 429);

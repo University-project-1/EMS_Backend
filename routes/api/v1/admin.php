@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function(){
     Route::post('login', [AuthController::class, 'login'])->name('login');
-    Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->name('admin.sendResetLink');
+    Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->name('admin.sendResetLink')->middleware('throttle:password_update');
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword'])->name('admin.resetPassword');
     });
 
@@ -19,7 +19,7 @@ Route::prefix('admin')->group(function(){
         Route::post('fcm/register-token', [FCMController::class, 'store'])
         ->defaults('guardName', 'web')->name('admin.fcm.store');
 
-    Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->name('admin.change-password');
+    Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->name('admin.change-password')->middleware('throttle:password_update');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('profile', [ProfileController::class, 'show'])->name('admin.profile.show');
