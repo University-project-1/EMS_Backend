@@ -280,7 +280,7 @@
         },
         "/v1/admin/profile": {
             "get": {
-                "operationId": "v1.systemUser.shared.profile.show_0",
+                "operationId": "admin.profile.show",
                 "summary": "show",
                 "tags": [
                     "SystemUser/Profile"
@@ -302,7 +302,7 @@
                 }
             },
             "post": {
-                "operationId": "v1.systemUser.shared.profile.update_1",
+                "operationId": "admin.profile.update",
                 "summary": "update",
                 "tags": [
                     "SystemUser/Profile"
@@ -402,7 +402,7 @@
         },
         "/v1/admin/forgot-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.sendResetLink_0",
+                "operationId": "admin.sendResetLink",
                 "summary": "send reset link",
                 "tags": [
                     "SystemUser/reset_password"
@@ -437,7 +437,7 @@
         },
         "/v1/admin/reset-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.resetPassword_0",
+                "operationId": "admin.resetPassword",
                 "summary": "reset password",
                 "tags": [
                     "SystemUser/reset_password"
@@ -472,7 +472,7 @@
         },
         "/v1/admin/change-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.changePassword_0",
+                "operationId": "admin.change-password",
                 "summary": "change password",
                 "tags": [
                     "SystemUser/reset_password"
@@ -482,7 +482,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ChangePasswordRequest"
+                                "$ref": "#/components/schemas/UpdatePasswordRequest"
                             }
                         }
                     }
@@ -503,16 +503,13 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
                     }
                 }
             }
         },
         "/v1/exhibitor/forgot-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.sendResetLink_0",
+                "operationId": "exhibitor.sendResetLink",
                 "summary": "send reset link",
                 "tags": [
                     "SystemUser/reset_password"
@@ -547,7 +544,7 @@
         },
         "/v1/exhibitor/reset-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.resetPassword_0",
+                "operationId": "exhibitor.resetPassword",
                 "summary": "reset password",
                 "tags": [
                     "SystemUser/reset_password"
@@ -582,7 +579,7 @@
         },
         "/v1/exhibitor/change-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.changePassword_0",
+                "operationId": "exhibitor.change-password",
                 "summary": "change password",
                 "tags": [
                     "SystemUser/reset_password"
@@ -592,7 +589,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ChangePasswordRequest"
+                                "$ref": "#/components/schemas/UpdatePasswordRequest"
                             }
                         }
                     }
@@ -613,9 +610,6 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
                     }
                 }
             }
@@ -1228,29 +1222,6 @@
                     }
                 },
                 "title": "App.Http.Requests.Mobile.Profile.UpdateProfileRequest"
-            },
-            "ChangePasswordRequest": {
-                "type": "object",
-                "properties": {
-                    "current_password": {
-                        "type": "string",
-                        "description": "'api' specifies the guard to check the current password against"
-                    },
-                    "new_password": {
-                        "type": "string",
-                        "minLength": 8
-                    },
-                    "new_password_confirmation": {
-                        "type": "string",
-                        "minLength": 8
-                    }
-                },
-                "required": [
-                    "current_password",
-                    "new_password",
-                    "new_password_confirmation"
-                ],
-                "title": "ChangePasswordRequest"
             },
             "DeviceType": {
                 "type": "string",
