@@ -20,10 +20,10 @@ class BoothResource extends JsonResource
             'qr_token' => $this->qr_token,
             'area' => $this->area,
             'price' => $this->price,
-            'svg_is' => $this->svg_is,
+            'svg_id' => $this->svg_id,
 
-            'company_id' => $this->company_id,
-            'hall_id' => $this->hall_id,
+            'hall_id' => $this->whenLoaded('hall', $this->hall_id),
+            'company_id' => $this->whenLoaded('company', $this->company_id),
         ];
     }
 }
