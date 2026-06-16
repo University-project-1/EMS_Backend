@@ -1,33 +1,37 @@
 <?php
 
 namespace App\Http\Controllers\Api\V1\Mobile;
+
+use App\DTOs\Mobile\ResetPasswordDTO;
+use App\DTOs\Mobile\VerifyDTO;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Mobile\Auth\ForgotPasswordRequest;
-use App\Http\Requests\Mobile\Auth\ResetPasswordRequest;
-use App\Http\Requests\Mobile\Auth\VerifyForgotPasswordOtpRequest;
-use App\Services\Mobile\AuthService;
+use App\Http\Requests\Mobile\ResetPassword\ForgotPasswordRequest;
+use App\Http\Requests\Mobile\ResetPassword\ResetPasswordRequest;
+use App\Http\Requests\Mobile\ResetPassword\VerifyForgotPasswordOtpRequest;
+use App\Http\Requests\Mobile\VerifyOtpRequest;
+use App\Services\Mobile\ResetPasswordService;
 use Dedoc\Scramble\Attributes\Group;
 
 #[Group('Visitor/ForgotPassword')]
 class PasswordController extends Controller
 {
-    public function __construct(protected AuthService $auth) {}
+    public function __construct(protected ResetPasswordService $password) {}
 
      /**
       * forgot Password
       */
      public function forgotPassword(ForgotPasswordRequest $request)
     {
-        $resetId = $this->auth->forgotPassword($request->validated());
+        $resetId = $this->password->forgotPassword($request->validated());
         return successResponse(['reset_id' => $resetId]);
     }
 
     /**
      * verify Forgot Password Otp
      */
-    public function verifyForgotPasswordOtp(VerifyForgotPasswordOtpRequest $request)
+    public function verifyForgotPasswordOtp(VerifyOtpRequest $request)
     {
-        $tempToken = $this->auth->verifyForgotPasswordOtp($request->validated());
+        $tempToken = $this->password->verifyForgotPasswordOtp(VerifyDTO::formRequest($request->validated()));
         return successResponse(['reset_token' => $tempToken]);
     }
 
@@ -36,7 +40,7 @@ class PasswordController extends Controller
      */
     public function resetPassword(ResetPasswordRequest $request)
     {
-        $this->auth->resetPassword($request->validated());
+        $this->password->resetPassword(ResetPasswordDTO::formRequest($request->validated()));
         return successResponse(['message' => 'Password has been reset successfully.']);
     }
 }

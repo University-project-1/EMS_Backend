@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api\V1\Mobile;
 
 use App\DTOs\Mobile\UpdateProfileDTO;
+use App\DTOs\Mobile\VerifyDTO;
 use App\DTOs\Shared\UpdatePasswordDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mobile\Profile\UpdatePhoneRequest;
 use App\Http\Requests\Mobile\Profile\UpdateProfileRequest;
 use App\Http\Requests\Mobile\Profile\VerifyPhoneRequest;
+use App\Http\Requests\Mobile\VerifyOtpRequest;
 use App\Http\Requests\Shared\UpdatePasswordRequest;
 use App\Http\Resources\Mobile\UserResource;
 use App\Services\Mobile\OtpService;
@@ -58,7 +60,7 @@ class ProfileController extends Controller
      */
     public function requestPhoneUpdate(UpdatePhoneRequest $request)
     {
-        $registrationId = $this->otp->generateOtp($request->only('phone'), 'phone_update');
+        $registrationId = $this->otp->generateOtp($request->phone, 'phone_update');
 
         return successResponse(['registration_id' => $registrationId]);
     }
@@ -66,9 +68,9 @@ class ProfileController extends Controller
     /**
      * verifyPhoneUpdate
      */
-    public function verifyPhoneUpdate(VerifyPhoneRequest $request)
+    public function verifyPhoneUpdate(VerifyOtpRequest $request)
     {
-        $this->profile->verifyPhoneUpdate(auth('mobile')->user(), $request->validated());
+        $this->profile->verifyPhoneUpdate(auth('mobile')->user(), VerifyDTO::formRequest($request->validated()));
 
         return successResponse(UserResource::make(auth('mobile')->user()->refresh()));
     }

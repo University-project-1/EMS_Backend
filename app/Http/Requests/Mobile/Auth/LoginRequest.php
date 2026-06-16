@@ -4,6 +4,7 @@ namespace App\Http\Requests\Mobile\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Propaganistas\LaravelPhone\Rules\Phone;
 
 class LoginRequest extends FormRequest
 {
@@ -23,7 +24,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => ['required', 'string'],
+            'phone' => ['required', 'string', , new Phone()],
             'password' => ['required', 'string'],
         ];
     }

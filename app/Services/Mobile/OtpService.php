@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Services\Mobile;
+
+use App\DTOs\Mobile\VerifyDTO;
 use App\Jobs\SendOtpWhatsappJob;
 use App\Models\OtpCode;
 use Illuminate\Support\Facades\{Cache, DB, Hash};
@@ -8,13 +10,13 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 class OtpService
 {
+    public function __construct(protected PhoneService $phoneService) {}
+
     const MAX_ATTEMPTS = 3;
     const COOLDOWN_SECONDS = 60;
     const DAILY_LIMIT = 10;
-    public function generateOtp(array $data, string $type)
+    public function generateOtp(string $phone, string $type)
     {
-        $phone = $data['phone'];
-
         // Redis Lock
         return Cache::lock("otp_lock_{$phone}_{$type}", 5)->block(3, function () use ($phone, $type) {
 
@@ -46,12 +48,14 @@ class OtpService
         });
     }
 
-    public function verifyOtp(array $data, string $type)
+    public function verifyOtp(VerifyDTO $data, string $type)
     {
+            $phone = $this->phoneService->normalize($data->phone);
+
             $otpRecord = OtpCode::query()
                 ->lockForUpdate()
-                ->where('phone', $data['phone'])
-                ->where('session_id', $data['registration_id'])
+                ->where('phone', $phone)
+                ->where('session_id', $data->session_id)
                 ->where('type', $type)
                 ->where('is_used', false)
                 ->first();
@@ -63,14 +67,14 @@ class OtpService
                 $otpRecord->update(['is_used' => true]);
                 throw ValidationException::withMessages(['otp' => ['Too many failed attempts. Session blocked.']]);
             }
-            if (!Hash::check($data['otp'], $otpRecord->otp)) {
+            if (!Hash::check($data->otp, $otpRecord->otp)) {
                 $otpRecord->increment('attempts');
                 throw ValidationException::withMessages(['otp' => ['The OTP code is incorrect']]);
             }
             $otpRecord->update(['is_used' => true]);
     }
 
-    private function checkRateLimits($phone, $type)
+    private function checkRateLimits(string $phone, string $type)
     {
         // Cooldown (60s)
         $lastOtp = OtpCode::where('phone', $phone)

@@ -4,6 +4,8 @@ namespace App\Http\Requests\Mobile\Profile;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Propaganistas\LaravelPhone\Rules\Phone;
 
 class UpdatePhoneRequest extends FormRequest
 {
@@ -23,7 +25,14 @@ class UpdatePhoneRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => ['required', 'string','max:20', 'unique:users,phone,' . $this->user()->id],
+            'phone' => ['required', 'string','max:20', Rule::unique('users', 'phone'),new Phone()],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'phone.unique' => 'Invalid phone number.',
         ];
     }
 }

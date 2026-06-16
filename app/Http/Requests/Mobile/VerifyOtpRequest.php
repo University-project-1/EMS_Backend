@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Mobile\Auth;
+namespace App\Http\Requests\Mobile;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Propaganistas\LaravelPhone\Rules\Phone;
 
-class VerifyRegisterRequest extends FormRequest
+class VerifyOtpRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +24,9 @@ class VerifyRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => ['required'],
-            'otp' => ['required', 'string', 'digits:6'],
-            'registration_id' => ['required', 'string']
+            'phone'    => ['required', 'string', new Phone()],
+            'session_id' => ['required', 'string', 'uuid'],
+            'otp'      => ['required', 'string', 'digits:6'],
         ];
     }
 }

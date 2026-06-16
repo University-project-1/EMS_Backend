@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Mobile\Auth;
+namespace App\Http\Requests\Mobile\ResetPassword;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Propaganistas\LaravelPhone\Rules\Phone;
 
-class VerifyForgotPasswordOtpRequest extends FormRequest
+class ForgotPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +24,7 @@ class VerifyForgotPasswordOtpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone'    => ['required', 'string', 'exists:users,phone'],
-            'reset_id' => ['required', 'string', 'uuid'],
-            'otp'      => ['required', 'string', 'digits:6'],
+            'phone' => ['required', 'string', new Phone()],
         ];
     }
 }
