@@ -10,6 +10,7 @@
     "skills": [
         "laravel-best-practices",
         "passport-development",
+        "socialite-development",
         "pest-testing",
         "tailwindcss-development"
     ]

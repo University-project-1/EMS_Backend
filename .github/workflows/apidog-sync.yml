@@ -1,0 +1,41 @@
+name: Auto Generate API Docs
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+permissions:
+  contents: write
+
+jobs:
+  generate-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Copy .env file
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Generate App Key
+        run: php artisan key:generate
+
+      - name: Export Scramble OpenAPI spec
+        run: php artisan scramble:export --path=api.json
+
+      - name: Commit and Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: Auto-generate OpenAPI spec via Scramble"
+          file_pattern: 'api.json'
