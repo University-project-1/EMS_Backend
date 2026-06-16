@@ -1,13 +1,13 @@
 <?php
 
-
+use App\Http\Controllers\Api\v1\Shared\BoothController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('admin')->group(function(){
+Route::prefix('admin')->middleware('type.admin')->group(function(){
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->name('admin.sendResetLink')->middleware('throttle:password_update');
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword'])->name('admin.resetPassword');
@@ -24,4 +24,6 @@ Route::prefix('admin')->group(function(){
 
     Route::get('profile', [ProfileController::class, 'show'])->name('admin.profile.show');
     Route::post('profile', [ProfileController::class, 'update'])->name('admin.profile.update');
+
+    Route::resource('booth', BoothController::class);
 });
