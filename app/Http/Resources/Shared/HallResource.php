@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources\Shared;
 
+use App\Http\Resources\SystemUser\Shared\BoothResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BoothResource extends JsonResource
+class HallResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,13 +18,11 @@ class BoothResource extends JsonResource
         return [
             'id' => $this->id,
             'number' => $this->number,
-            'qr_token' => $this->qr_token,
             'area' => $this->area,
-            'price' => $this->price,
+            'type' => $this->type,
             'svg_id' => $this->svg_id,
 
-            'hall_id' => $this->whenLoaded('hall', $this->hall_id),
-            'company_id' => $this->whenLoaded('company', $this->company_id),
+            'booths' => BoothResource::collection($this->whenLoaded('booths')),
         ];
     }
 }

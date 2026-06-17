@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enum\SystemUserType;
 use App\Models\SystemUser;
 use App\Models\User;
 use App\Models\Company;
@@ -51,11 +52,13 @@ class DatabaseSeeder extends Seeder
             'name' => 'Fawzy',
             'email' => 'fawzy.sukkar2005@gmail.com',
             'password' => '12345678',
-        ]);
+            'type' => SystemUserType::ADMIN,
+            ]);
 
-        SystemUser::create([
-            'name' => 'Elza3eem',
-            'email' => 'abdalrahmansalloum200@gmail.com',
+            SystemUser::create([
+                'name' => 'Elza3eem',
+                'email' => 'abdalrahmansalloum200@gmail.com',
+                'type' => SystemUserType::ADMIN,
             'password' => '12345678',
         ]);
 

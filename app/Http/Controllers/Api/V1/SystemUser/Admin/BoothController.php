@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1\Shared;
+namespace App\Http\Controllers\Api\V1\SystemUser\Admin;
 
 use App\DTOs\SystemUser\BoothUpdateDTO;
 use App\Filter\BookedBoothFilter;
@@ -8,26 +8,32 @@ use App\Filter\MaxFilter;
 use App\Filter\MinFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Admin\UpdateBoothRequest;
-use App\Http\Resources\Shared\BoothResource;
+use App\Http\Resources\SystemUser\Shared\BoothResource;
 use App\Models\Booth;
 use App\Services\SystemUser\Admin\UpdateBoothService;
+use Dedoc\Scramble\Attributes\Group;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
+#[Group('SystemUser/Admin/Booth')]
 class BoothController extends Controller
 {
     public function __construct(
         private readonly UpdateBoothService $updateBoothService,
     ){}
 
+    /**
+     * all
+     */
     public function index(){
         $booths = QueryBuilder::for(Booth::class)
             ->allowedFilters(
                 AllowedFilter::exact('number'),
-                AllowedFilter::exact('area'),
                 AllowedFilter::custom('booked', new BookedBoothFilter()),
                 AllowedFilter::custom('min_price', new MinFilter(), 'price'),
-                AllowedFilter::custom('max_price', new MaxFilter(), 'price')
+                AllowedFilter::custom('max_price', new MaxFilter(), 'price'),
+                AllowedFilter::custom('min_area', new MinFilter(), 'area'),
+                AllowedFilter::custom('max_area', new MaxFilter(), 'area')
             )
             ->allowedIncludes('company', 'hall')
             ->allowedSorts('price', 'area')
@@ -38,6 +44,9 @@ class BoothController extends Controller
         );
     }
 
+    /**
+     * show
+     */
     public function show(Booth $booth){
         $booth->loadMissing(['hall', 'company']);
         return successResponse(
@@ -46,6 +55,9 @@ class BoothController extends Controller
         );
     }
 
+    /**
+     * update
+     */
     public function update(Booth $booth, UpdateBoothRequest $request){
         $dto = BoothUpdateDTO::fromRequest($request->validated());
         $updatedBooth = $this->updateBoothService->update($booth, $dto);

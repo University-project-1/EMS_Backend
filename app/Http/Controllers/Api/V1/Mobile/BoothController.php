@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1\Mobile;
+
+use App\Filter\CompanyNameFilter;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Mobile\BoothResource;
+use App\Models\Booth;
+use Dedoc\Scramble\Attributes\Group;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
+
+#[Group('Visitor/Booth')]
+class BoothController extends Controller
+{
+    /**
+     * all
+     */
+    public function index(){
+        $booths = QueryBuilder::for(Booth::class)
+            ->allowedFilters(
+                AllowedFilter::exact('number'),
+                AllowedFilter::custom('company_name', new CompanyNameFilter()),
+            )
+            ->allowedIncludes('company', 'hall')
+            ->paginate(10);
+        return successResponse(
+            data: BoothResource::collection($booths),
+            message: 'booths returned successfully',
+        );
+    }
+
+    /**
+     * show
+     */
+    public function show(Booth $booth){
+        $booth->loadMissing(['hall', 'company']);
+        return successResponse(
+            data: new BoothResource($booth),
+            message: 'booth returned successfully',
+        );
+    }
+}
+
