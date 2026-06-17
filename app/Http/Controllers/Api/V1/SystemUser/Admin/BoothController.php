@@ -16,7 +16,7 @@ use Dedoc\Scramble\Attributes\QueryParameter;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-#[Group('SystemUser/Admin/Booth')]
+#[Group('SystemUser/Admin/Bootha')]
 class BoothController extends Controller
 {
     public function __construct(

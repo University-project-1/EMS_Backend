@@ -2,7 +2,7 @@
 
 namespace App\Services\SystemUser\Shared;
 
-use App\DTOs\SystemUser\ProfileUpdateDTO;
+use App\DTOs\SystemUser\UpdateProfileDTO;
 use App\Models\SystemUser;
 use Illuminate\Http\UploadedFile;
 
@@ -13,7 +13,7 @@ class ProfileService
      */
     public function __construct(){}
 
-    public function update(SystemUser $user, ProfileUpdateDTO $dto){
+    public function update(SystemUser $user, UpdateProfileDTO $dto){
         $updatedData = $dto->updatePayload();
         $user->update($updatedData);
 

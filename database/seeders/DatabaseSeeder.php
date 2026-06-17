@@ -55,10 +55,17 @@ class DatabaseSeeder extends Seeder
             'type' => SystemUserType::ADMIN,
             ]);
 
-            SystemUser::create([
+        SystemUser::create([
                 'name' => 'Elza3eem',
                 'email' => 'abdalrahmansalloum200@gmail.com',
                 'type' => SystemUserType::ADMIN,
+            'password' => '12345678',
+        ]);
+
+        SystemUser::create([
+                'name' => 'Elcoach',
+                'email' => 'zuheiralhomsi73@gmail.com',
+                'type' => SystemUserType::EXHIBITOR,
             'password' => '12345678',
         ]);
 
