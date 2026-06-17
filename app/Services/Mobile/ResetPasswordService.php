@@ -33,7 +33,7 @@ class ResetPasswordService
 
         if (!$user) {
             throw ValidationException::withMessages([
-                'phone' => ['Invalid credentials']
+                'phone' => [__('auth.invalid_credentials')]
             ]);
         }
 
@@ -55,11 +55,17 @@ class ResetPasswordService
 
         if (!$tokenDataCache) {
             throw ValidationException::withMessages([
-                'token' => ['The password reset token is invalid or has expired.']
+                'token' => [__('auth.invalid_reset_token')]
             ]);
         }
 
-        $user = User::where('phone', $tokenDataCache['phone'])->firstOrFail();
+        $user = User::where('phone', $tokenDataCache['phone'])->first();
+
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'token' => [__('auth.invalid_reset_token')]
+            ]);
+        }
 
         $user->update([
             'password' => Hash::make($data->password)

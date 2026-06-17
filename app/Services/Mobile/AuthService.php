@@ -23,7 +23,7 @@ class AuthService
         $user = User::where('phone', $phone)->orWhere('email', $data->email)->first();
         if ($user) {
             throw ValidationException::withMessages([
-                'phone' => ['invalid registration state']
+                'phone' => [__('auth.invalid_registration_state')]
             ]);
         }
 
@@ -55,7 +55,7 @@ class AuthService
 
             if (!$userDataCache)
                 throw ValidationException::withMessages([
-                    'user' => ['Registration session expired or not found']
+                    'user' => [__('auth.registration_session_expired')]
                 ]);
 
             $exists = User::where('phone', $userDataCache['phone'])
@@ -63,7 +63,7 @@ class AuthService
 
             if ($exists){
                 throw ValidationException::withMessages([
-                    'phone' => ['invalid registration state']
+                    'phone' => [__('auth.invalid_registration_state')]
                 ]);
             }
 
@@ -129,7 +129,7 @@ class AuthService
 
                 if (! $otp) {
                     throw ValidationException::withMessages([
-                        'phone' => ['Invalid credentials'],
+                        'phone' => [__('auth.invalid_credentials')]
                     ]);
                 }
 
@@ -141,7 +141,7 @@ class AuthService
 
                 if (! $latestOtp || $latestOtp->isNot($otp)) {
                     throw ValidationException::withMessages([
-                        'phone' => ['Invalid credentials'],
+                        'phone' => [__('auth.invalid_credentials')]
                     ]);
                 }
 
@@ -174,9 +174,7 @@ class AuthService
         
         if (! $data) {
             throw ValidationException::withMessages([
-                'session_id' => [
-                    'Registration session expired or not found.',
-                ],
+                'session_id' => [__('auth.invalid_registration_state')]
             ]);
         }
 

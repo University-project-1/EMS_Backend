@@ -32,7 +32,7 @@ class UpdatePhoneRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'phone.unique' => 'Invalid phone number.',
+            'phone.unique' => __('profile.phone_already_exists'),
         ];
     }
 }

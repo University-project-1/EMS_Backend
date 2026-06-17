@@ -12,9 +12,9 @@ class OtpService
 {
     public function __construct(protected PhoneService $phoneService) {}
 
-    const MAX_ATTEMPTS = 3;
-    const COOLDOWN_SECONDS = 60;
-    const DAILY_LIMIT = 10;
+    private const MAX_ATTEMPTS = 3;
+    private const COOLDOWN_SECONDS = 60;
+    private const DAILY_LIMIT = 10;
     public function generateOtp(string $phone, string $type)
     {
         // Redis Lock
@@ -61,15 +61,15 @@ class OtpService
                 ->first();
 
             if (!$otpRecord || $otpRecord->expires_at < now())
-                throw ValidationException::withMessages(['otp' => ['Invalid or expired session.']]);
+                throw ValidationException::withMessages(['otp' => [__('auth.invalid_or_expired_session')]]);
 
             if ($otpRecord->attempts >= self::MAX_ATTEMPTS) {
                 $otpRecord->update(['is_used' => true]);
-                throw ValidationException::withMessages(['otp' => ['Too many failed attempts. Session blocked.']]);
+                throw ValidationException::withMessages(['otp' => [__('auth.too_many_failed_attempts')]]);
             }
             if (!Hash::check($data->otp, $otpRecord->otp)) {
                 $otpRecord->increment('attempts');
-                throw ValidationException::withMessages(['otp' => ['The OTP code is incorrect']]);
+                throw ValidationException::withMessages(['otp' => [__('auth.invalid_otp')]]);
             }
             $otpRecord->update(['is_used' => true]);
     }
@@ -84,7 +84,7 @@ class OtpService
 
         if ($lastOtp && $lastOtp->created_at > now()->subSeconds(self::COOLDOWN_SECONDS)) {
             throw ValidationException::withMessages([
-                'otp' => ['Please wait before requesting another OTP']
+                'otp' => [__('auth.otp_cooldown')]
             ]);
         }
 
@@ -96,7 +96,7 @@ class OtpService
 
         if ($count >= self::DAILY_LIMIT) {
             throw ValidationException::withMessages([
-                'otp' => ['Daily OTP limit exceeded']
+                'otp' => [__('auth.otp_daily_limit')]
             ]);
         }
     }
