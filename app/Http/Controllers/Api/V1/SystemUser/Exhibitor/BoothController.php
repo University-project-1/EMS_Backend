@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SystemUser\Shared\BoothResource;
 use App\Models\Booth;
 use Dedoc\Scramble\Attributes\Group;
+use Dedoc\Scramble\Attributes\QueryParameter;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -18,6 +19,14 @@ class BoothController extends Controller
     /**
      * all
      */
+    #[QueryParameter('filter[number]', 'Filter booths by exact booth number', required: false, type: 'string')]
+    #[QueryParameter('filter[booked]', 'Filter booths by booking status', required: false, type: 'boolean')]
+    #[QueryParameter('filter[min_price]', 'Filter booths by minimum price', required: false, type: 'number')]
+    #[QueryParameter('filter[max_price]', 'Filter booths by maximum price', required: false, type: 'number')]
+    #[QueryParameter('filter[min_area]', 'Filter booths by minimum area', required: false, type: 'number')]
+    #[QueryParameter('filter[max_area]', 'Filter booths by maximum area', required: false, type: 'number')]
+    #[QueryParameter('include', 'Include related resources (company, hall)', required: false, type: 'string')]
+    #[QueryParameter('sort', 'Sort results by field (price, area). Prefix with - for descending order', required: false, type: 'string')]
     public function index(){
         $booths = QueryBuilder::for(Booth::class)
             ->allowedFilters(

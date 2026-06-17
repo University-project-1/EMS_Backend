@@ -7,11 +7,19 @@ use App\Filter\MinFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Shared\HallResource;
 use App\Models\Hall;
+use Dedoc\Scramble\Attributes\QueryParameter;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class HallController extends Controller
 {
+    #[QueryParameter('filter[type]', 'Filter halls by exact type', required: false, type: 'string')]
+    #[QueryParameter('filter[number]', 'Filter halls by exact number', required: false, type: 'string')]
+    #[QueryParameter('filter[min_area]', 'Filter halls by minimum area', required: false, type: 'number')]
+    #[QueryParameter('filter[max_area]', 'Filter halls by maximum area', required: false, type: 'number')]
+    #[QueryParameter('include', 'Include related resources (booths)', required: false, type: 'string')]
+    #[QueryParameter('fields', 'Specify fields to return for related resources (e.g., fields[booths]=id,hall_id,number)', required: false, type: 'string')]
+    #[QueryParameter('sort', 'Sort results by field (area). Prefix with - for descending order', required: false, type: 'string')]
     public function index()
     {
         $halls = QueryBuilder::for(Hall::class)

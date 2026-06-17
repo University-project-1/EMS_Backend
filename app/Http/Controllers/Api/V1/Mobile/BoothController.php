@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Mobile\BoothResource;
 use App\Models\Booth;
 use Dedoc\Scramble\Attributes\Group;
+use Dedoc\Scramble\Attributes\QueryParameter;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -16,6 +17,9 @@ class BoothController extends Controller
     /**
      * all
      */
+    #[QueryParameter('filter[number]', 'Filter booths by exact booth number', required: false, type: 'string')]
+    #[QueryParameter('filter[company_name]', 'Filter booths by company name', required: false, type: 'string')]
+    #[QueryParameter('include', 'Include related resources (company, hall)', required: false, type: 'string')]
     public function index(){
         $booths = QueryBuilder::for(Booth::class)
             ->allowedFilters(
