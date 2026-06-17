@@ -30,11 +30,9 @@ class ProfileService
     {
         $phone = $this->phoneService->normalize($data->phone);
 
-        $ifexists = User::where('phone', $phone)->exists();
-        
-        if ($ifexists) {
+        if (User::where('phone', $phone)->exists()) {
             throw ValidationException::withMessages([
-                'phone' => ['Invalid phone number.']
+                'phone' => [__('profile.phone_already_exists')]
             ]);
         }
 

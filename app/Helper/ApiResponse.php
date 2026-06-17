@@ -3,7 +3,7 @@
 use Illuminate\Http\JsonResponse;
 
 if (! function_exists('successResponse')) {
-    function successResponse(mixed $data = null, string $message = 'success', int $code = 200): JsonResponse
+    function successResponse(mixed $data = null, ?string $message = null, int $code = 200): JsonResponse
     {
         return response()->json([
             'status'  => true,
@@ -14,12 +14,12 @@ if (! function_exists('successResponse')) {
 }
 
 if (! function_exists('errorResponse')) {
-    function errorResponse(string $message = 'error', mixed $data = null, int $code = 400): JsonResponse
+    function errorResponse(?string $message = null, mixed $errors = null, int $code = 400): JsonResponse
     {
         return response()->json([
             'status'  => false,
             'message' => $message,
-            'data'    => $data,
+            'errors'    => $errors,
         ], $code);
     }
 }
