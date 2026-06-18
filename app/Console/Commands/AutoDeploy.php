@@ -23,7 +23,7 @@ class AutoDeploy extends Command
             'git reset --hard origin/dev',
             'php artisan optimize:clear',
             'php artisan queue:restart',
-            'php artisan migrate:fresh --seed',
+            'php artisan migrate:fresh --seed --force',
         ];
         Log::info('starting');
         foreach ($commands as $command) {
