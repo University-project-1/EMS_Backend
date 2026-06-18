@@ -6,6 +6,7 @@ use App\Enum\Gender;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
+use Propaganistas\LaravelPhone\Rules\Phone;
 
 class RegisterRequest extends FormRequest
 {
@@ -28,7 +29,7 @@ class RegisterRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
-            'phone' => ['required', 'string', 'max:20'],
+            'phone' => ['required', 'string', 'max:20', new Phone()],
             'password' => ['required', 'string', 'min:8'],
             'job' => ['required', 'string', 'max:255'],
             'location' => ['required', 'string', 'max:255'],

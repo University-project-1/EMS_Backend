@@ -13,7 +13,7 @@ class RegisterDTO
         public readonly string $password,
     ){}
 
-    public static function fromRequest(array $data){
+        public static function fromRequest(array $data){
         return new self(
             name: $data['name'],
             email: $data['email'],

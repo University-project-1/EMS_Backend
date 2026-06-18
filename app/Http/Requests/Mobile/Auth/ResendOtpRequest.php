@@ -4,6 +4,7 @@ namespace App\Http\Requests\Mobile\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Propaganistas\LaravelPhone\Rules\Phone;
 
 class ResendOtpRequest extends FormRequest
 {
@@ -23,8 +24,8 @@ class ResendOtpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => ['required', 'string'],
-            'session_id' => ['required', 'uuid'],
+            'phone' => ['required', 'string', new Phone()],
+            'session_id' => ['required'],
         ];
     }
 }

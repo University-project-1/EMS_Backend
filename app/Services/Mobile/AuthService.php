@@ -2,49 +2,54 @@
 
 namespace App\Services\Mobile;
 
+use App\DTOs\Mobile\LoginDTO;
+use App\DTOs\Mobile\RegisterDTO;
+use App\DTOs\Mobile\ResendOtpDTO;
+use App\DTOs\Mobile\VerifyDTO;
 use App\Models\OtpCode;
 use App\Models\User;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\{Cache, DB, Hash};
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-    public function __construct(protected OtpService $otp) {}
+    public function __construct(protected OtpService $otp, protected PhoneService $phoneService) {}
 
-    public function register(array $data)
+    public function register(RegisterDTO $data)
     {
-        $user = User::where('phone', $data['phone'])->orWhere('email', $data['email'])->first();
+        $phone = $this->phoneService->normalize($data->phone);
+
+        $user = User::where('phone', $phone)->orWhere('email', $data->email)->first();
         if ($user) {
             throw ValidationException::withMessages([
                 'phone' => ['invalid registration state']
             ]);
         }
 
-        $registrationId = $this->otp->generateOtp($data, "registration");
+        $registrationId = $this->otp->generateOtp($phone, "registration");
 
         Cache::put("reg_data_{$registrationId}", [
-            'phone' => $data['phone'],
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'email' => $data['email'],
-            'job' => $data['job'],
-            'location' => $data['location'],
-            'gender' => $data['gender'],
-            'birthday' => $data['birthday'],  
-            'password' => $data['password']
+            'phone' => $phone,
+            'first_name' => $data->first_name,
+            'last_name' => $data->last_name,
+            'email' => $data->email,
+            'job' => $data->job,
+            'location' => $data->location,
+            'gender' => $data->gender->value,
+            'birthday' => $data->birthday->toDateString(),  
+            'password' => $data->password
         ], now()->addMinutes(10));
 
         return $registrationId;
     }
 
-    public function verifyRegister(array $data)
+    public function verifyRegister(VerifyDTO $data)
     {
         return DB::transaction(function () use ($data) {
             $this->otp->verifyOtp($data, "registration");
 
-            $key = "reg_data_{$data['registration_id']}";
+            $key = "reg_data_{$data->session_id}";
 
             $userDataCache = Cache::get($key);
 
@@ -53,8 +58,10 @@ class AuthService
                     'user' => ['Registration session expired or not found']
                 ]);
 
-            $userIsFound = User::where('phone', $userDataCache['phone'])->first();
-            if ($userIsFound) {
+            $exists = User::where('phone', $userDataCache['phone'])
+                ->exists();
+
+            if ($exists){
                 throw ValidationException::withMessages([
                     'phone' => ['invalid registration state']
                 ]);
@@ -81,11 +88,13 @@ class AuthService
         });
     }
 
-    public function login(array $data)
+    public function login(LoginDTO $data)
     {
-        $user = User::where('phone', $data['phone'])->first();
+        $phone = $this->phoneService->normalize($data->phone);
 
-        if (!$user || !Hash::check($data['password'], $user->password))
+        $user = User::where('phone', $phone)->first();
+
+        if (!$user || !Hash::check($data->password, $user->password))
             throw new AuthenticationException();
 
         $token = $user->createToken('api_token')->accessToken;
@@ -105,90 +114,72 @@ class AuthService
         $token->revoke();
     }
 
-    public function forgotPassword(array $data)
+    public function resendOtp(ResendOtpDTO $data): string
     {
-        $userExists = User::where('phone', $data['phone'])->exists();
+        $phone = $this->phoneService->normalize($data->phone);
 
-        if ($userExists) {
-            return $this->otp->generateOtp($data, "password_reset");
-        }
+        return Cache::lock("otp_resend_{$phone}_{$data->session_id}", 5)
+            ->block(3, function () use ($data, $phone) {
 
-        return Str::uuid()->toString();
+                $otp = OtpCode::query()
+                    ->where('session_id', $data->session_id)
+                    ->where('phone', $phone)
+                    ->where('is_used', false)
+                    ->first();
+
+                if (! $otp) {
+                    throw ValidationException::withMessages([
+                        'phone' => ['Invalid credentials'],
+                    ]);
+                }
+
+                $latestOtp = OtpCode::query()
+                    ->where('phone', $phone)
+                    ->where('type', $otp->type)
+                    ->latest('id')
+                    ->first();
+
+                if (! $latestOtp || $latestOtp->isNot($otp)) {
+                    throw ValidationException::withMessages([
+                        'phone' => ['Invalid credentials'],
+                    ]);
+                }
+
+                $registrationData = null;
+
+                if ($otp->type === 'registration') {
+                    $registrationData = $this->transferRegistrationData($otp->session_id);
+                }
+
+                $newSessionId = $this->otp->generateOtp(
+                    $otp->phone,
+                    $otp->type
+                );
+
+                if ($otp->type === 'registration') {
+                    Cache::put(
+                        "reg_data_{$newSessionId}",
+                        $registrationData,
+                        now()->addMinutes(10)
+                    );
+                }
+
+                return $newSessionId;
+            });
     }
 
-    public function verifyForgotPasswordOtp(array $data)
+    private function transferRegistrationData(string $oldSessionId): array
     {
-        $user = User::where('phone', $data['phone'])->first();
-
-        if (!$user) {
+        $data = Cache::get("reg_data_{$oldSessionId}");
+        
+        if (! $data) {
             throw ValidationException::withMessages([
-                'phone' => ['Invalid credentials']
+                'session_id' => [
+                    'Registration session expired or not found.',
+                ],
             ]);
         }
 
-        $data['registration_id'] = $data['reset_id'];
-
-        $this->otp->verifyOtp($data, "password_reset");
-
-        $tempToken = Str::random(60);
-
-        Cache::put("password_reset_token_{$tempToken}", [
-            'phone' => $data['phone']
-        ], now()->addMinutes(10));
-
-        return $tempToken;
-    }
-
-    public function resetPassword(array $data)
-    {
-        $key = "password_reset_token_{$data['reset_token']}";
-        $tokenDataCache = Cache::get($key);
-
-        if (!$tokenDataCache) {
-            throw ValidationException::withMessages([
-                'token' => ['The password reset token is invalid or has expired.']
-            ]);
-        }
-
-        $user = User::where('phone', $tokenDataCache['phone'])->firstOrFail();
-
-        $user->update([
-            'password' => Hash::make($data['password'])
-        ]);
-
-        // return to this and sure it is working correctly
-        $user->tokens()->update([
-            'revoked' => true
-        ]);
-
-        Cache::forget($key);
-    }
-
-    public function resendOtp(array $data){
-        $otp = OtpCode::query()
-            ->where('session_id', $data['session_id'])
-            ->where('phone' , $data['phone'])
-            ->where('is_used', false)
-            ->first();
-
-        if (!$otp) {
-            throw ValidationException::withMessages([
-                'phone' => ['Invalid credentials']
-            ]);
-        }
-
-        $latestOtp = OtpCode::query()
-            ->where('phone', $data['phone'])
-            ->where('type', $otp->type)
-            ->latest()
-            ->first();
-
-        if ($latestOtp->id !== $otp->id){
-            throw ValidationException::withMessages([
-                'phone' => ['Invalid credentials']
-            ]);
-        }
-
-        return $this->otp->generateOtp(['phone' => $otp->phone], $otp->type);
+        return $data;
     }
 }

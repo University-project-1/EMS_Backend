@@ -341,7 +341,7 @@
         },
         "/v1/exhibitor/profile": {
             "get": {
-                "operationId": "v1.systemUser.shared.profile.show_0",
+                "operationId": "exhibitor.profile.show",
                 "summary": "show",
                 "tags": [
                     "SystemUser/Profile"
@@ -363,7 +363,7 @@
                 }
             },
             "post": {
-                "operationId": "v1.systemUser.shared.profile.update_1",
+                "operationId": "exhibitor.profile.update",
                 "summary": "update",
                 "tags": [
                     "SystemUser/Profile"
@@ -696,7 +696,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/VerifyRegisterRequest"
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
                             }
                         }
                     }
@@ -790,7 +790,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/App.Http.Requests.Mobile.Auth.ForgotPasswordRequest"
+                                "$ref": "#/components/schemas/App.Http.Requests.Mobile.ResetPassword.ForgotPasswordRequest"
                             }
                         }
                     }
@@ -825,7 +825,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/VerifyForgotPasswordOtpRequest"
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
                             }
                         }
                     }
@@ -860,7 +860,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/App.Http.Requests.Mobile.Auth.ResetPasswordRequest"
+                                "$ref": "#/components/schemas/App.Http.Requests.Mobile.ResetPassword.ResetPasswordRequest"
                             }
                         }
                     }
@@ -983,11 +983,20 @@
         "/v1/visitor/profile/phone/request": {
             "post": {
                 "operationId": "profile.requestPhoneUpdate",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: Cannot evaluate validation rules (2 evaluators failed):\n  [FormRequestRulesEvaluator] Attempt to read property \"id\" on null (at /home/runner/work/EMS_Backend/EMS_Backend/app/Http/Requests/Mobile/Profile/UpdatePhoneRequest.php:26)\n  [NodeRulesEvaluator] Attempt to read property \"id\" on null (at /home/runner/work/EMS_Backend/EMS_Backend/vendor/dedoc/scramble/src/Support/OperationExtensions/RulesEvaluator/NodeRulesEvaluator.php(232) : eval()'d code:1)",
                 "summary": "requestPhoneUpdate",
                 "tags": [
                     "Visitor/Profile"
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePhoneRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -1011,11 +1020,20 @@
         "/v1/visitor/profile/phone/verify": {
             "post": {
                 "operationId": "profile.verifyPhoneUpdate",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: Cannot evaluate validation rules (2 evaluators failed):\n  [FormRequestRulesEvaluator] Attempt to read property \"id\" on null (at /home/runner/work/EMS_Backend/EMS_Backend/app/Http/Requests/Mobile/Profile/VerifyPhoneRequest.php:26)\n  [NodeRulesEvaluator] Attempt to read property \"id\" on null (at /home/runner/work/EMS_Backend/EMS_Backend/vendor/dedoc/scramble/src/Support/OperationExtensions/RulesEvaluator/NodeRulesEvaluator.php(232) : eval()'d code:1)",
                 "summary": "verifyPhoneUpdate",
                 "tags": [
                     "Visitor/Profile"
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -1153,40 +1171,6 @@
             }
         },
         "schemas": {
-            "App.Http.Requests.Mobile.Auth.ForgotPasswordRequest": {
-                "type": "object",
-                "properties": {
-                    "phone": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "phone"
-                ],
-                "title": "App.Http.Requests.Mobile.Auth.ForgotPasswordRequest"
-            },
-            "App.Http.Requests.Mobile.Auth.ResetPasswordRequest": {
-                "type": "object",
-                "properties": {
-                    "reset_token": {
-                        "type": "string"
-                    },
-                    "password": {
-                        "type": "string",
-                        "minLength": 8
-                    },
-                    "password_confirmation": {
-                        "type": "string",
-                        "minLength": 8
-                    }
-                },
-                "required": [
-                    "reset_token",
-                    "password",
-                    "password_confirmation"
-                ],
-                "title": "App.Http.Requests.Mobile.Auth.ResetPasswordRequest"
-            },
             "App.Http.Requests.Mobile.Profile.UpdateProfileRequest": {
                 "type": "object",
                 "properties": {
@@ -1222,6 +1206,40 @@
                     }
                 },
                 "title": "App.Http.Requests.Mobile.Profile.UpdateProfileRequest"
+            },
+            "App.Http.Requests.Mobile.ResetPassword.ForgotPasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "phone": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "phone"
+                ],
+                "title": "App.Http.Requests.Mobile.ResetPassword.ForgotPasswordRequest"
+            },
+            "App.Http.Requests.Mobile.ResetPassword.ResetPasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "reset_token": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 8
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "minLength": 8
+                    }
+                },
+                "required": [
+                    "reset_token",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "App.Http.Requests.Mobile.ResetPassword.ResetPasswordRequest"
             },
             "DeviceType": {
                 "type": "string",
@@ -1371,8 +1389,7 @@
                         "type": "string"
                     },
                     "session_id": {
-                        "type": "string",
-                        "format": "uuid"
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -1446,6 +1463,19 @@
                 ],
                 "title": "UpdatePasswordRequest"
             },
+            "UpdatePhoneRequest": {
+                "type": "object",
+                "properties": {
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 20
+                    }
+                },
+                "required": [
+                    "phone"
+                ],
+                "title": "UpdatePhoneRequest"
+            },
             "UpdateProfileRequest": {
                 "type": "object",
                 "properties": {
@@ -1465,13 +1495,13 @@
                 },
                 "title": "UpdateProfileRequest"
             },
-            "VerifyForgotPasswordOtpRequest": {
+            "VerifyOtpRequest": {
                 "type": "object",
                 "properties": {
                     "phone": {
                         "type": "string"
                     },
-                    "reset_id": {
+                    "session_id": {
                         "type": "string",
                         "format": "uuid"
                     },
@@ -1481,30 +1511,10 @@
                 },
                 "required": [
                     "phone",
-                    "reset_id",
+                    "session_id",
                     "otp"
                 ],
-                "title": "VerifyForgotPasswordOtpRequest"
-            },
-            "VerifyRegisterRequest": {
-                "type": "object",
-                "properties": {
-                    "phone": {
-                        "type": "string"
-                    },
-                    "otp": {
-                        "type": "string"
-                    },
-                    "registration_id": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "phone",
-                    "otp",
-                    "registration_id"
-                ],
-                "title": "VerifyRegisterRequest"
+                "title": "VerifyOtpRequest"
             }
         },
         "responses": {
