@@ -20,8 +20,10 @@ class AutoDeploy extends Command
 
         $commands = [
             'git fetch origin',
-            'git pull origin dev',
+            'git reset --hard origin/dev',
             'php artisan optimize:clear',
+            'php artisan queue:restart',
+            'php artisan migrate:fresh --seed',
         ];
         Log::info('starting');
         foreach ($commands as $command) {
