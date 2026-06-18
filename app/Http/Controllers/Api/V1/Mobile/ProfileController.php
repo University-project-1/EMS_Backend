@@ -8,7 +8,6 @@ use App\DTOs\Shared\UpdatePasswordDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mobile\Profile\UpdatePhoneRequest;
 use App\Http\Requests\Mobile\Profile\UpdateProfileRequest;
-use App\Http\Requests\Mobile\Profile\VerifyPhoneRequest;
 use App\Http\Requests\Mobile\VerifyOtpRequest;
 use App\Http\Requests\Shared\UpdatePasswordRequest;
 use App\Http\Resources\Mobile\UserResource;

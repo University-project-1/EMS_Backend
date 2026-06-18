@@ -7,7 +7,6 @@ use App\DTOs\Mobile\VerifyDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mobile\ResetPassword\ForgotPasswordRequest;
 use App\Http\Requests\Mobile\ResetPassword\ResetPasswordRequest;
-use App\Http\Requests\Mobile\ResetPassword\VerifyForgotPasswordOtpRequest;
 use App\Http\Requests\Mobile\VerifyOtpRequest;
 use App\Services\Mobile\ResetPasswordService;
 use Dedoc\Scramble\Attributes\Group;
@@ -41,6 +40,6 @@ class PasswordController extends Controller
     public function resetPassword(ResetPasswordRequest $request)
     {
         $this->password->resetPassword(ResetPasswordDTO::formRequest($request->validated()));
-        return successResponse(['message' => 'Password has been reset successfully.']);
+        return successResponse();
     }
 }
