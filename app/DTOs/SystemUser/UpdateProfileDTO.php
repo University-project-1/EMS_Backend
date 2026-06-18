@@ -6,7 +6,7 @@ use App\DTOs\PatchDTO;
 use App\Trait\HasUpdatePayload;
 use Illuminate\Http\UploadedFile;
 
-class ProfileUpdateDTO extends PatchDTO
+class UpdateProfileDTO extends PatchDTO
 {
     use HasUpdatePayload;
 

@@ -65,6 +65,7 @@ Table booth_system_users {
 Table halls {
   id integer [primary key]
   number varchar [unique]
+  svg_id varchar [unique, note: Nullable]
   area float
   type varchar [note: 'company, restaurant']
   deleted_at timestamp [note: 'Soft Delete']
@@ -75,10 +76,10 @@ Table booths {
   hall_id integer
   company_id integer [note: 'Nullable. Set automatically when a request is approved']
   qr_token varchar [unique, note: 'Secure Token for QR Generation']
+  svg_id varchar [unique, note: Nullable]
   number varchar
   area float
   price decimal
-  is_booked boolean [default: false]
   deleted_at timestamp [note: 'Soft Delete']
   Indexes {
     (hall_id, number) [unique, note: 'Booth number must be unique within the same hall']
@@ -118,6 +119,7 @@ Table booth_request_services {
 Table event_halls {
   id integer [primary key]
   number varchar [unique]
+  svg_id varchar [unique, note: Nullable]
   area float
   price_per_hour decimal
 }
