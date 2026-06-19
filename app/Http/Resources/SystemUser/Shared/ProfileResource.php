@@ -21,7 +21,6 @@ class ProfileResource extends JsonResource
             'email'  => $this->email,
             'type'   => $this->type->value ?? $this->type,
             'avatar' => $this->whenLoaded('media', fn() => $this->getFirstMediaUrl('avatar'), null),
-            'email_verified_at'
         ];
     }
 }
