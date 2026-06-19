@@ -286,5 +286,7 @@ return [
         'year'                     => 'year',
     ],
     'failed' => 'Validation failed.',
-    'phone' => 'The phone number is invalid'
+    'phone' => 'The phone number is invalid',
+    'invalid_link' => 'Invalid verification link or hash.',
+    'already_verified' => 'Email is already verified.',
 ];

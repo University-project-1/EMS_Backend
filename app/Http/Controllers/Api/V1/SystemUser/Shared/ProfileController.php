@@ -27,7 +27,7 @@ class ProfileController extends Controller
 
         return successResponse(
             data: new ProfileResource($user),
-            message: 'Profile retrieved successfully.',
+            message: __('profile.show_success'),
         );
     }
 
@@ -45,7 +45,7 @@ class ProfileController extends Controller
 
         return successResponse(
             data: new ProfileResource($updatedUser),
-            message: __('Profile updated successfully.')
+            message: __('profile.update_success')
         );
     }
 }

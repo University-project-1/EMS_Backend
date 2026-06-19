@@ -23,7 +23,7 @@ class AuthController extends Controller
         $result = $this->authService->login($dto);
         
         return successResponse(
-            message: 'login successfully',
+            message: __('auth.login_success'),
             data: ['user' => $result['user'], 'token'=>$result['token']],
         );
     }
@@ -35,7 +35,7 @@ class AuthController extends Controller
         $request->user()->token()->revoke();
         return successResponse(
             data: null,
-            message: 'logged out successfully',
+            message: __('auth.logout_success'),
         );
     }
 }

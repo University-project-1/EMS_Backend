@@ -37,7 +37,7 @@ class ServiceController extends Controller
 
         return successResponse(
             data: ServiceResource::collection($services),
-            message: 'Services returned successfully',
+            message: __('service.index_success'),
         );
     }
     /**
@@ -47,7 +47,7 @@ class ServiceController extends Controller
     public function show(Service $service){
         return successResponse(
             data: new ServiceResource($service),
-            message: 'service returned successfully',
+            message: __('service.show_success'),
         );
     }
 
@@ -60,7 +60,7 @@ class ServiceController extends Controller
         $updatedService = $this->service->update($service, $dto);
         return successResponse(
             data: new ServiceResource($updatedService),
-            message: 'service updated successfully',
+            message: __('service.update_success'),
         );
     }
 
@@ -72,7 +72,7 @@ class ServiceController extends Controller
         $service = $this->service->create($dto);
         return successResponse(
             data: new ServiceResource($service),
-            message: 'service created successfully',
+            message: __('service.store_success'),
         );
     }
 }

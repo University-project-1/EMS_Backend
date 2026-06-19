@@ -30,7 +30,7 @@ class AuthController extends Controller
         $result = $this->authService->register($dto);
         return successResponse(
             data: ['user'  => new ProfileResource($result['user']), 'token' => $result['token']],
-            message: 'verify your account',
+            message: __('auth.register_success'),
             code: 200
         );
     }
@@ -48,7 +48,7 @@ class AuthController extends Controller
 
         return successResponse(
             data: $user,
-            message: 'Email verified successfully'
+            message: __('auth.email_verified')
         );
     }
 
@@ -60,7 +60,7 @@ class AuthController extends Controller
         $this->authService->resendVerificationEmail($request->user('system'));
 
         return successResponse(
-            message: 'Verification link sent successfully.'
+            message: __('auth.verification_sent')
         );
     }
     /**
@@ -71,7 +71,7 @@ class AuthController extends Controller
         $result = $this->authService->login($dto);
 
         return successResponse(
-            message: 'login successfully',
+            message: __('auth.login_success'),
             data: ['user' => new ProfileResource($result['user']), 'token'=>$result['token']],
         );
     }
@@ -83,7 +83,7 @@ class AuthController extends Controller
         $request->user()->token()->revoke();
         return successResponse(
             data: null,
-            message: 'logged out successfully',
+            message: __('auth.logout_success'),
         );
     }
 
@@ -100,7 +100,7 @@ class AuthController extends Controller
             $result = $this->googleAuthService->handleGoogleProviderToken($request->token);
 
             return successResponse(
-                message: 'Authenticated successfully.',
+                message: __('auth.google_auth_success'),
                 data: [
                     'user' => new ProfileResource($result['user']),
                     'access_token' => $result['token']
@@ -120,7 +120,7 @@ class AuthController extends Controller
     public function checkStatus(Request $request)
     {
         return successResponse(
-            message: 'User status fetched successfully',
+            message: __('auth.status_fetched'),
             data: [
                 'is_verified' => $request->user('system')->hasVerifiedEmail(),
             ]

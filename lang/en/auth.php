@@ -17,4 +17,13 @@ return [
     'failed' => 'Invalid credentials.',
     'unauthenticated' => 'You must be logged in.',
     'forbidden' => 'You are not allowed to perform this action.',
+    'login_success' => 'Login successful.',
+    'logout_success' => 'Logged out successfully.',
+    'register_success' => 'Please verify your account.',
+    'email_verified' => 'Email verified successfully.',
+    'verification_sent' => 'Verification link sent successfully.',
+    'google_auth_success' => 'Authenticated successfully.',
+    'status_fetched' => 'User status fetched successfully.',
+    'google_invalid_token' => 'Invalid or expired Google token.',
+    'email_not_verified' => 'Your email address is not verified.',
 ];
