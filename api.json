@@ -429,6 +429,30 @@
                 "security": []
             }
         },
+        "/v1/exhibitor/auth/status": {
+            "get": {
+                "operationId": "auth.checkStatus",
+                "summary": "check account verification",
+                "tags": [
+                    "SystemUser/Exhibitor/Auth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/exhibitor/logout": {
             "post": {
                 "operationId": "v1.systemUser.exhibitor.auth.logout",
