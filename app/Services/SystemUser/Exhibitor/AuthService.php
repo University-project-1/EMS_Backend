@@ -30,9 +30,9 @@ class AuthService
     public function register(RegisterDTO $dto){
         return DB::transaction(function() use ($dto){
             $exhibitor = SystemUser::updateOrCreate(
-                ['name' => $dto->name],
+                ['email' => $dto->email],
                 [
-                    'email' => $dto->email,
+                    'name' => $dto->name,
                     'password' => Hash::make($dto->password),
                 ]
             );
@@ -59,6 +59,14 @@ class AuthService
         $user->markEmailAsVerified();
 
         event(new Verified($user));
+    }
+    public function resendVerificationEmail(SystemUser $user): void
+    {
+        if ($user->hasVerifiedEmail()) {
+            abort(400, 'Email is already verified.');
+        }
+
+        $user->sendEmailVerificationNotification();
     }
 
 }

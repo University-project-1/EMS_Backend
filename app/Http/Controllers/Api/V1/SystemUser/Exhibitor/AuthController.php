@@ -7,6 +7,7 @@ use App\DTOs\SystemUser\RegisterDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Exhibitor\RegisterExhibitorRequest;
 use App\Http\Requests\SystemUser\Shared\LoginSystemUserRequest;
+use App\Http\Resources\SystemUser\Shared\ProfileResource;
 use App\Models\SystemUser;
 use App\Services\SystemUser\Exhibitor\AuthService;
 use App\Services\SystemUser\Exhibitor\GoogleAuthService;
@@ -28,7 +29,7 @@ class AuthController extends Controller
         $dto = RegisterDTO::fromRequest($request->validated());
         $result = $this->authService->register($dto);
         return successResponse(
-            data: ['user'  => $result['user'], 'token' => $result['token']],
+            data: ['user'  => new ProfileResource($result['user']), 'token' => $result['token']],
             message: 'verify your account',
             code: 200
         );
@@ -50,6 +51,18 @@ class AuthController extends Controller
             message: 'Email verified successfully'
         );
     }
+
+    /**
+     * resend verification email
+     */
+    public function resendVerificationEmail(Request $request)
+    {
+        $this->authService->resendVerificationEmail($request->user('system'));
+
+        return successResponse(
+            message: 'Verification link sent successfully.'
+        );
+    }
     /**
      * login
      */
@@ -59,7 +72,7 @@ class AuthController extends Controller
 
         return successResponse(
             message: 'login successfully',
-            data: ['user' => $result['user'], 'token'=>$result['token']],
+            data: ['user' => new ProfileResource($result['user']), 'token'=>$result['token']],
         );
     }
 
@@ -89,7 +102,7 @@ class AuthController extends Controller
             return successResponse(
                 message: 'Authenticated successfully.',
                 data: [
-                    'user' => $result['user'],
+                    'user' => new ProfileResource($result['user']),
                     'access_token' => $result['token']
                 ]
             );

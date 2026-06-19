@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('exhibitor')->group(function(){
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register']);
+    Route::post('/email/resend-verification', [AuthController::class, 'resendVerificationEmail'])
+        ->middleware(['auth:system', 'throttle:verify_otp']);
     Route::post('/auth/system/google', [AuthController::class, 'googleAuth']);
     Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
 
@@ -19,10 +21,10 @@ Route::prefix('exhibitor')->group(function(){
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
 
 
-    Route::middleware('auth:system')->group(function(){
+    Route::middleware(['auth:system', 'verified'])->group(function(){
         // store fcm token
         Route::post('fcm/register-token', [FCMController::class, 'store'])
-            ->defaults('guardName', 'web')->name('exhibitor.fcm.store');
+        ->defaults('guardName', 'web')->name('exhibitor.fcm.store');
 
         Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('throttle:password_update');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
