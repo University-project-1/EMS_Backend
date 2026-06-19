@@ -32,7 +32,7 @@ class HallController extends Controller
             ->allowedIncludes('booths')
             ->allowedFields('booths.id', 'booths.hall_id', 'booths.number')
             ->allowedSorts('area')
-            ->paginate(2);
+            ->get();
 
         return successResponse(
             data: HallResource::collection($halls),

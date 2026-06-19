@@ -21,6 +21,8 @@ class BoothController extends Controller
      */
     #[QueryParameter('filter[number]', 'Filter booths by exact booth number', required: false, type: 'string')]
     #[QueryParameter('filter[booked]', 'Filter booths by booking status', required: false, type: 'boolean')]
+    #[QueryParameter('filter[hall_id]', 'Filter booths by hall_id', required: false, type: 'number')]
+    #[QueryParameter('filter[hall_type]', 'Filter booths by hall type', required: false, type: 'string(enum)')]
     #[QueryParameter('filter[min_price]', 'Filter booths by minimum price', required: false, type: 'number')]
     #[QueryParameter('filter[max_price]', 'Filter booths by maximum price', required: false, type: 'number')]
     #[QueryParameter('filter[min_area]', 'Filter booths by minimum area', required: false, type: 'number')]
@@ -31,6 +33,8 @@ class BoothController extends Controller
         $booths = QueryBuilder::for(Booth::class)
             ->allowedFilters(
                 AllowedFilter::exact('number'),
+                AllowedFilter::exact('hall_id'),
+                AllowedFilter::exact('hall_type', 'hall.type'),
                 AllowedFilter::custom('booked', new BookedBoothFilter()),
                 AllowedFilter::custom('min_price', new MinFilter(), 'price'),
                 AllowedFilter::custom('max_price', new MaxFilter(), 'price'),
@@ -39,7 +43,7 @@ class BoothController extends Controller
             )
             ->allowedIncludes('company', 'hall')
             ->allowedSorts('price', 'area')
-            ->paginate(10);
+            ->get();
         return successResponse(
             data: BoothResource::collection($booths),
             message: 'booths returned successfully',
