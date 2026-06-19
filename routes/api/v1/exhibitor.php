@@ -16,6 +16,7 @@ Route::prefix('exhibitor')->group(function(){
         ->middleware(['auth:system', 'throttle:verify_otp']);
     Route::post('/auth/system/google', [AuthController::class, 'googleAuth']);
     Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
+    Route::get('/auth/status', [AuthController::class, 'checkStatus'])->middleware('auth:system');
 
     Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->middleware('throttle:forgot_password');
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);

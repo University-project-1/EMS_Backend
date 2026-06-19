@@ -113,4 +113,17 @@ class AuthController extends Controller
             );
         }
     }
+
+    /**
+     * check account verification
+     */
+    public function checkStatus(Request $request)
+    {
+        return successResponse(
+            message: 'User status fetched successfully',
+            data: [
+                'is_verified' => $request->user('system')->hasVerifiedEmail(),
+            ]
+        );
+    }
 }
