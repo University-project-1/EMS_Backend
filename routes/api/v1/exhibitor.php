@@ -36,6 +36,7 @@ Route::prefix('exhibitor')->group(function(){
         Route::prefix('booth')->group(function(){
             Route::get('/', [BoothController::class, 'index']);
             Route::get('/{booth}', [BoothController::class, 'show']);
+            Route::post('request-booth', [BoothController::class, 'book']);
         });
 
         Route::get('services', [ServiceController::class, 'index']);

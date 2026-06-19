@@ -24,6 +24,7 @@ class ServiceController extends Controller
         $services = QueryBuilder::for(Service::class)
             ->allowedFilters('name')
             ->allowedSorts('price', 'name')
+            ->where('is_active', true)
             ->paginate(request()->query('per_page', 15));
 
         return successResponse(

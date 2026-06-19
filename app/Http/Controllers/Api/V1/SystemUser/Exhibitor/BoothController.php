@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers\Api\v1\SystemUser\Exhibitor;
 
+use App\DTOs\SystemUser\BookingBoothDTO;
+use App\DTOs\SystemUser\CompanyDTO;
 use App\Filter\BookedBoothFilter;
 use App\Filter\MaxFilter;
 use App\Filter\MinFilter;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SystemUser\Exhibitor\StoreBoothRequestRequest;
+use App\Http\Resources\SystemUser\Shared\BoothRequestResource;
 use App\Http\Resources\SystemUser\Shared\BoothResource;
 use App\Models\Booth;
+use App\Services\SystemUser\Exhibitor\BoothBookingService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -16,6 +21,9 @@ use Spatie\QueryBuilder\QueryBuilder;
 #[Group('SystemUser/Exhibitor/Booths')]
 class BoothController extends Controller
 {
+    public function __construct(
+        private readonly BoothBookingService $bookingService,
+    ){}
     /**
      * all
      */
@@ -58,6 +66,24 @@ class BoothController extends Controller
         return successResponse(
             data: new BoothResource($booth),
             message: 'booth returned successfully',
+        );
+    }
+
+    /**
+     * request booth booking
+     */
+    public function book(StoreBoothRequestRequest $request)
+    {
+        $validated = $request->validated();
+        $dto = BookingBoothDTO::fromRequest($validated);
+        $companyDto = isset($validated['new_company'])
+            ? CompanyDTO::fromRequest($validated['new_company'])
+            : null;
+        $boothRequest = $this->bookingService->confirmBoothBooking($request->user('system'), $dto, $companyDto);
+
+        return successResponse(
+            data: new BoothRequestResource($boothRequest),
+            message: 'booking confirmed successfully, needs admin confirmation',
         );
     }
 }
