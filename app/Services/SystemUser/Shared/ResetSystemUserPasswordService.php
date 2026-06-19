@@ -10,7 +10,7 @@ class ResetSystemUserPasswordService
 {
     public function sendResetLink(array $data): string
     {
-        return Password::broker()->sendResetLink($data);
+        return Password::broker('system_users')->sendResetLink($data);
     }
 
     public function resetPassword(array $data): string

@@ -286,5 +286,5 @@ return [
         'year'                     => 'year',
     ],
     'failed' => 'Validation failed.',
-
+    'phone' => 'The phone number is invalid'
 ];
