@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
-    Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->middleware('throttle:password_update');
+    Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->middleware('throttle:forgot_password');
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
 
 

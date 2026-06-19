@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('forgot_password', function (Request $request) {
             $phone = $request->input('phone') ?? $request->ip();
 
-            return Limit::perHour(3)->by($phone)->response(function () {
+            return Limit::perHour(10)->by($phone)->response(function () {
                 return errorResponse('Daily or hourly OTP limit reached for this phone number. Try again later.', [], 429);
             });
         });
