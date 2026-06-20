@@ -29,7 +29,7 @@ class ServiceController extends Controller
 
         return successResponse(
             data: ServiceResource::collection($services),
-            message: 'Services returned successfully',
+            message: __('service.list_success'),
         );
     }
 }

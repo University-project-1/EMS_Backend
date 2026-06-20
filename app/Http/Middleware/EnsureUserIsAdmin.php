@@ -13,7 +13,7 @@ class EnsureUserIsAdmin
     {
         if (! $request->user('system') || $request->user('system')->type !== SystemUserType::ADMIN) {
             return errorResponse(
-                message:  'Forbidden: Admin access required.',
+                message:  __('auth.forbidden'),
                 code:  403,
             );
         }

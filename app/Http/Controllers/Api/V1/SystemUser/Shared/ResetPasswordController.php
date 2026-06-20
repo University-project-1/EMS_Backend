@@ -28,7 +28,7 @@ class ResetPasswordController extends Controller
         $this->passwordService->updatePassword($request->user(), $dto);
         return successResponse(
             data: null,
-            message: 'password changed successfully',
+            message: __('passwords.password_changed'),
             code: 200
         );
     }

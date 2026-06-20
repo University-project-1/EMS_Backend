@@ -24,6 +24,7 @@ class AutoDeploy extends Command
             'php artisan optimize:clear',
             'php artisan migrate:fresh --seed --force',
             'php artisan queue:restart',
+            'php artisan queue:work',
         ];
         Log::info('starting');
         foreach ($commands as $command) {

@@ -49,7 +49,7 @@ class BoothController extends Controller
             ->paginate(10);
         return successResponse(
             data: BoothResource::collection($booths),
-            message: 'booths returned successfully',
+            message: __('booth.list_success'),
         );
     }
 
@@ -60,7 +60,7 @@ class BoothController extends Controller
         $booth->loadMissing(['hall', 'company']);
         return successResponse(
             data: new BoothResource($booth),
-            message: 'booth returned successfully',
+            message: __('booth.show_success'),
         );
     }
 
@@ -73,7 +73,7 @@ class BoothController extends Controller
 
         return successResponse(
             data: new BoothResource($updatedBooth),
-            message: 'booth updated successfully',
+            message: __('booth.update_success'),
         );
     }
 }

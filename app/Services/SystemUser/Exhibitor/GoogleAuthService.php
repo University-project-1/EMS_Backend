@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class GoogleAuthService
 {
@@ -21,7 +22,9 @@ class GoogleAuthService
             // Verify the token securely with Google servers
             $googleUser = $provider->userFromToken($providerToken);
         } catch (Exception $e) {
-            throw new Exception('Invalid or expired Google Token.');
+            throw ValidationException::withMessages([
+                'google_token' => [__('auth.google_invalid_token')],
+            ]);
         }
 
         return DB::transaction(function () use ($googleUser) {

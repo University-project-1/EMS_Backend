@@ -36,7 +36,7 @@ class HallController extends Controller
 
         return successResponse(
             data: HallResource::collection($halls),
-            message: 'Halls returned successfully',
+            message: __('hall.list_success'),
         );
     }
 
@@ -46,7 +46,7 @@ class HallController extends Controller
 
         return successResponse(
             data: new HallResource($hall),
-            message: 'Hall returned successfully',
+            message: __('hall.show_success'),
         );
     }
 
