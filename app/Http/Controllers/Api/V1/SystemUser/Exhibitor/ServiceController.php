@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1\SystemUser\Exhibitor;
+namespace App\Http\Controllers\Api\V1\SystemUser\Exhibitor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SystemUser\Shared\ServiceResource;

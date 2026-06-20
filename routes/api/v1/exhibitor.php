@@ -3,8 +3,8 @@
 
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
-use App\Http\Controllers\Api\v1\SystemUser\Exhibitor\BoothController;
-use App\Http\Controllers\Api\v1\SystemUser\Exhibitor\ServiceController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
 use Illuminate\Support\Facades\Route;

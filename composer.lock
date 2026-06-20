@@ -236,7 +236,7 @@
             },
             "require-dev": {
                 "larastan/larastan": "^3.3",
-                "laravel/pint": "^v1.1.0",
+                "laravel/pint": "^V1.1.0",
                 "nunomaduro/collision": "^7.0|^8.0",
                 "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
                 "pestphp/pest": "^2.34|^3.7|^4.4",
@@ -798,7 +798,7 @@
         },
         {
             "name": "fruitcake/php-cors",
-            "version": "v1.4.0",
+            "version": "V1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fruitcake/php-cors.git",
@@ -853,7 +853,7 @@
             ],
             "support": {
                 "issues": "https://github.com/fruitcake/php-cors/issues",
-                "source": "https://github.com/fruitcake/php-cors/tree/v1.4.0"
+                "source": "https://github.com/fruitcake/php-cors/tree/V1.4.0"
             },
             "funding": [
                 {
@@ -947,7 +947,7 @@
         },
         {
             "name": "graham-campbell/result-type",
-            "version": "v1.1.4",
+            "version": "V1.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GrahamCampbell/Result-Type.git",
@@ -993,7 +993,7 @@
             ],
             "support": {
                 "issues": "https://github.com/GrahamCampbell/Result-Type/issues",
-                "source": "https://github.com/GrahamCampbell/Result-Type/tree/v1.1.4"
+                "source": "https://github.com/GrahamCampbell/Result-Type/tree/V1.1.4"
             },
             "funding": [
                 {
@@ -1340,7 +1340,7 @@
         },
         {
             "name": "guzzlehttp/uri-template",
-            "version": "v1.0.6",
+            "version": "V1.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/uri-template.git",
@@ -1406,7 +1406,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/uri-template/issues",
-                "source": "https://github.com/guzzle/uri-template/tree/v1.0.6"
+                "source": "https://github.com/guzzle/uri-template/tree/V1.0.6"
             },
             "funding": [
                 {
@@ -1426,7 +1426,7 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v13.13.0",
+            "version": "V13.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
@@ -1650,7 +1650,7 @@
         },
         {
             "name": "laravel/passport",
-            "version": "v13.7.5",
+            "version": "V13.7.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/passport.git",
@@ -2230,7 +2230,7 @@
         },
         {
             "name": "league/config",
-            "version": "v1.2.0",
+            "version": "V1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/config.git",
@@ -2559,7 +2559,7 @@
         },
         {
             "name": "league/oauth1-client",
-            "version": "v1.11.0",
+            "version": "V1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/oauth1-client.git",
@@ -2629,7 +2629,7 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/oauth1-client/issues",
-                "source": "https://github.com/thephpleague/oauth1-client/tree/v1.11.0"
+                "source": "https://github.com/thephpleague/oauth1-client/tree/V1.11.0"
             },
             "time": "2024-12-10T19:59:05+00:00"
         },
@@ -3259,7 +3259,7 @@
         },
         {
             "name": "nette/schema",
-            "version": "v1.3.5",
+            "version": "V1.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/schema.git",
@@ -3320,7 +3320,7 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/schema/issues",
-                "source": "https://github.com/nette/schema/tree/v1.3.5"
+                "source": "https://github.com/nette/schema/tree/V1.3.5"
             },
             "time": "2026-02-23T03:47:12+00:00"
         },
@@ -6305,7 +6305,7 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.37.0",
+            "version": "V1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
@@ -6364,7 +6364,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.37.0"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/V1.37.0"
             },
             "funding": [
                 {
@@ -6388,7 +6388,7 @@
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
-            "version": "v1.38.1",
+            "version": "V1.38.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-grapheme.git",
@@ -6446,7 +6446,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.38.1"
+                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/V1.38.1"
             },
             "funding": [
                 {
@@ -6470,7 +6470,7 @@
         },
         {
             "name": "symfony/polyfill-intl-idn",
-            "version": "v1.38.1",
+            "version": "V1.38.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-idn.git",
@@ -6533,7 +6533,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.38.1"
+                "source": "https://github.com/symfony/polyfill-intl-idn/tree/V1.38.1"
             },
             "funding": [
                 {
@@ -6557,7 +6557,7 @@
         },
         {
             "name": "symfony/polyfill-intl-normalizer",
-            "version": "v1.38.0",
+            "version": "V1.38.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-normalizer.git",
@@ -6618,7 +6618,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.38.0"
+                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/V1.38.0"
             },
             "funding": [
                 {
@@ -6642,7 +6642,7 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.38.1",
+            "version": "V1.38.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
@@ -6703,7 +6703,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.38.1"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/V1.38.1"
             },
             "funding": [
                 {
@@ -6727,7 +6727,7 @@
         },
         {
             "name": "symfony/polyfill-php80",
-            "version": "v1.37.0",
+            "version": "V1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
@@ -6787,7 +6787,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php80/tree/v1.37.0"
+                "source": "https://github.com/symfony/polyfill-php80/tree/V1.37.0"
             },
             "funding": [
                 {
@@ -6811,7 +6811,7 @@
         },
         {
             "name": "symfony/polyfill-php83",
-            "version": "v1.38.1",
+            "version": "V1.38.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php83.git",
@@ -6867,7 +6867,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php83/tree/v1.38.1"
+                "source": "https://github.com/symfony/polyfill-php83/tree/V1.38.1"
             },
             "funding": [
                 {
@@ -6891,7 +6891,7 @@
         },
         {
             "name": "symfony/polyfill-php84",
-            "version": "v1.38.1",
+            "version": "V1.38.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php84.git",
@@ -6947,7 +6947,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php84/tree/v1.38.1"
+                "source": "https://github.com/symfony/polyfill-php84/tree/V1.38.1"
             },
             "funding": [
                 {
@@ -6971,7 +6971,7 @@
         },
         {
             "name": "symfony/polyfill-php85",
-            "version": "v1.38.1",
+            "version": "V1.38.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php85.git",
@@ -7027,7 +7027,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php85/tree/v1.38.1"
+                "source": "https://github.com/symfony/polyfill-php85/tree/V1.38.1"
             },
             "funding": [
                 {
@@ -7051,7 +7051,7 @@
         },
         {
             "name": "symfony/polyfill-php86",
-            "version": "v1.38.0",
+            "version": "V1.38.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php86.git",
@@ -7107,7 +7107,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php86/tree/v1.38.0"
+                "source": "https://github.com/symfony/polyfill-php86/tree/V1.38.0"
             },
             "funding": [
                 {
@@ -7131,7 +7131,7 @@
         },
         {
             "name": "symfony/polyfill-uuid",
-            "version": "v1.37.0",
+            "version": "V1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-uuid.git",
@@ -7190,7 +7190,7 @@
                 "uuid"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-uuid/tree/v1.37.0"
+                "source": "https://github.com/symfony/polyfill-uuid/tree/V1.37.0"
             },
             "funding": [
                 {
@@ -8192,7 +8192,7 @@
     "packages-dev": [
         {
             "name": "archtechx/enums",
-            "version": "v1.1.2",
+            "version": "V1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/archtechx/enums.git",
@@ -8239,7 +8239,7 @@
             "description": "Helpers for making PHP enums more lovable.",
             "support": {
                 "issues": "https://github.com/archtechx/enums/issues",
-                "source": "https://github.com/archtechx/enums/tree/v1.1.2"
+                "source": "https://github.com/archtechx/enums/tree/V1.1.2"
             },
             "time": "2025-06-06T23:15:09+00:00"
         },
@@ -9044,7 +9044,7 @@
         },
         {
             "name": "fakerphp/faker",
-            "version": "v1.24.1",
+            "version": "V1.24.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FakerPHP/Faker.git",
@@ -9101,7 +9101,7 @@
             ],
             "support": {
                 "issues": "https://github.com/FakerPHP/Faker/issues",
-                "source": "https://github.com/FakerPHP/Faker/tree/v1.24.1"
+                "source": "https://github.com/FakerPHP/Faker/tree/V1.24.1"
             },
             "time": "2024-11-21T13:46:39+00:00"
         },
@@ -11044,7 +11044,7 @@
         },
         {
             "name": "laravel/pail",
-            "version": "v1.2.7",
+            "version": "V1.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pail.git",
@@ -11124,7 +11124,7 @@
         },
         {
             "name": "laravel/pao",
-            "version": "v1.1.0",
+            "version": "V1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pao.git",
@@ -11209,7 +11209,7 @@
         },
         {
             "name": "laravel/pint",
-            "version": "v1.29.1",
+            "version": "V1.29.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pint.git",
@@ -11338,7 +11338,7 @@
         },
         {
             "name": "laravel/sentinel",
-            "version": "v1.1.0",
+            "version": "V1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sentinel.git",
@@ -11388,7 +11388,7 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/laravel/sentinel/tree/v1.1.0"
+                "source": "https://github.com/laravel/sentinel/tree/V1.1.0"
             },
             "time": "2026-03-24T14:03:38+00:00"
         },

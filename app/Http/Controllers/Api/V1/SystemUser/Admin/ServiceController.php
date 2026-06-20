@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1\SystemUser\Admin;
+namespace App\Http\Controllers\Api\V1\SystemUser\Admin;
 
 use App\DTOs\SystemUser\ServiceDTO;
 use App\DTOs\SystemUser\UpdateServiceDTO;

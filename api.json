@@ -48,9 +48,9 @@
         }
     ],
     "paths": {
-        "/v1/admin/login": {
+        "/V1/admin/login": {
             "post": {
-                "operationId": "v1.systemUser.admin.auth.login",
+                "operationId": "V1.systemUser.admin.auth.login",
                 "summary": "login",
                 "tags": [
                     "SystemUser/Admin/Auth"
@@ -83,9 +83,9 @@
                 "security": []
             }
         },
-        "/v1/admin/logout": {
+        "/V1/admin/logout": {
             "post": {
-                "operationId": "v1.systemUser.admin.auth.logout",
+                "operationId": "V1.systemUser.admin.auth.logout",
                 "summary": "logout",
                 "tags": [
                     "SystemUser/Admin/Auth"
@@ -107,9 +107,9 @@
                 }
             }
         },
-        "/v1/admin/booths": {
+        "/V1/admin/booths": {
             "get": {
-                "operationId": "v1.systemUser.admin.booth.index",
+                "operationId": "V1.systemUser.admin.booth.index",
                 "summary": "all",
                 "tags": [
                     "SystemUser/Admin/Booths"
@@ -201,9 +201,9 @@
                 }
             }
         },
-        "/v1/admin/booths/{booth}": {
+        "/V1/admin/booths/{booth}": {
             "get": {
-                "operationId": "v1.systemUser.admin.booth.show",
+                "operationId": "V1.systemUser.admin.booth.show",
                 "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
                 "summary": "show",
                 "tags": [
@@ -252,9 +252,9 @@
                 }
             }
         },
-        "/v1/exhibitor/login": {
+        "/V1/exhibitor/login": {
             "post": {
-                "operationId": "v1.systemUser.exhibitor.auth.login",
+                "operationId": "V1.systemUser.exhibitor.auth.login",
                 "summary": "login",
                 "tags": [
                     "SystemUser/Exhibitor/Auth"
@@ -287,9 +287,9 @@
                 "security": []
             }
         },
-        "/v1/exhibitor/register": {
+        "/V1/exhibitor/register": {
             "post": {
-                "operationId": "v1.systemUser.exhibitor.auth.register",
+                "operationId": "V1.systemUser.exhibitor.auth.register",
                 "summary": "register",
                 "tags": [
                     "SystemUser/Exhibitor/Auth"
@@ -322,7 +322,7 @@
                 "security": []
             }
         },
-        "/v1/exhibitor/email/resend-verification": {
+        "/V1/exhibitor/email/resend-verification": {
             "post": {
                 "operationId": "auth.resendVerificationEmail",
                 "summary": "resend verification email",
@@ -346,7 +346,7 @@
                 }
             }
         },
-        "/v1/exhibitor/auth/system/google": {
+        "/V1/exhibitor/auth/system/google": {
             "post": {
                 "operationId": "auth.googleAuth",
                 "summary": "googleAuth",
@@ -389,7 +389,7 @@
                 "security": []
             }
         },
-        "/v1/exhibitor/email/verify/{id}/{hash}": {
+        "/V1/exhibitor/email/verify/{id}/{hash}": {
             "get": {
                 "operationId": "verification.verify",
                 "summary": "verify",
@@ -429,7 +429,7 @@
                 "security": []
             }
         },
-        "/v1/exhibitor/auth/status": {
+        "/V1/exhibitor/auth/status": {
             "get": {
                 "operationId": "auth.checkStatus",
                 "summary": "check account verification",
@@ -453,9 +453,9 @@
                 }
             }
         },
-        "/v1/exhibitor/logout": {
+        "/V1/exhibitor/logout": {
             "post": {
-                "operationId": "v1.systemUser.exhibitor.auth.logout",
+                "operationId": "V1.systemUser.exhibitor.auth.logout",
                 "summary": "logout",
                 "tags": [
                     "SystemUser/Exhibitor/Auth"
@@ -477,9 +477,9 @@
                 }
             }
         },
-        "/v1/admin/profile": {
+        "/V1/admin/profile": {
             "get": {
-                "operationId": "v1.systemUser.shared.profile.show_0",
+                "operationId": "V1.systemUser.shared.profile.show_0",
                 "summary": "show",
                 "tags": [
                     "SystemUser/Profile"
@@ -501,7 +501,7 @@
                 }
             },
             "post": {
-                "operationId": "v1.systemUser.shared.profile.update_1",
+                "operationId": "V1.systemUser.shared.profile.update_1",
                 "summary": "update",
                 "tags": [
                     "SystemUser/Profile"
@@ -538,9 +538,9 @@
                 }
             }
         },
-        "/v1/exhibitor/profile": {
+        "/V1/exhibitor/profile": {
             "get": {
-                "operationId": "v1.systemUser.shared.profile.show_0",
+                "operationId": "V1.systemUser.shared.profile.show_0",
                 "summary": "show",
                 "tags": [
                     "SystemUser/Profile"
@@ -562,7 +562,7 @@
                 }
             },
             "post": {
-                "operationId": "v1.systemUser.shared.profile.update_1",
+                "operationId": "V1.systemUser.shared.profile.update_1",
                 "summary": "update",
                 "tags": [
                     "SystemUser/Profile"
@@ -599,9 +599,9 @@
                 }
             }
         },
-        "/v1/admin/forgot-password": {
+        "/V1/admin/forgot-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.sendResetLink_0",
+                "operationId": "V1.systemUser.shared.resetPassword.sendResetLink_0",
                 "summary": "send reset link",
                 "tags": [
                     "SystemUser/reset_password"
@@ -634,9 +634,9 @@
                 "security": []
             }
         },
-        "/v1/admin/reset-password": {
+        "/V1/admin/reset-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.resetPassword_0",
+                "operationId": "V1.systemUser.shared.resetPassword.resetPassword_0",
                 "summary": "reset password",
                 "tags": [
                     "SystemUser/reset_password"
@@ -669,9 +669,9 @@
                 "security": []
             }
         },
-        "/v1/admin/change-password": {
+        "/V1/admin/change-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.changePassword_0",
+                "operationId": "V1.systemUser.shared.resetPassword.changePassword_0",
                 "summary": "change password",
                 "tags": [
                     "SystemUser/reset_password"
@@ -706,9 +706,9 @@
                 }
             }
         },
-        "/v1/exhibitor/forgot-password": {
+        "/V1/exhibitor/forgot-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.sendResetLink_0",
+                "operationId": "V1.systemUser.shared.resetPassword.sendResetLink_0",
                 "summary": "send reset link",
                 "tags": [
                     "SystemUser/reset_password"
@@ -741,9 +741,9 @@
                 "security": []
             }
         },
-        "/v1/exhibitor/reset-password": {
+        "/V1/exhibitor/reset-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.resetPassword_0",
+                "operationId": "V1.systemUser.shared.resetPassword.resetPassword_0",
                 "summary": "reset password",
                 "tags": [
                     "SystemUser/reset_password"
@@ -776,9 +776,9 @@
                 "security": []
             }
         },
-        "/v1/exhibitor/change-password": {
+        "/V1/exhibitor/change-password": {
             "post": {
-                "operationId": "v1.systemUser.shared.resetPassword.changePassword_0",
+                "operationId": "V1.systemUser.shared.resetPassword.changePassword_0",
                 "summary": "change password",
                 "tags": [
                     "SystemUser/reset_password"
@@ -813,9 +813,9 @@
                 }
             }
         },
-        "/v1/auth/register": {
+        "/V1/auth/register": {
             "post": {
-                "operationId": "v1.mobile.auth.register",
+                "operationId": "V1.mobile.auth.register",
                 "summary": "register",
                 "tags": [
                     "Visitor/Auth"
@@ -848,9 +848,9 @@
                 "security": []
             }
         },
-        "/v1/auth/login": {
+        "/V1/auth/login": {
             "post": {
-                "operationId": "v1.mobile.auth.login",
+                "operationId": "V1.mobile.auth.login",
                 "summary": "login",
                 "tags": [
                     "Visitor/Auth"
@@ -883,7 +883,7 @@
                 "security": []
             }
         },
-        "/v1/auth/register/verify": {
+        "/V1/auth/register/verify": {
             "post": {
                 "operationId": "auth.verifyRegister",
                 "summary": "verify register",
@@ -918,7 +918,7 @@
                 "security": []
             }
         },
-        "/v1/auth/otp/resend": {
+        "/V1/auth/otp/resend": {
             "post": {
                 "operationId": "auth.resendOtp",
                 "summary": "resend otp",
@@ -953,9 +953,9 @@
                 "security": []
             }
         },
-        "/v1/visitor/auth/logout": {
+        "/V1/visitor/auth/logout": {
             "delete": {
-                "operationId": "v1.mobile.auth.logout",
+                "operationId": "V1.mobile.auth.logout",
                 "summary": "logout",
                 "tags": [
                     "Visitor/Auth"
@@ -977,9 +977,9 @@
                 }
             }
         },
-        "/v1/visitor/profile/booth": {
+        "/V1/visitor/profile/booth": {
             "get": {
-                "operationId": "v1.mobile.booth.index",
+                "operationId": "V1.mobile.booth.index",
                 "summary": "all",
                 "tags": [
                     "Visitor/Booth"
@@ -1027,9 +1027,9 @@
                 }
             }
         },
-        "/v1/visitor/profile/booth/{booth}": {
+        "/V1/visitor/profile/booth/{booth}": {
             "get": {
-                "operationId": "v1.mobile.booth.show",
+                "operationId": "V1.mobile.booth.show",
                 "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
                 "summary": "show",
                 "tags": [
@@ -1052,7 +1052,7 @@
                 }
             }
         },
-        "/v1/auth/password/forgot": {
+        "/V1/auth/password/forgot": {
             "post": {
                 "operationId": "password.forgotPassword",
                 "summary": "forgot Password",
@@ -1087,7 +1087,7 @@
                 "security": []
             }
         },
-        "/v1/auth/password/otp/verify": {
+        "/V1/auth/password/otp/verify": {
             "post": {
                 "operationId": "password.verifyForgotPasswordOtp",
                 "summary": "verify Forgot Password Otp",
@@ -1122,7 +1122,7 @@
                 "security": []
             }
         },
-        "/v1/auth/password/reset": {
+        "/V1/auth/password/reset": {
             "post": {
                 "operationId": "password.resetPassword",
                 "summary": "reset Password",
@@ -1157,9 +1157,9 @@
                 "security": []
             }
         },
-        "/v1/visitor/profile": {
+        "/V1/visitor/profile": {
             "get": {
-                "operationId": "v1.mobile.profile.show",
+                "operationId": "V1.mobile.profile.show",
                 "summary": "show",
                 "tags": [
                     "Visitor/Profile"
@@ -1181,7 +1181,7 @@
                 }
             }
         },
-        "/v1/visitor/profile/update": {
+        "/V1/visitor/profile/update": {
             "post": {
                 "operationId": "profile.updateProfile",
                 "summary": "updateProfile",
@@ -1217,7 +1217,7 @@
                 }
             }
         },
-        "/v1/visitor/profile/password/update": {
+        "/V1/visitor/profile/password/update": {
             "put": {
                 "operationId": "profile.updatePassword",
                 "summary": "updatePassword",
@@ -1254,7 +1254,7 @@
                 }
             }
         },
-        "/v1/visitor/profile/phone/request": {
+        "/V1/visitor/profile/phone/request": {
             "post": {
                 "operationId": "profile.requestPhoneUpdate",
                 "summary": "requestPhoneUpdate",
@@ -1291,7 +1291,7 @@
                 }
             }
         },
-        "/v1/visitor/profile/phone/verify": {
+        "/V1/visitor/profile/phone/verify": {
             "post": {
                 "operationId": "profile.verifyPhoneUpdate",
                 "summary": "verifyPhoneUpdate",
@@ -1328,7 +1328,7 @@
                 }
             }
         },
-        "/v1/admin/fcm/register-token": {
+        "/V1/admin/fcm/register-token": {
             "post": {
                 "operationId": "admin.fcm.store",
                 "tags": [
@@ -1364,7 +1364,7 @@
                 }
             }
         },
-        "/v1/exhibitor/fcm/register-token": {
+        "/V1/exhibitor/fcm/register-token": {
             "post": {
                 "operationId": "exhibitor.fcm.store",
                 "tags": [
@@ -1400,7 +1400,7 @@
                 }
             }
         },
-        "/v1/visitor/fcm/register-token": {
+        "/V1/visitor/fcm/register-token": {
             "post": {
                 "operationId": "visitor.fcm.store",
                 "tags": [

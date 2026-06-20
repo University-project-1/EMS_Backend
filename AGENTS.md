@@ -10,18 +10,18 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
 - php - 8.3
-- laravel/framework (LARAVEL) - v13
-- laravel/passport (PASSPORT) - v13
+- laravel/framework (LARAVEL) - V13
+- laravel/passport (PASSPORT) - V13
 - laravel/prompts (PROMPTS) - v0
 - laravel/socialite (SOCIALITE) - v5
 - larastan/larastan (LARASTAN) - v3
 - laravel/boost (BOOST) - v2
 - laravel/mcp (MCP) - v0
-- laravel/pail (PAIL) - v1
-- laravel/pint (PINT) - v1
+- laravel/pail (PAIL) - V1
+- laravel/pint (PINT) - V1
 - laravel/telescope (TELESCOPE) - v5
 - pestphp/pest (PEST) - v4
-- phpunit/phpunit (PHPUNIT) - v12
+- phpunit/phpunit (PHPUNIT) - V12
 - tailwindcss (TAILWINDCSS) - v4
 
 ## Skills Activation
