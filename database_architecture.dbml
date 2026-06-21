@@ -33,7 +33,7 @@ Table companies {
   name varchar
   business_sector varchar
   social_links json [note: 'JSON object for website, facebook, twitter, linkedin, etc.']
-  phone varchar [unique, note: 'Company public phone']
+  phone varchar [note: 'Company public phone']
   year_founded integer
   description text
   headquarters_lat float

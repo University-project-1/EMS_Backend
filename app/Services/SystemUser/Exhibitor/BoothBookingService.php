@@ -25,10 +25,8 @@ class BoothBookingService
     public function confirmBoothBooking(SystemUser $user, BookingBoothDTO $bookingDTO, ?CompanyDTO $companyDTO){
         return DB::transaction(function() use ($user, $bookingDTO, $companyDTO){
             $booth = Booth::findOrFail($bookingDTO->boothId);
-            Log::info(1);
             $company = $bookingDTO->companyId ? Company::findOrFail($bookingDTO->companyId)
             : $this->companyService->create($user, $companyDTO);
-            Log::info(2);
 
             $boothRequest = BoothRequest::create([
                 'system_user_id' => $user->id,
@@ -42,7 +40,7 @@ class BoothBookingService
 
             $boothRequest->update(['final_price' => $booth->price + $servicesCost]);
 
-            return $boothRequest->load('services');;
+            return $boothRequest->load(['services', 'company.logoMedia', 'company.galleryMedia']);;
         });
     }
 

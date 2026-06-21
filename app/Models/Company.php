@@ -46,4 +46,14 @@ class Company extends Model implements HasMedia
     {
         return $this->morphMany(Event::class, 'eventable');
     }
+
+    public function logoMedia()
+    {
+        return $this->media()->where('collection_name', 'logo');
+    }
+
+    public function galleryMedia()
+    {
+        return $this->media()->where('collection_name', 'gallery');
+    }
 }
