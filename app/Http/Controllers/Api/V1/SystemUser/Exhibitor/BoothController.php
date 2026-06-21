@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\SystemUser\Exhibitor;
 
-use App\DTOs\SystemUser\BookingBoothDTO;
+use App\DTOs\SystemUser\BoothRequestDTO;
 use App\DTOs\SystemUser\CompanyDTO;
 use App\Filter\BookedBoothFilter;
 use App\Filter\MaxFilter;
@@ -12,7 +12,7 @@ use App\Http\Requests\SystemUser\Exhibitor\StoreBoothRequestRequest;
 use App\Http\Resources\SystemUser\Shared\BoothRequestResource;
 use App\Http\Resources\SystemUser\Shared\BoothResource;
 use App\Models\Booth;
-use App\Services\SystemUser\Exhibitor\BoothBookingService;
+use App\Services\SystemUser\Exhibitor\BoothRequestService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -22,7 +22,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class BoothController extends Controller
 {
     public function __construct(
-        private readonly BoothBookingService $bookingService,
+        private readonly BoothRequestService $boothRequestService,
     ){}
     /**
      * all
@@ -75,11 +75,11 @@ class BoothController extends Controller
     public function book(StoreBoothRequestRequest $request)
     {
         $validated = $request->validated();
-        $dto = BookingBoothDTO::fromRequest($validated);
+        $dto = BoothRequestDTO::fromRequest($validated);
         $companyDto = isset($validated['new_company'])
             ? CompanyDTO::fromRequest($validated['new_company'])
             : null;
-        $boothRequest = $this->bookingService->confirmBoothBooking($request->user('system'), $dto, $companyDto);
+        $boothRequest = $this->boothRequestService->confirmBoothBooking($request->user('system'), $dto, $companyDto);
 
         return successResponse(
             data: new BoothRequestResource($boothRequest),

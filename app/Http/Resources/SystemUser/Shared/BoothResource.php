@@ -24,6 +24,8 @@ class BoothResource extends JsonResource
 
             'hall_id' => $this->whenLoaded('hall', $this->hall_id),
             'company_id' => $this->whenLoaded('company', $this->company_id),
+
+            'created_at' => $this->created_at
         ];
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Services\SystemUser\Exhibitor;
 
-use App\DTOs\SystemUser\BookingBoothDTO;
+use App\DTOs\SystemUser\BoothRequestDTO;
 use App\DTOs\SystemUser\CompanyDTO;
 use App\Enum\Status;
 use App\Models\Booth;
@@ -11,9 +11,8 @@ use App\Models\Company;
 use App\Models\Service;
 use App\Models\SystemUser;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
-class BoothBookingService
+class BoothRequestService
 {
     /**
      * Create a new class instance.
@@ -22,7 +21,7 @@ class BoothBookingService
         public readonly CompanyService $companyService,
     ){}
 
-    public function confirmBoothBooking(SystemUser $user, BookingBoothDTO $bookingDTO, ?CompanyDTO $companyDTO){
+    public function confirmBoothBooking(SystemUser $user, BoothRequestDTO $bookingDTO, ?CompanyDTO $companyDTO){
         return DB::transaction(function() use ($user, $bookingDTO, $companyDTO){
             $booth = Booth::findOrFail($bookingDTO->boothId);
             $company = $bookingDTO->companyId ? Company::findOrFail($bookingDTO->companyId)
