@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController as AdminEventHallController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
@@ -32,5 +34,12 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::resource('service', ServiceController::class);
+
+        // eventHall
+        Route::prefix('eventHall/')->group(function(){
+            Route::get('', [EventHallController::class, 'index'])->name('admin.event_halls.index');
+            Route::get('{eventHall}', [EventHallController::class, 'show'])->name('admin.event_halls.show');
+            Route::patch('{eventHall}', [AdminEventHallController::class, 'update']);
+        });
     });
 });
