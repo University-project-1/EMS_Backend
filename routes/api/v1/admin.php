@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
@@ -29,6 +30,13 @@ Route::prefix('admin')->group(function () {
             Route::get('/', [BoothController::class, 'index']);
             Route::get('/{booth}', [BoothController::class, 'show']);
             Route::patch('/{booth}', [BoothController::class, 'update']);
+
+            Route::prefix('requests')->group(function(){
+                Route::get('', [BoothRequestController::class, 'index']);
+                Route::get('/{boothRequest}', [BoothRequestController::class, 'show']);
+                Route::post('/approve/{boothRequest}', [BoothRequestController::class, 'approve']);
+                Route::patch('/reject/{boothRequest}', [BoothRequestController::class, 'reject']);
+            });
         });
 
         Route::resource('service', ServiceController::class);

@@ -2,13 +2,12 @@
 
 namespace App\Services\SystemUser\Admin;
 
-use App\DTOs\SystemUser\BoothRequestDTO;
 use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\BoothRequest;
+use App\Notifications\SystemUser\BoothApprovedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BoothRequestService
@@ -19,7 +18,7 @@ class BoothRequestService
     public function __construct(){}
 
     public function getConflictingRequests(BoothRequest $request){
-        return $boothRequests = Booth::where('id','!=', $request->id)
+        return $boothRequests = BoothRequest::where('id','!=', $request->id)
             ->where('booth_id', $request->booth_id)
             ->where('status', Status::PENDING)
             ->with(['company', 'company.logoMedia'])
@@ -42,6 +41,8 @@ class BoothRequestService
                 ->where('booth_id', $boothRequest->booth_id)
                 ->where('status', Status::PENDING)
                 ->update(['status' => Status::REJECTED]);
+
+            $boothRequest->systemUser->notify(new BoothApprovedNotification($boothRequest));
         });
     }
 

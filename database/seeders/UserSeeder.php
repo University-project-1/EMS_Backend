@@ -31,13 +31,15 @@ class UserSeeder extends Seeder
             'email' => 'fawzy.sukkar2005@gmail.com',
             'password' => '12345678',
             'type' => SystemUserType::ADMIN,
-        ]);
+            'email_verified_at' => now(),
+            ]);
 
         SystemUser::create([
             'name' => 'Elza3eem',
             'email' => 'abdalrahmansalloum200@gmail.com',
             'type' => SystemUserType::ADMIN,
             'password' => '12345678',
+            'email_verified_at' => now(),
         ]);
 
         SystemUser::create([
@@ -45,6 +47,7 @@ class UserSeeder extends Seeder
             'email' => 'zuheiralhomsi73@gmail.com',
             'type' => SystemUserType::EXHIBITOR,
             'password' => '12345678',
+            'email_verified_at' => now(),
         ]);
     }
 }

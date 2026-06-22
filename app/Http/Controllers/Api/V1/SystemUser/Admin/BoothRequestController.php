@@ -8,6 +8,7 @@ use App\Http\Resources\SystemUser\Shared\BoothRequestResource;
 use App\Models\BoothRequest;
 use App\Services\SystemUser\Admin\BoothRequestService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -35,7 +36,7 @@ class BoothRequestController extends Controller
     }
 
     public function show(BoothRequest $boothRequest){
-        $boothRequest->load(['systeUser', 'company', 'company.logoMedia', 'company.galleryMedia', 'booth', 'services']);
+        $boothRequest->load(['systemUser', 'company', 'company.logoMedia', 'company.galleryMedia', 'booth', 'services']);
         return successResponse(
             data: new BoothRequestResource($boothRequest),
             message: 'booth request retrived successfully',
@@ -49,7 +50,7 @@ class BoothRequestController extends Controller
             if($conflicts->isNotEmpty()){
                 return errorResponse(
                     errors: BoothRequestResource::collection($conflicts)->response()->getData(true),
-                    message: 'Conflicting requests retrieved successfully',
+                    message: 'Conflicting requests retrieved',
                     code: 409,
                 );
             }
