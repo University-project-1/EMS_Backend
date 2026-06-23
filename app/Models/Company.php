@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\Status;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-#[Fillable(['name', 'business_sector', 'social_links', 'phone', 'year_founded', 'description', 'headquarters_lat', 'headquarters_lng'])]
+#[Fillable(['name', 'business_sector', 'social_links', 'phone', 'year_founded', 'description', 'headquarters_lat', 'headquarters_lng', 'status'])]
 class Company extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia, SoftDeletes;
@@ -24,6 +25,7 @@ class Company extends Model implements HasMedia
             'year_founded' => 'integer',
             'headquarters_lat' => 'float',
             'headquarters_lng' => 'float',
+            'status' => Status::class,
         ];
     }
 

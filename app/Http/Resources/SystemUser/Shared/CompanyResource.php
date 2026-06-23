@@ -24,6 +24,7 @@ class CompanyResource extends JsonResource
             'social_links' => $this->social_links,
             'headquarters_lat' => (float) $this->headquarters_lat,
             'headquarters_lng' => (float) $this->headquarters_lng,
+            'status' => $this->status,
 
             'logo' => $this->whenLoaded('logoMedia', fn () => $this->getFirstMediaUrl('logo')),
 

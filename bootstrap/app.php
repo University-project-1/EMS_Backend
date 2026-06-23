@@ -64,13 +64,13 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             // 4. Not Found
-            if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException) {
-                return errorResponse(
-                    __('errors.not_found'),
-                    null,
-                    404
-                );
-            }
+            // if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException) {
+            //     return errorResponse(
+            //         __('errors.not_found'),
+            //         null,
+            //         404
+            //     );
+            // }
 
             // 5. Method Not Allowed
             if ($e instanceof MethodNotAllowedHttpException) {

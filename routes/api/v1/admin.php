@@ -27,16 +27,17 @@ Route::prefix('admin')->group(function () {
         Route::post('profile', [ProfileController::class, 'update']);
 
         Route::prefix('booths')->group(function(){
-            Route::get('/', [BoothController::class, 'index']);
-            Route::get('/{booth}', [BoothController::class, 'show']);
-            Route::patch('/{booth}', [BoothController::class, 'update']);
 
             Route::prefix('requests')->group(function(){
-                Route::get('', [BoothRequestController::class, 'index']);
+                Route::get('/', [BoothRequestController::class, 'index']);
                 Route::get('/{boothRequest}', [BoothRequestController::class, 'show']);
                 Route::post('/approve/{boothRequest}', [BoothRequestController::class, 'approve']);
                 Route::patch('/reject/{boothRequest}', [BoothRequestController::class, 'reject']);
-            });
+                });
+                
+            Route::get('/', [BoothController::class, 'index']);
+            Route::get('/{booth}', [BoothController::class, 'show']);
+            Route::patch('/{booth}', [BoothController::class, 'update']);
         });
 
         Route::resource('service', ServiceController::class);

@@ -23,6 +23,7 @@ class BoothRequestService
 
     public function confirmBoothBooking(SystemUser $user, BoothRequestDTO $bookingDTO, ?CompanyDTO $companyDTO){
         return DB::transaction(function() use ($user, $bookingDTO, $companyDTO){
+            Service::lockForUpdate();
             $booth = Booth::findOrFail($bookingDTO->boothId);
             $company = $bookingDTO->companyId ? Company::findOrFail($bookingDTO->companyId)
             : $this->companyService->create($user, $companyDTO);
@@ -49,7 +50,7 @@ class BoothRequestService
         $servicesToInsert = [];
 
         $serviceIds = array_column($services, 'service_id');
-        $dbPrices = Service::whereIn('id', $serviceIds)->pluck('price', 'id');
+        $dbPrices = Service::whereIn('id', $serviceIds)->lockForUpdate()->pluck('price', 'id');
 
         foreach ($services as $service) {
             $serviceId = $service['service_id'];

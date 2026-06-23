@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('description');
             $table->float('headquarters_lat');
             $table->float('headquarters_lng');
+            $table->string('status')->default('pending');
             $table->timestamps();
             $table->softDeletes();
         });

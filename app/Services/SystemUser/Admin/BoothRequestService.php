@@ -5,6 +5,7 @@ namespace App\Services\SystemUser\Admin;
 use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\BoothRequest;
+use App\Models\Company;
 use App\Notifications\SystemUser\BoothApprovedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -31,6 +32,7 @@ class BoothRequestService
         }
         return DB::transaction(function() use ($boothRequest){
             $boothRequest->update(['status' => Status::APPROVED]);
+            Company::findOrFail($boothRequest->company_id)->update(['status' => Status::APPROVED]);
             Booth::where('id', $boothRequest->booth_id)
             ->update([
                 'company_id' => $boothRequest->company_id,
@@ -50,6 +52,7 @@ class BoothRequestService
         if($boothRequest->status !== Status::PENDING){
             throw new HttpException(400, __('booth.invalid_status'));
         }
+        Company::findOrFail($boothRequest->company_id)->update(['status' => Status::APPROVED]);
         return $boothRequest->update(['status' => Status::REJECTED]);
     }
 }

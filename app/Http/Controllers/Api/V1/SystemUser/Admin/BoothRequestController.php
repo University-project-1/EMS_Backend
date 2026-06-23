@@ -7,16 +7,29 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SystemUser\Shared\BoothRequestResource;
 use App\Models\BoothRequest;
 use App\Services\SystemUser\Admin\BoothRequestService;
+use Dedoc\Scramble\Attributes\Group;
+use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
+#[Group('SystemUser/Admin/BoothRequests')]
 class BoothRequestController extends Controller
 {
     public function __construct(
         public readonly BoothRequestService $boothRequestService,
     ){}
+    
+    #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 15')]
+    #[QueryParameter('filter[name]', type: 'string', description: 'Filter by request name (partial match).')]
+    #[QueryParameter('filter[status]', type: 'string', description: 'Filter by request status (exact match).')]
+    #[QueryParameter('filter[created_date]', type: 'string', description: 'Filter by created date (mapped to created_at).')]
+    #[QueryParameter('sort', type: 'string', description: 'Sort by created_at. Use -created_at for descending.')]
+    #[QueryParameter('include', type: 'string', description: 'Include related resources. Allowed: company.')]
+    /**
+     * all requests
+     */
     public function index(){
         $boothRequests = QueryBuilder::for(BoothRequest::class)
         ->allowedFilters(
@@ -26,7 +39,7 @@ class BoothRequestController extends Controller
         )
         ->allowedSorts('created_at')
         ->allowedIncludes('company')
-        ->paginate(request()->per_page(5));
+        ->paginate(request()->query('per_page', 15));
 
 
         return successResponse(
@@ -34,7 +47,9 @@ class BoothRequestController extends Controller
             message: 'booth requests retrived successfully',
         );
     }
-
+    /**
+     * show request
+     */
     public function show(BoothRequest $boothRequest){
         $boothRequest->load(['systemUser', 'company', 'company.logoMedia', 'company.galleryMedia', 'booth', 'services']);
         return successResponse(
@@ -42,14 +57,18 @@ class BoothRequestController extends Controller
             message: 'booth request retrived successfully',
         );
     }
-
+    /**
+     * approve request
+     */
     public function approve(Request $request, BoothRequest $boothRequest){
         $force = $request->boolean('force', false);
         if (! $force) {
             $conflicts = $this->boothRequestService->getConflictingRequests($boothRequest);
             if($conflicts->isNotEmpty()){
                 return errorResponse(
-                    errors: BoothRequestResource::collection($conflicts)->response()->getData(true),
+                    errors: [
+                        'data' => BoothRequestResource::collection($conflicts)->response()->getData(true),
+                    ],
                     message: 'Conflicting requests retrieved',
                     code: 409,
                 );
@@ -61,7 +80,9 @@ class BoothRequestController extends Controller
             message: 'booth request approved successfully',
         );
     }
-
+    /**
+     * reject request
+     */
     public function reject(BoothRequest $boothRequest){
         $this->boothRequestService->reject($boothRequest);
         return successResponse(
