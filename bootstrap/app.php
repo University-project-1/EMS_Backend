@@ -64,13 +64,13 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             // 4. Not Found
-            // if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException) {
-            //     return errorResponse(
-            //         __('errors.not_found'),
-            //         null,
-            //         404
-            //     );
-            // }
+            if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException) {
+                return errorResponse(
+                    __('errors.not_found'),
+                    null,
+                    404
+                );
+            }
 
             // 5. Method Not Allowed
             if ($e instanceof MethodNotAllowedHttpException) {
@@ -81,9 +81,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 );
             }
 
-            if ($e instanceof HttpResponseException) {
-                return $e->getResponse();
-            }
+            // if ($e instanceof HttpResponseException) {
+            //     return $e->getResponse();
+            // }
 
             // 6. Rate limit
             if ($e instanceof ThrottleRequestsException) {
@@ -91,6 +91,14 @@ return Application::configure(basePath: dirname(__DIR__))
                     __('errors.too_many_requests'),
                     null,
                     429
+                );
+            }
+
+            if ($e instanceof HttpResponseException) {
+                return errorResponse(
+                    $e->getMessage() ?: __('errors.http_error'),
+                    null,
+                    $e->getStatusCode()
                 );
             }
 

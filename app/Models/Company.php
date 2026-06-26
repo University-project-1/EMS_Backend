@@ -50,7 +50,7 @@ class Company extends Model implements HasMedia
     }
 
     public function invitations() : MorphMany{
-        return $this->morphMany(Invitation::class, 'invitable');
+        return $this->morphMany(Invitation::class, 'inviteable');
     }
 
     public function logoMedia()

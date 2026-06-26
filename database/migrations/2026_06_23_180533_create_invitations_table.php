@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('invitations', function (Blueprint $table) {
             $table->id();
-            $table->morphs('invitable');
+            $table->morphs('inviteable');
             $table->string('email');
             $table->string('token')->unique();
             $table->string('status')->default('pending');

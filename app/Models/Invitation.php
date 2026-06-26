@@ -6,7 +6,7 @@ use App\Enum\Status;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['invitable_type', 'invitable_id', 'email', 'token', 'status', 'expires_at'])]
+#[Fillable(['inviteable_type', 'inviteable_id', 'email', 'token', 'status', 'expires_at'])]
 class Invitation extends Model
 {
     protected function casts():array
@@ -16,7 +16,7 @@ class Invitation extends Model
         ];
     }
 
-    public function invitable(){
+    public function inviteable(){
         return $this->morphTo();
     }
 }
