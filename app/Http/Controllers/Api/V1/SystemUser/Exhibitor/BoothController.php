@@ -15,6 +15,7 @@ use App\Models\Booth;
 use App\Services\SystemUser\Exhibitor\BoothRequestService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
+use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -57,7 +58,6 @@ class BoothController extends Controller
             message: __('booth.list_success'),
         );
     }
-
     /**
      * show
      */
@@ -68,7 +68,6 @@ class BoothController extends Controller
             message: __('booth.show_success'),
         );
     }
-
     /**
      * request booth booking
      */
@@ -84,6 +83,23 @@ class BoothController extends Controller
         return successResponse(
             data: new BoothRequestResource($boothRequest),
             message: 'booking confirmed successfully, needs admin confirmation',
+        );
+    }
+    /**
+     * My booths
+     */
+    public function ownedBooths(Request $request){
+        $userId = $request->user('system')->id;
+
+        $booths = Booth::with(['company'])
+            ->whereHas('systemUsers', fn($q) => $q->whereKey($userId))
+            ->orWhereHas('company.systemUsers', fn($q) => $q->whereKey($userId))
+            ->latest()
+            ->paginate(5);
+
+        return successResponse(
+            data: BoothResource::collection($booths)->response()->getData(true),
+            message: __('booth.list_success')
         );
     }
 }

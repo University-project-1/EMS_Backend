@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\Api\V1\Shared\FCMController;
+use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
@@ -33,8 +34,14 @@ Route::prefix('exhibitor')->group(function(){
         Route::get('profile', [ProfileController::class, 'show']);
         Route::post('profile', [ProfileController::class, 'update']);
 
+        Route::prefix('halls')->group(function(){
+            Route::get('/', [HallController::class, 'index']);
+            Route::get('/{hall}', [HallController::class, 'show']);
+        });
+
         Route::prefix('booth')->group(function(){
             Route::get('/', [BoothController::class, 'index']);
+            Route::get('/my', [BoothController::class, 'ownedBooths']);
             Route::get('/{booth}', [BoothController::class, 'show']);
             Route::post('request-booth', [BoothController::class, 'book']);
         });
