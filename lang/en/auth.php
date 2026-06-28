@@ -15,7 +15,7 @@ return [
     'otp_daily_limit' => 'Daily OTP limit exceeded.',
     'invalid_reset_token' => 'The password reset token is invalid or has expired.',
     'failed' => 'Invalid credentials.',
-    'unauthenticated' => 'You must be logged in.',
+    'unauthenticated' => 'unauthenticated',
     'forbidden' => 'You are not allowed to perform this action.',
     'login_success' => 'Login successful.',
     'logout_success' => 'Logged out successfully.',
