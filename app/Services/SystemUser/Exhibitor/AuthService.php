@@ -17,7 +17,9 @@ class AuthService
     /**
      * Create a new class instance.
      */
-    public function __construct(){}
+    public function __construct(
+        private readonly InvitationService $invitationService,
+    ){}
 
     public function login(LoginDTO $dto){
         $exhibitor = SystemUser::where('email', $dto->email)->first();
@@ -36,6 +38,13 @@ class AuthService
     }
 
     public function register(RegisterDTO $dto){
+        if ($dto->inviteToken) {
+            $invitation = $this->invitationService->getInvitationByToken($dto->inviteToken);
+
+            if ($invitation->email !== $dto->email) {
+                abort(400, __('invitation.email_mismatch'));
+            }
+        }
         return DB::transaction(function() use ($dto){
             $exhibitor = SystemUser::updateOrCreate(
                 ['email' => $dto->email],
@@ -44,10 +53,19 @@ class AuthService
                     'password' => Hash::make($dto->password),
                 ]
             );
-            event(new Registered($exhibitor));
+            $message = "auth.verification_sent";
+            if ($dto->inviteToken) {
+                $exhibitor->markEmailAsVerified();
+                $this->invitationService->approve($dto->inviteToken);
+                $message = "auth.email_verified";
+
+            } else {
+                event(new Registered($exhibitor));
+            }
 
             $token = $exhibitor->createToken('exhibitor_token')->accessToken;
             return [
+                'message' => $message,
                 'user'  => $exhibitor,
                 'token' => $token,
             ];

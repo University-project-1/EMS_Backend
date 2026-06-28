@@ -65,4 +65,8 @@ class Booth extends Model implements HasMedia
     {
         return $this->morphMany(Saved::class, 'savedable');
     }
+
+    public function invitations() : MorphMany{
+        return $this->morphMany(Invitation::class, 'inviteable');
+    }
 }

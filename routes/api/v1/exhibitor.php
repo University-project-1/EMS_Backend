@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
@@ -42,8 +43,21 @@ Route::prefix('exhibitor')->group(function(){
         Route::prefix('booth')->group(function(){
             Route::get('/', [BoothController::class, 'index']);
             Route::get('/my', [BoothController::class, 'ownedBooths']);
-            Route::get('/{booth}', [BoothController::class, 'show']);
             Route::post('request-booth', [BoothController::class, 'book']);
+            Route::get('/{booth}', [BoothController::class, 'show']);
+            Route::get('/{booth}/invitations', [InvitationController::class, 'boothInvitations']);
+            Route::post('/{booth}/invitations', [InvitationController::class, 'storeForBooth']);
+        });
+
+        Route::prefix('companies')->group(function(){
+            Route::get('/{company}/invitations', [InvitationController::class, 'companyInvitations']);
+            Route::post('/{company}/invitations', [InvitationController::class, 'storeForCompany']);
+        });
+
+        Route::prefix('invitation')->group(function(){
+            Route::get('/{token}', [InvitationController::class, 'show']);
+            Route::post('/{token}/accept', [InvitationController::class, 'approve']);
+            Route::post('/{token}/reject', [InvitationController::class, 'reject']);
         });
 
         Route::get('services', [ServiceController::class, 'index']);

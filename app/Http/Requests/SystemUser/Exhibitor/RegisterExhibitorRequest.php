@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\SystemUser\Exhibitor;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,15 +17,14 @@ class RegisterExhibitorRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('system_users', 'email')->whereNotNull('email_verified_at')],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'invite_token' => ['nullable', 'string', 'size:20'],
         ];
     }
 }

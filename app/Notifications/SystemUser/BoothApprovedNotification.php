@@ -27,8 +27,7 @@ class BoothApprovedNotification extends Notification implements ShouldQueue
         $booth = $this->boothRequest->booth;
 
         $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
-        $actionUrl = "{$frontendUrl}/booths/{$booth->id}?token={$booth->qr_token}";
-
+        $actionUrl = "{$frontendUrl}/dashboard/booths/{$booth->id}";
         return (new MailMessage)
             ->subject('Booth Booking Confirmation - Booth Approved')
             ->greeting('Hello ' . $notifiable->name . ',')
