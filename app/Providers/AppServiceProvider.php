@@ -3,13 +3,13 @@
 namespace App\Providers;
 
 use Dedoc\Scramble\Scramble;
-use Illuminate\Support\ServiceProvider;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
-use Dedoc\Scramble\Support\Generator\OpenApi;
-use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -52,19 +52,19 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('forgot_password', function (Request $request) {
             $phone = $request->input('phone') ?? $request->ip();
 
-            return Limit::perHour(10)->by($phone)->response(function () {
+            return Limit::perMinute(10)->by($phone)->response(function () { // perHour to perMinute for testing
                 return errorResponse(__('rate_limit.forgot_password'), [], 429);
             });
         });
 
-        RateLimiter::for('profile_update', function (Request $request) {
+        RateLimiter::for('profile_update', function (Request $request) { // 2 to 20 for testing
             return Limit::perMinute(20)->by($request->user()->id)->response(function () {
                 return errorResponse(__('rate_limit.profile_update'), [], 429);
             });
         });
 
         RateLimiter::for('password_update', function (Request $request) {
-            return Limit::perMinute(3)->by($request->user()->id)->response(function () {
+            return Limit::perMinute(10)->by($request->user()->id)->response(function () { // 3 to 10 for testing
                 return errorResponse(__('rate_limit.password_update'), [], 429);
             });
         });

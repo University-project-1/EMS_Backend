@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Company;
+use App\Models\SystemUser;
+use Illuminate\Database\Seeder;
 
 class CompanySeeder extends Seeder
 {
@@ -33,6 +33,20 @@ class CompanySeeder extends Seeder
             'description' => 'Organic, sustainable food producer with regional distribution.',
             'headquarters_lat' => 33.500000,
             'headquarters_lng' => 36.300000,
+        ]);
+
+        $elcoach = SystemUser::where('name', 'Elcoach')->firstOrFail();
+        $fawzy = SystemUser::where('name', 'Fawzy')->firstOrFail();
+        $elza3eem = SystemUser::where('name', 'Elza3eem')->firstOrFail();
+
+        $companyA->systemUsers()->syncWithoutDetaching([
+            $elcoach->id,
+            $fawzy->id,
+        ]);
+
+        $companyB->systemUsers()->syncWithoutDetaching([
+            $elza3eem->id,
+            $elcoach->id,
         ]);
     }
 }

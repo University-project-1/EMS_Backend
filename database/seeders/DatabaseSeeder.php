@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Booth;
-use Illuminate\Support\Str;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -22,8 +20,8 @@ class DatabaseSeeder extends Seeder
             CompanySeeder::class,
             HallSeeder::class,
             BoothSeeder::class,
+            BoothRequestSeeder::class,
             EventSeeder::class,
         ]);
     }
-
 }
