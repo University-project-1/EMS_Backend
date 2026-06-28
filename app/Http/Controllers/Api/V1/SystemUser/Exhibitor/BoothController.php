@@ -57,6 +57,7 @@ class BoothController extends Controller
             message: __('booth.list_success'),
         );
     }
+    //TODO : my booths
 
     /**
      * show

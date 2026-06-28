@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('invitations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('sender_id')->constrained('system_users')->cascadeOnDelete();
             $table->morphs('inviteable');
             $table->string('email');
             $table->string('token')->unique();

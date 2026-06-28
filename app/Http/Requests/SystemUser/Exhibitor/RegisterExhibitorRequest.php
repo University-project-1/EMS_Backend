@@ -26,7 +26,8 @@ class RegisterExhibitorRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('system_users', 'email')->whereNotNull('email_verified_at')],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'invite_token' => ['nullable', 'string', 'size:20'],
         ];
     }
 }

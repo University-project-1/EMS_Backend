@@ -4,7 +4,9 @@ namespace App\Services\SystemUser\Exhibitor;
 use App\Enum\Status;
 use App\Models\Invitation;
 use App\Models\SystemUser;
+use App\Notifications\SystemUser\Exhibitor\InvitationNotification;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +16,7 @@ class InvitationService
 {
     public function __construct() {}
 
-    public function create(Model $inviteable, string $email): Invitation
+    public function invite(Model $inviteable, SystemUser $sender, string $email): Invitation
     {
         $user = SystemUser::where('email', $email)->first();
         if ($user && $inviteable->systemUsers()->where('system_user_id', $user->id)->exists()) {
@@ -22,12 +24,18 @@ class InvitationService
         }
 
         $invitation = $inviteable->invitations()->create([
+            'sender_id' => $sender->id,
             'email' => $email,
             'token' => Str::random(20),
             'expires_at' => now()->addDays(2),
         ]);
 
-        // notify...
+        if ($user) {
+            $user->notify(new InvitationNotification($invitation));
+        }
+        else {
+            Notification::route('mail', $email)->notify(new InvitationNotification($invitation));
+        }
 
         return $invitation;
     }
@@ -69,5 +77,20 @@ class InvitationService
         }
 
         $invitation->update(['status' => Status::REJECTED]);
+    }
+
+    public function getInvitationByToken(string $token): Invitation
+    {
+        $invitation = Invitation::with(['sender', 'inviteable'])
+            ->where('token', $token)
+            ->where('status', Status::PENDING)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$invitation) {
+            abort(404, __('errors.invalid_or_expired_token'));
+        }
+
+        return $invitation;
     }
 }

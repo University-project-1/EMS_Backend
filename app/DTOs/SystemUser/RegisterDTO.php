@@ -11,6 +11,7 @@ class RegisterDTO
         public readonly string $name,
         public readonly string $email,
         public readonly string $password,
+        public readonly ?string $inviteToken,
     ){}
 
         public static function fromRequest(array $data){
@@ -18,6 +19,7 @@ class RegisterDTO
             name: $data['name'],
             email: $data['email'],
             password: $data['password'],
+            inviteToken: $data['invite_token'] ?? null,
         );
     }
 }
