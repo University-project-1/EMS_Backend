@@ -66,7 +66,7 @@ class BoothSeeder extends Seeder
         Booth::create([
             'hall_id' => $halls->random()->id,
             'company_id' => null,
-            'qr_token' => (string) Str::uuid(),
+            'qr_token' => null,
             'number' => 'B-02',
             'svg_id' => 'booth-b02',
             'area' => 7.0,
