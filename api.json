@@ -139,7 +139,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -164,7 +164,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -248,7 +248,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -273,7 +273,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -357,7 +357,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -382,7 +382,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -416,7 +416,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -441,7 +441,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -515,7 +515,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -540,7 +540,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -565,7 +565,14 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "anyOf": [
+                                        {
+                                            "type": "string"
+                                        },
+                                        {
+                                            "type": "object"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -590,7 +597,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -684,7 +691,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -709,7 +716,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -732,7 +739,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -760,6 +767,14 @@
                         "description": "Filter services partially by name. Example: Screen",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[is_active]",
+                        "in": "query",
+                        "description": "Filter services partially by availability. Example: 1",
+                        "schema": {
+                            "type": "boolean"
                         }
                     },
                     {
@@ -803,7 +818,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -835,7 +850,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -863,7 +878,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -886,7 +901,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -923,7 +938,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -958,7 +973,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -983,7 +998,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1025,7 +1040,14 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "anyOf": [
+                                        {
+                                            "type": "object"
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -1068,7 +1090,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1090,7 +1112,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1114,7 +1136,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1223,7 +1245,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1247,7 +1269,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1281,7 +1303,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1312,7 +1334,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1337,7 +1359,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1363,7 +1385,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1394,7 +1416,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1420,7 +1442,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1460,7 +1482,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1494,7 +1516,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1528,7 +1550,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1578,7 +1600,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1602,7 +1624,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1633,7 +1655,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1663,7 +1685,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1694,7 +1716,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1734,7 +1756,14 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "anyOf": [
+                                        {
+                                            "type": "string"
+                                        },
+                                        {
+                                            "type": "object"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -1769,7 +1798,14 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "anyOf": [
+                                        {
+                                            "type": "string"
+                                        },
+                                        {
+                                            "type": "object"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -1804,7 +1840,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1841,7 +1877,14 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "anyOf": [
+                                        {
+                                            "type": "string"
+                                        },
+                                        {
+                                            "type": "object"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -1876,7 +1919,14 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "anyOf": [
+                                        {
+                                            "type": "string"
+                                        },
+                                        {
+                                            "type": "object"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -1911,7 +1961,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1948,7 +1998,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -1983,7 +2033,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2018,7 +2068,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2053,7 +2103,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2078,7 +2128,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2128,7 +2178,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2153,7 +2203,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2187,7 +2237,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2222,7 +2272,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2257,7 +2307,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2282,7 +2332,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2315,7 +2365,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2352,7 +2402,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2389,7 +2439,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2426,7 +2476,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2462,7 +2512,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2498,7 +2548,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -2534,7 +2584,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "type": "string"
                                 }
                             }
                         }
