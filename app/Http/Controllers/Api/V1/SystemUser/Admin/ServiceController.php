@@ -25,6 +25,7 @@ class ServiceController extends Controller
     ){}
 
     #[QueryParameter('filter[name]', type: 'string', description: 'Filter services partially by name. Example: Screen')]
+    #[QueryParameter('filter[is_active]', type: 'boolean', description: 'Filter services partially by availability. Example: 1')]
     #[QueryParameter('filter[min_price]', 'Filter services by minimum price', required: false, type: 'number')]
     #[QueryParameter('filter[max_price]', 'Filter services by maximum price', required: false, type: 'number')]
     #[QueryParameter('sort', type: 'string', description: 'Sort by field (price, name). Prefix with "-" for descending. Example: -price')]
@@ -37,7 +38,7 @@ class ServiceController extends Controller
 
         $services = QueryBuilder::for(Service::class)
             ->allowedFilters(
-                'name',
+                'name', 'is_active',
                 AllowedFilter::custom('min_price', new MinFilter(), 'price'),
                 AllowedFilter::custom('max_price', new MaxFilter(), 'price'),
             )
