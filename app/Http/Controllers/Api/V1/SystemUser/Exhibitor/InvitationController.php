@@ -45,11 +45,13 @@ class InvitationController extends Controller
      */
     public function show(string $token){
         $invitation = $this->invitationService->getInvitationByToken($token);
+        Gate::authorize('view', $invitation);
         return successResponse(
             data: new InvitaionResource($invitation),
             message: __('invitation.list_success'),
         );
     }
+
     /**
      * invite For Company
      */
@@ -57,7 +59,7 @@ class InvitationController extends Controller
     {
         Gate::authorize('manageInvitations', $company);
         $validated = $request->validate([
-            'email' => 'required|email|max:255'
+            'email' => 'required|email|max:255',
         ]);
         $this->invitationService->invite($company, $request->user(), $validated['email']);
 
@@ -83,8 +85,12 @@ class InvitationController extends Controller
     /**
      * approve
      */
-    public function approve(string $token){
-        $this->invitationService->approve($token);
+    public function approve(string $token)
+    {
+        $invitation = $this->invitationService->getInvitationByToken($token);
+        Gate::authorize('accept', $invitation);
+        $this->invitationService->approve($invitation);
+
         return successResponse(
             message: __('invitation.approve_success'),
         );
@@ -92,8 +98,12 @@ class InvitationController extends Controller
     /**
      * reject
      */
-    public function reject(string $token){
-        $this->invitationService->reject($token);
+    public function reject(string $token)
+    {
+        $invitation = $this->invitationService->getInvitationByToken($token);
+        Gate::authorize('reject', $invitation);
+        $this->invitationService->reject($invitation);
+
         return successResponse(
             message: __('invitation.reject_success'),
         );

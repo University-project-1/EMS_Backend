@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\SystemUser\Exhibitor;
 
 use App\Enum\Status;
@@ -6,10 +7,9 @@ use App\Models\Invitation;
 use App\Models\SystemUser;
 use App\Notifications\SystemUser\Exhibitor\InvitationNotification;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class InvitationService
@@ -32,50 +32,28 @@ class InvitationService
 
         if ($user) {
             $user->notify(new InvitationNotification($invitation));
-        }
-        else {
+        } else {
             Notification::route('mail', $email)->notify(new InvitationNotification($invitation));
         }
 
         return $invitation;
     }
 
-    public function approve(string $token): void
+    public function approve(Invitation $invitation): void
     {
-        $invitation = Invitation::where('token', $token)
-            ->where('status', Status::PENDING)
-            ->where('expires_at', '>', Carbon::now())
-            ->first();
-
-        if (!$invitation) {
-            abort(404, __('errors.invalid_or_expired_token'));
-        }
-
         $user = SystemUser::where('email', $invitation->email)->first();
 
-        if (!$user) {
+        if (! $user) {
             throw new HttpException(404, __('errors.user_not_found'));
-            // abort(404, __('errors.user_not_found'));
         }
         DB::transaction(function () use ($invitation, $user) {
-
             $invitation->inviteable->systemUsers()->syncWithoutDetaching($user->id);
-
             $invitation->update(['status' => Status::APPROVED]);
         });
     }
 
-    public function reject(string $token): void
+    public function reject(Invitation $invitation): void
     {
-        $invitation = Invitation::where('token', $token)
-            ->where('status', Status::PENDING)
-            ->where('expires_at', '>', Carbon::now())
-            ->first();
-
-        if (!$invitation) {
-            abort(404, __('errors.invalid_or_expired_token'));
-        }
-
         $invitation->update(['status' => Status::REJECTED]);
     }
 
@@ -87,7 +65,7 @@ class InvitationService
             ->where('expires_at', '>', now())
             ->first();
 
-        if (!$invitation) {
+        if (! $invitation) {
             abort(404, __('errors.invalid_or_expired_token'));
         }
 
