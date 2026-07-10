@@ -18,7 +18,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 #[Group('SystemUser/Admin/ManagerDirectory')]
 class ManagerDirectoryController extends Controller
 {
-    public function directory()
+    public function directory() 
     {
         $stats = Cache::remember('admin_directory_stats', 600, function () {
             return [

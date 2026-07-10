@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\SystemUser\Admin;
 
+use App\Enum\Status;
 use App\Filter\DateFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SystemUser\Shared\BoothRequestResource;
@@ -10,6 +11,7 @@ use App\Services\SystemUser\Admin\BoothRequestService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -20,7 +22,20 @@ class BoothRequestController extends Controller
     public function __construct(
         public readonly BoothRequestService $boothRequestService,
     ){}
-    
+
+    public function statistics(){
+        $stats = Cache::remember('admin_bootRequests_stat', 600, function(){
+            return [
+                'total_requests' => BoothRequest::count(),
+                'pending_requests' => BoothRequest::where('status', Status::PENDING->value)->count(),
+                'approved_requests' => BoothRequest::where('status', Status::APPROVED->value)->count(),
+            ];
+        });
+        return successResponse(
+            data: $stats,
+            message: "booth request statistics retrived successfully",
+        );
+    }
     #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 15')]
     #[QueryParameter('filter[name]', type: 'string', description: 'Filter by request name (partial match).')]
     #[QueryParameter('filter[status]', type: 'string', description: 'Filter by request status (exact match).')]

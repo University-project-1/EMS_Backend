@@ -37,6 +37,7 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('requests')->group(function () {
                 Route::get('/', [BoothRequestController::class, 'index']);
+                Route::get('/stats', [BoothRequestController::class, 'statistics']);
                 Route::get('/{boothRequest}', [BoothRequestController::class, 'show']);
                 Route::post('/approve/{boothRequest}', [BoothRequestController::class, 'approve']);
                 Route::patch('/reject/{boothRequest}', [BoothRequestController::class, 'reject']);
