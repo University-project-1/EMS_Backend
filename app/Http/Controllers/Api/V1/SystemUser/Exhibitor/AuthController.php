@@ -31,7 +31,6 @@ class AuthController extends Controller
         return successResponse(
             data: ['user'  => new ProfileResource($result['user']), 'token' => $result['token']],
             message: __($result['message']),
-            code: 200
         );
     }
 
