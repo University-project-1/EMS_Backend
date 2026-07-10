@@ -31,4 +31,9 @@ class InvitationPolicy
     {
         return $systemUser->email === $invitation->email;
     }
+
+    public function delete(SystemUser $systemUserm, Invitation $invitation)
+    {
+        return $systemUserm->id === $invitation->sender_id;
+    }
 }

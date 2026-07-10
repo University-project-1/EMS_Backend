@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SystemUser\Exhibitor\InvitaionResource;
 use App\Models\Booth;
 use App\Models\Company;
+use App\Models\Invitation;
 use App\Services\SystemUser\Exhibitor\InvitationService;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\Request;
@@ -16,39 +17,47 @@ class InvitationController extends Controller
 {
     public function __construct(
         public readonly InvitationService $invitationService,
-    ){}
+    ) {}
 
     /**
      * company Invitations
      */
-    public function companyInvitations(Company $company){
+    public function companyInvitations(Company $company)
+    {
         Gate::authorize('manageInvitations', $company);
         $invitations = $company->invitations()->with('sender')->latest()->paginate(5);
+
         return successResponse(
             data: InvitaionResource::collection($invitations),
             message: __('invitation.company_list_success'),
         );
     }
+
     /**
      * booth Invitations
      */
-    public function boothInvitations(Booth $booth){
+    public function boothInvitations(Booth $booth)
+    {
         Gate::authorize('manageInvitations', $booth);
         $invitations = $booth->invitations()->with('sender')->latest()->paginate(5);
+
         return successResponse(
             data: InvitaionResource::collection($invitations),
             message: __('invitation.booth_list_success'),
         );
     }
+
     /**
      * show
      */
-    public function show(string $token){
+    public function show(string $token)
+    {
         $invitation = $this->invitationService->getInvitationByToken($token);
         Gate::authorize('view', $invitation);
+
         return successResponse(
             data: new InvitaionResource($invitation),
-            message: __('invitation.list_success'),
+            message: __('invitation.show_success'),
         );
     }
 
@@ -67,6 +76,7 @@ class InvitationController extends Controller
             message: __('invitation.send_success')
         );
     }
+
     /**
      * invite For Booth
      */
@@ -74,7 +84,7 @@ class InvitationController extends Controller
     {
         Gate::authorize('manageInvitations', $booth);
         $validated = $request->validate([
-            'email' => 'required|email|max:255'
+            'email' => 'required|email|max:255',
         ]);
         $this->invitationService->invite($booth, $request->user(), $validated['email']);
 
@@ -82,6 +92,21 @@ class InvitationController extends Controller
             message: __('invitation.send_success')
         );
     }
+
+    /**
+     * cancele invitation
+     */
+    public function delete(Invitation $invitation)
+    {
+        Gate::authorize('delete', $invitation);
+        $invitation->delete();
+
+        return successResponse(
+            data: null,
+            message: __('invitation.cancel_success'),
+        );
+    }
+
     /**
      * approve
      */
@@ -95,6 +120,7 @@ class InvitationController extends Controller
             message: __('invitation.approve_success'),
         );
     }
+
     /**
      * reject
      */

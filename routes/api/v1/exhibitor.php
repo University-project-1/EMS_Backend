@@ -1,6 +1,5 @@
 <?php
 
-
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
@@ -11,7 +10,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('exhibitor')->group(function(){
+Route::prefix('exhibitor')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register']);
     Route::post('/email/resend-verification', [AuthController::class, 'resendVerificationEmail'])
@@ -23,11 +22,10 @@ Route::prefix('exhibitor')->group(function(){
     Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->middleware('throttle:forgot_password');
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
 
-
-    Route::middleware(['auth:system', 'verified'])->group(function(){
+    Route::middleware(['auth:system', 'verified'])->group(function () {
         // store fcm token
         Route::post('fcm/register-token', [FCMController::class, 'store'])
-        ->defaults('guardName', 'web')->name('exhibitor.fcm.store');
+            ->defaults('guardName', 'web')->name('exhibitor.fcm.store');
 
         Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('throttle:password_update');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -35,12 +33,12 @@ Route::prefix('exhibitor')->group(function(){
         Route::get('profile', [ProfileController::class, 'show']);
         Route::post('profile', [ProfileController::class, 'update']);
 
-        Route::prefix('halls')->group(function(){
+        Route::prefix('halls')->group(function () {
             Route::get('/', [HallController::class, 'index']);
             Route::get('/{hall}', [HallController::class, 'show']);
         });
 
-        Route::prefix('booth')->group(function(){
+        Route::prefix('booth')->group(function () {
             Route::get('/', [BoothController::class, 'index']);
             Route::get('/my', [BoothController::class, 'ownedBooths']);
             Route::post('request-booth', [BoothController::class, 'book']);
@@ -49,15 +47,16 @@ Route::prefix('exhibitor')->group(function(){
             Route::post('/{booth}/invitations', [InvitationController::class, 'storeForBooth']);
         });
 
-        Route::prefix('companies')->group(function(){
+        Route::prefix('companies')->group(function () {
             Route::get('/{company}/invitations', [InvitationController::class, 'companyInvitations']);
             Route::post('/{company}/invitations', [InvitationController::class, 'storeForCompany']);
         });
 
-        Route::prefix('invitation')->group(function(){
+        Route::prefix('invitation')->group(function () {
             Route::get('/{token}', [InvitationController::class, 'show']);
             Route::post('/{token}/accept', [InvitationController::class, 'approve']);
             Route::post('/{token}/reject', [InvitationController::class, 'reject']);
+            Route::delete('/{invitation}', [InvitationController::class, 'delete']);
         });
 
         Route::get('services', [ServiceController::class, 'index']);
