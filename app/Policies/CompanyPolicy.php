@@ -2,6 +2,8 @@
 
 namespace App\Policies;
 
+use App\Enum\Status;
+use App\Enum\SystemUserType;
 use App\Models\Company;
 use App\Models\SystemUser;
 
@@ -11,20 +13,23 @@ class CompanyPolicy
     {
         return $systemUser->companies()->where('companies.id', $company->id)->exists();
     }
+
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(SystemUser $systemUser): bool
+    public function viewAny(SystemUser $user): bool
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(SystemUser $systemUser, Company $company): bool
+    public function view(SystemUser $user, Company $company): bool
     {
-        return false;
+        if ($user->type === SystemUserType::ADMIN) {
+            return true;
+        }
+
+        return $company->status === Status::APPROVED ||
+               $company->systemUsers()->where('system_user_id', $user->id)->exists();
     }
 
     /**

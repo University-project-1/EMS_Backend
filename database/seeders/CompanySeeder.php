@@ -48,5 +48,15 @@ class CompanySeeder extends Seeder
             $elza3eem->id,
             $elcoach->id,
         ]);
+
+        $companyALogo = database_path('assets/alawael.png');
+        if (is_file($companyALogo)) {
+            $companyA->addMedia($companyALogo)->toMediaCollection('logo');
+        }
+
+        $companyBLogo = database_path('assets/RBCs.png');
+        if (is_file($companyBLogo)) {
+            $companyB->addMedia($companyBLogo)->toMediaCollection('logo');
+        }
     }
 }
