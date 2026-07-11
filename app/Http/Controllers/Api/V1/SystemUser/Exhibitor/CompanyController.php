@@ -6,8 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SystemUser\Shared\CompanyResource;
 use App\Http\Resources\SystemUser\Shared\ProfileResource;
 use App\Models\Company;
-use App\Models\SystemUser;
-use Illuminate\Http\Request;
+
 
 class CompanyController extends Controller
 {
