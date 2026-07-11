@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
@@ -48,6 +49,7 @@ Route::prefix('exhibitor')->group(function () {
         });
 
         Route::prefix('companies')->group(function () {
+            Route::get('/{company}/profile', [CompanyController::class, 'show']);
             Route::get('/{company}/invitations', [InvitationController::class, 'companyInvitations']);
             Route::post('/{company}/invitations', [InvitationController::class, 'storeForCompany']);
         });
