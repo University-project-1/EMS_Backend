@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1\Shared;
+
+use App\Filter\MaxFilter;
+use App\Filter\MinFilter;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Shared\EventHallResource;
+use App\Models\EventHall;
+use Dedoc\Scramble\Attributes\Group;
+use Dedoc\Scramble\Attributes\QueryParameter;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
+
+#[Group('EventHall')]
+class EventHallController extends Controller
+{
+    /**
+     * all
+     */
+    #[QueryParameter('filter[number]', 'Filter by hall number', required: false, type: 'string')]
+    #[QueryParameter('filter[min_area]', 'Minimum area', required: false, type: 'number')]
+    #[QueryParameter('filter[max_area]', 'Maximum area', required: false, type: 'number')]
+    #[QueryParameter('filter[min_price]', 'Minimum price per hour', required: false, type: 'number')]
+    #[QueryParameter('filter[max_price]', 'Maximum price per hour', required: false, type: 'number')]
+    #[QueryParameter('include', 'Include events relationship', required: false, type: 'string')]
+    #[QueryParameter('sort', 'Sort by number, area or price_per_hour', required: false, type: 'string')]
+    public function index()
+    {
+        $eventHalls = QueryBuilder::for(EventHall::class)
+            ->allowedFilters(
+                AllowedFilter::exact('number'),
+                AllowedFilter::custom('min_area', new MinFilter(), 'area'),
+                AllowedFilter::custom('max_area', new MaxFilter(), 'area'),
+                AllowedFilter::custom('min_price', new MinFilter(), 'price_per_hour'),
+                AllowedFilter::custom('max_price', new MaxFilter(), 'price_per_hour'),
+            )
+            ->allowedIncludes('events')
+            ->allowedSorts(
+                'number',
+                'area',
+                'price_per_hour'
+            )
+            ->get();
+
+        return successResponse(EventHallResource::collection($eventHalls),);
+    }
+
+    /**
+     * show
+     */
+    public function show(EventHall $eventHall){
+        $eventHall->load('events');
+        return successResponse(EventHallResource::make($eventHall),);
+    }
+}

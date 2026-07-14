@@ -1,9 +1,12 @@
 <?php
 
+
+use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
@@ -62,5 +65,16 @@ Route::prefix('exhibitor')->group(function () {
         });
 
         Route::get('services', [ServiceController::class, 'index']);
+
+        // eventHall
+        Route::prefix('eventHall/')->group(function(){
+            Route::get('', [EventHallController::class, 'index'])->name('exhibitor.event_halls.index');
+            Route::get('{eventHall}', [EventHallController::class, 'show'])->name('exhibitor.event_halls.show');
+        });
+
+        // events
+        Route::prefix('events/')->group(function(){
+            Route::post('', [EventController::class, 'store']);
+        });
     });
 });
