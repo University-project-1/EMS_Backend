@@ -3,6 +3,7 @@
 namespace App\DTOs\SystemUser;
 
 use App\Trait\HasSnakeCaseArray;
+use Illuminate\Http\UploadedFile;
 
 class CompanyDTO
 {
@@ -19,6 +20,8 @@ class CompanyDTO
             public readonly string $description,
             public readonly float $headquartersLat,
             public readonly float $headquartersLng,
+            public readonly UploadedFile $logo,
+            public readonly ?array $gallery,
     ){}
 
     public static function fromRequest(array $data){
@@ -31,6 +34,8 @@ class CompanyDTO
             description: $data['description'],
             headquartersLat: $data['headquarters_lat'],
             headquartersLng: $data['headquarters_lng'],
+            logo: $data['logo'],
+            gallery: $data['gallery'],
         );
     }
 }

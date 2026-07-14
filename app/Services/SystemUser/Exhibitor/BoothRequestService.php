@@ -2,7 +2,7 @@
 
 namespace App\Services\SystemUser\Exhibitor;
 
-use App\DTOs\SystemUser\BookingBoothDTO;
+use App\DTOs\SystemUser\BoothRequestDTO;
 use App\DTOs\SystemUser\CompanyDTO;
 use App\Enum\Status;
 use App\Models\Booth;
@@ -11,9 +11,8 @@ use App\Models\Company;
 use App\Models\Service;
 use App\Models\SystemUser;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
-class BoothBookingService
+class BoothRequestService
 {
     /**
      * Create a new class instance.
@@ -22,13 +21,12 @@ class BoothBookingService
         public readonly CompanyService $companyService,
     ){}
 
-    public function confirmBoothBooking(SystemUser $user, BookingBoothDTO $bookingDTO, ?CompanyDTO $companyDTO){
+    public function confirmBoothBooking(SystemUser $user, BoothRequestDTO $bookingDTO, ?CompanyDTO $companyDTO){
         return DB::transaction(function() use ($user, $bookingDTO, $companyDTO){
+            Service::lockForUpdate();
             $booth = Booth::findOrFail($bookingDTO->boothId);
-            Log::info(1);
             $company = $bookingDTO->companyId ? Company::findOrFail($bookingDTO->companyId)
             : $this->companyService->create($user, $companyDTO);
-            Log::info(2);
 
             $boothRequest = BoothRequest::create([
                 'system_user_id' => $user->id,
@@ -42,7 +40,7 @@ class BoothBookingService
 
             $boothRequest->update(['final_price' => $booth->price + $servicesCost]);
 
-            return $boothRequest->load('services');;
+            return $boothRequest->load(['services', 'company.logoMedia', 'company.galleryMedia']);;
         });
     }
 
@@ -52,7 +50,7 @@ class BoothBookingService
         $servicesToInsert = [];
 
         $serviceIds = array_column($services, 'service_id');
-        $dbPrices = Service::whereIn('id', $serviceIds)->pluck('price', 'id');
+        $dbPrices = Service::whereIn('id', $serviceIds)->lockForUpdate()->pluck('price', 'id');
 
         foreach ($services as $service) {
             $serviceId = $service['service_id'];

@@ -2,7 +2,7 @@
 
 namespace App\DTOs\SystemUser;
 
-class BookingBoothDTO
+class BoothRequestDTO
 {
     /**
      * Create a new class instance.

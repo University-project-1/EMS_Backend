@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Hall;
 
@@ -13,18 +12,17 @@ class HallSeeder extends Seeder
      */
     public function run(): void
     {
-        $hallMain = Hall::create([
-            'number' => 'Main-1',
-            'area' => 1500.0,
-            'svg_id' => 'hall-main-1',
-            'type' => 'exhibition',
-        ]);
+        $letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
-        $hallB = Hall::create([
-            'number' => 'Hall-B',
-            'area' => 800.0,
-            'svg_id' => 'hall-b',
-            'type' => 'conference',
-        ]);
+        $types = ['conference', 'exhibition'];
+
+        foreach ($letters as $letter) {
+            Hall::create([
+                'number' => 'Hall-' . $letter,
+                'area' => rand(500, 2000),
+                'svg_id' => 'hall-' . strtolower($letter),
+                'type' => $types[array_rand($types)],
+            ]);
+        }
     }
 }

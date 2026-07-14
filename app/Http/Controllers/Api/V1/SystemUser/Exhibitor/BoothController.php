@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\SystemUser\Exhibitor;
 
-use App\DTOs\SystemUser\BookingBoothDTO;
+use App\DTOs\SystemUser\BoothRequestDTO;
 use App\DTOs\SystemUser\CompanyDTO;
 use App\Filter\BookedBoothFilter;
 use App\Filter\MaxFilter;
@@ -12,9 +12,10 @@ use App\Http\Requests\SystemUser\Exhibitor\StoreBoothRequestRequest;
 use App\Http\Resources\SystemUser\Shared\BoothRequestResource;
 use App\Http\Resources\SystemUser\Shared\BoothResource;
 use App\Models\Booth;
-use App\Services\SystemUser\Exhibitor\BoothBookingService;
+use App\Services\SystemUser\Exhibitor\BoothRequestService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
+use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -22,7 +23,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class BoothController extends Controller
 {
     public function __construct(
-        private readonly BoothBookingService $bookingService,
+        private readonly BoothRequestService $boothRequestService,
     ){}
     /**
      * all
@@ -57,7 +58,6 @@ class BoothController extends Controller
             message: __('booth.list_success'),
         );
     }
-
     /**
      * show
      */
@@ -68,22 +68,38 @@ class BoothController extends Controller
             message: __('booth.show_success'),
         );
     }
-
     /**
      * request booth booking
      */
     public function book(StoreBoothRequestRequest $request)
     {
         $validated = $request->validated();
-        $dto = BookingBoothDTO::fromRequest($validated);
+        $dto = BoothRequestDTO::fromRequest($validated);
         $companyDto = isset($validated['new_company'])
             ? CompanyDTO::fromRequest($validated['new_company'])
             : null;
-        $boothRequest = $this->bookingService->confirmBoothBooking($request->user('system'), $dto, $companyDto);
+        $boothRequest = $this->boothRequestService->confirmBoothBooking($request->user('system'), $dto, $companyDto);
 
         return successResponse(
             data: new BoothRequestResource($boothRequest),
             message: 'booking confirmed successfully, needs admin confirmation',
+        );
+    }
+    /**
+     * My booths
+     */
+    public function ownedBooths(Request $request){
+        $userId = $request->user('system')->id;
+
+        $booths = Booth::with(['company'])
+            ->whereHas('systemUsers', fn($q) => $q->whereKey($userId))
+            ->orWhereHas('company.systemUsers', fn($q) => $q->whereKey($userId))
+            ->latest()
+            ->paginate(5);
+
+        return successResponse(
+            data: BoothResource::collection($booths)->response()->getData(true),
+            message: __('booth.list_success')
         );
     }
 }

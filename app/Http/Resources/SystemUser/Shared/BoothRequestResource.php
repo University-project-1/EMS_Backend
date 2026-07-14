@@ -20,6 +20,7 @@ class BoothRequestResource extends JsonResource
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
 
             'services' => BoothRequestServiceResource::collection($this->whenLoaded('services')),
+            'company' => new CompanyResource($this->whenLoaded('company')),
         ];
     }
 }

@@ -1,11 +1,9 @@
 # EMS Backend: Comprehensive AI Handover Document
 
-**Last Updated:** 2026-06-18
-**Status:** Partial Implementation (Auth/Profile routes, Admin Booths & Services CRUD live. Booth booking workflow pending).
-**Last Updated:** 2026-06-16  
+**Last Updated:** 2026-07-11
+**Status:** Functional Implementation (Auth/Profile, Admin Booths/BoothRequests/Services CRUD, Exhibitor Booth Booking, Team Invitations & Cancellation, Admin Companies & Managers Directories, and Visitor Booth/Hall lists are live. Event management pending).
 **Laravel Version:** 13.7  
 **PHP Version:** 8.3+  
-**Status:** Partial Implementation (Auth/Profile routes live; booth/event/company management missing)
 
 ---
 
@@ -19,9 +17,13 @@
 - **Exhibitor (`SystemUser` type=`exhibitor`):** Companies managing booths and events
 
 **Current Maturity:**
-- ✅ Complete: Authentication (OTP, email verification, OAuth2), visitor/admin/exhibitor registration, profile management, FCM push tokens, rate limiting
-- ✅ Partial: Models and migrations for booth, event, company, announcement, lead, saved item, review, and report management
-- ❌ Missing: CRUD endpoints for most business entities; no authorization policies; no GET/list endpoints; no resource filtering
+- ✅ Complete: Authentication (OTP, email verification, Google OAuth2), registration, profile management, FCM push tokens, rate limiting.
+- ✅ Complete: Admin Booths, Booth Requests (booking approvals & rejections, conflict detection, stats), and Services CRUD endpoints.
+- ✅ Complete: Exhibitor Booth booking & request workflow, and Team Invitations system (inviting system users to booths/companies, canceling invitations).
+- ✅ Complete: Admin Companies & Managers Directories (paginated list, show details, directory/request stats).
+- ✅ Complete: Visitor/Visitor profile list & show endpoints for Booths & Halls with Spatie QueryBuilder filtering.
+- ✅ Complete: Model authorization policies (`BoothPolicy`, `CompanyPolicy`, `InvitationPolicy`, `SystemUserPolicy`) and `type.admin` middleware.
+- ❌ Missing: Event creation & attendance tracking, Company write CRUD (outside of booth request flow), Report/complaint resolutions, Reviews, and Visitor engagement tracking (leads/saved items).
 
 **API Documentation:** Available at `/docs/api` (Scramble-generated OpenAPI spec)
 
@@ -54,7 +56,7 @@
 
 **Filtering & Querying (Spatie QueryBuilder):**
 - Strictly using `spatie/laravel-query-builder` for all GET list endpoints.
-- Complex filtering logic must be extracted to Dedicated Custom Filters in `app/Filters/Shared/` (e.g., MinFilter, MaxFilter) or Domain-specific folders.
+- Complex filtering logic must be extracted to Dedicated Custom Filters in `app/Filter/` (e.g., MinFilter, MaxFilter, BookedBoothFilter, DateFilter, CompanyNameFilter).
 - Avoid inline closures or Local Scopes for Spatie filters.
 
 **Exception Handling:**
@@ -97,7 +99,7 @@ app/
 │   ├── PatchDTO.php                 [Base class for PATCH operations with field tracking]
 │   ├── Mobile/UpdateProfileDTO.php
 │   ├── Shared/UpdatePasswordDTO.php
-│   └── SystemUser/LoginDTO.php, RegisterDTO.php, ProfileUpdateDTO.php
+│   └── SystemUser/LoginDTO.php, RegisterDTO.php, ProfileUpdateDTO.php, BoothRequestDTO.php, BoothUpdateDTO.php, CompanyDTO.php, ServiceDTO.php, UpdateServiceDTO.php
 ├── Enum/                            [8 backing enums for domain validation]
 │   ├── Status.php                   [pending, approved, rejected]
 │   ├── SystemUserType.php           [admin, exhibitor]
@@ -105,46 +107,80 @@ app/
 │   ├── ReportStatus.php             [pending, resolved, rejected]
 │   ├── Gender.php, AnnouncementReceiverType.php, DeviceType.php, HallType.php
 ├── Exceptions/ApiException.php      [Custom app exception handler]
+├── Filter/                          [Custom Spatie QueryBuilder filters]
+│   ├── BookedBoothFilter.php        [Filters booths by booking status]
+│   ├── CompanyNameFilter.php        [Filters booths by associated company name]
+│   ├── DateFilter.php               [Filters records by created_at date]
+│   ├── MaxFilter.php                [Filters values less than or equal to max]
+│   └── MinFilter.php                [Filters values greater than or equal to min]
 ├── Helper/ApiResponse.php           [Global successResponse(), errorResponse() helpers]
 ├── Http/
 │   ├── Controllers/Api/V1/
 │   │   ├── Mobile/
 │   │   │   ├── AuthController        [register, verifyRegister, login, logout, resendOtp]
 │   │   │   ├── ProfileController     [show, updateProfile, updatePassword, requestPhoneUpdate, verifyPhoneUpdate]
-│   │   │   └── PasswordController    [forgotPassword, verifyForgotPasswordOtp, resetPassword]
+│   │   │   ├── PasswordController    [forgotPassword, verifyForgotPasswordOtp, resetPassword]
+│   │   │   └── BoothController       [index, show]
 │   │   ├── SystemUser/
-│   │   │   ├── Admin/AuthController  [login, logout]
-│   │   │   ├── Exhibitor/AuthController [register, verify email, login, logout, googleAuth]
+│   │   │   ├── Admin/
+│   │   │   │   ├── AuthController    [login, logout]
+│   │   │   │   ├── BoothController   [index, show, update]
+│   │   │   │   ├── BoothRequestController [index, show, approve, reject, statistics]
+│   │   │   │   ├── CompanyDirectoryController [index, show]
+│   │   │   │   ├── ManagerDirectoryController [directory, index, show]
+│   │   │   │   └── ServiceController [resource CRUD]
+│   │   │   ├── Exhibitor/
+│   │   │   │   ├── AuthController    [register, verify email, login, logout, googleAuth, checkStatus]
+│   │   │   │   ├── BoothController   [index, show, book, ownedBooths]
+│   │   │   │   ├── ServiceController [index]
+│   │   │   │   └── InvitationController [companyInvitations, boothInvitations, show, storeForCompany, storeForBooth, approve, reject, delete]
 │   │   │   └── Shared/
 │   │   │       ├── ProfileController [show, update]
 │   │   │       └── ResetPasswordController [changePassword, sendResetLink, resetPassword]
 │   │   └── Shared/FCMController      [store: updateOrCreate FCM token]
-│   ├── Requests/                    [18 form request classes; enum/existence validation active]
-│   └── Resources/                   [2 API resources; minimal coverage; no collection resources]
-│       ├── Mobile/UserResource.php
-│       └── SystemUser/Shared/ProfileResource.php
+│   ├── Middleware/
+│   │   ├── ApiLocalization.php       [Sets locale based on request header]
+│   │   └── EnsureUserIsAdmin.php     [Middleware alias type.admin; restricts to admins]
+│   ├── Requests/                    [25 form request classes; validation active]
+│   └── Resources/                   [12 API resources; comprehensive coverage]
+│       ├── Mobile/
+│       │   ├── UserResource.php
+│       │   └── BoothResource.php
+│       ├── SystemUser/
+│       │   ├── Admin/
+│       │   │   ├── CompanyDirectoryResource.php
+│       │   │   └── ManagerResource.php
+│       │   ├── Exhibitor/
+│       │   │   └── InvitaionResource.php
+│       │   └── Shared/
+│       │       ├── BoothRequestResource.php, BoothRequestServiceResource.php, BoothResource.php, CompanyResource.php, ProfileResource.php, ServiceResource.php, SystemUserResource.php
 ├── Jobs/
 │   └── SendOtpWhatsappJob.php       [Queued; calls UltraMsg API with OTP code]
-├── Models/                          [22 eloquent models with soft deletes and polymorphic relations]
+├── Models/                          [23 eloquent models with soft deletes and polymorphic relations]
 │   ├── User.php                     [Mobile visitor; HasApiTokens, media avatars]
 │   ├── SystemUser.php               [Admin/Exhibitor; MustVerifyEmail, media avatars]
-│   ├── Company.php                  [Company/exhibitor entity; coordinates stored as float]
-│   ├── Booth.php                    [Exhibition booth; has unique (hall_id, number) constraint]
-│   ├── BoothRequest.php             [Request to book booth; decimal price snapshot]
-│   ├── Hall.php                     [Physical exhibition hall]
-│   ├── Event.php                    [Polymorphic; owned by Company or SystemUser]
+│   ├── Company.php                  [Company/exhibitor entity; coordinates stored as float; status]
+│   ├── Booth.php                    [Exhibition booth; unique qr_token, composite (hall_id, number)]
+│   ├── BoothRequest.php             [Request to book booth; final_price snapshot]
+│   ├── Hall.php                     [Physical exhibition hall; type, area]
+│   ├── Event.php                    [Polymorphic; avg_rating, unique qr_token]
 │   ├── EventHall.php                [Event venue; hourly pricing for billing]
 │   ├── Lead.php                     [User view/scan of Booth/Event; no timestamps]
 │   ├── Saved.php                    [User bookmark of Company/Event; composite unique index]
-│   ├── Review.php                   [1-5 rating; composite unique index prevents duplicates]
+│   ├── Review.php                   [1-5 rating; composite unique index]
 │   ├── Report.php                   [Complaint; polymorphic reporter/reportable]
+│   ├── Invitation.php               [Team invitation model; token unique]
 │   ├── Announcement.php, Facility.php, BusCatalog.php, Service.php, EventSpeaker.php [skeletal]
 │   └── DeviceToken.php, OtpCode.php [Support models]
 ├── Notifications/Auth/
 │   ├── VerifyApiEmail.php           [Sends verification link with id/{hash} to frontend URL]
 │   └── ResetApiPassword.php         [Sends password reset link to frontend]
+├── Policies/                        [Authorization policies]
+│   ├── BoothPolicy.php              [Enforces invitation rules for Booths]
+│   ├── CompanyPolicy.php            [Enforces invitation rules for Companies]
+│   └── InvitationPolicy.php         [Enforces user validation for accepting/rejecting invitations]
 ├── Providers/
-│   ├── AppServiceProvider.php       [Rate limiters, Scramble config, HTTPS enforcement, Passport unimplemented]
+│   ├── AppServiceProvider.php       [Rate limiters, Scramble config, HTTPS enforcement, Passport key configurations]
 │   └── TelescopeServiceProvider.php [Dev debugging dashboard]
 ├── Services/
 │   ├── Mobile/
@@ -152,9 +188,17 @@ app/
 │   │   ├── OtpService.php           [generateOtp, verifyOtp; rate limits, locks, cache cleanup]
 │   │   └── ProfileService.php       [updateProfile, verifyPhoneUpdate with media library]
 │   ├── SystemUser/
-│   │   ├── Admin/AuthService.php    [login]
-│   │   ├── Exhibitor/AuthService.php [register, login, verifyEmail]
-│   │   ├── Exhibitor/GoogleAuthService.php [Socialite OAuth2 token validation; auto-creates SystemUser]
+│   │   ├── Admin/
+│   │   │   ├── AuthService.php      [login]
+│   │   │   ├── BoothRequestService.php [approve, reject, conflict checking]
+│   │   │   ├── ServiceService.php   [services CRUD logic]
+│   │   │   └── UpdateBoothService.php [booth properties updates]
+│   │   ├── Exhibitor/
+│   │   │   ├── AuthService.php      [register, login, verifyEmail]
+│   │   │   ├── GoogleAuthService.php [Socialite OAuth2 token validation; auto-creates SystemUser]
+│   │   │   ├── BoothRequestService.php [request booth booking, attach services]
+│   │   │   ├── CompanyService.php   [creates and updates companies]
+│   │   │   └── InvitationService.php [creates, accepts, rejects team/booth invitations]
 │   │   └── Shared/ProfileService.php [update with media library]
 │   └── Shared/
 │       ├── PasswordService.php      [updatePassword; revokes other tokens + device tokens]
@@ -209,7 +253,7 @@ phpunit.xml, phpstan.neon, .github/skills/, AGENTS.md
 
 ## 4. Implemented Modules
 
-### 4.1 Completed Routes (18 endpoints)
+### 4.1 Completed Routes (26 endpoints)
 
 #### Mobile Visitor Routes (`/v1/auth`, `/v1/visitor`)
 
@@ -241,8 +285,18 @@ phpunit.xml, phpstan.neon, .github/skills/, AGENTS.md
 - `GET /profile` → Retrieve admin profile with media
 - `POST /profile` → Update name + optional avatar
 - `POST /forgot-password`, `POST /reset-password` → Via Laravel Password broker
-- `GET /booths`, `GET /booths/{id}`, `PATCH /booths/{id}` → Filterable and paginated Booth management. Store is omitted to maintain SVG map integrity.
-- `GET /services`, `POST /services`, `GET /services/{id}`, `PATCH /services/{id}` → Service management. Toggle active status is handled via PATCH `is_active`.
+- `GET /booths`, `GET /booths/{id}`, `PATCH /booths/{id}` → Paginated Booth management with Spatie QueryBuilder filtering.
+- `GET /booths/requests` → Paginated listing of booking requests with filters.
+- `GET /booths/requests/stats` → Retrieve statistics for booking requests (total, pending, approved).
+- `GET /booths/requests/{id}` → Retrieve details of a booking request.
+- `POST /booths/requests/approve/{id}` → Approve booth request (auto-assigns booth to company, sets price, and detects conflicts).
+- `PATCH /booths/requests/reject/{id}` → Reject booth request.
+- `GET /companies` → Retrieve paginated list of companies with name, business sector, and status filtering.
+- `GET /companies/{company}` → Retrieve detailed company profile.
+- `GET /managers/directory` → Retrieve statistics for companies, booths, and managers.
+- `GET /managers` → Retrieve paginated list of managers/exhibitors.
+- `GET /managers/{manager}` → Retrieve detailed manager profile with portfolio.
+- `GET /service`, `POST /service`, `GET /service/{id}`, `PATCH /service/{id}`, `DELETE /service/{id}` → Service CRUD resource.
 
 #### Exhibitor Routes (`/v1/exhibitor`)
 
@@ -250,6 +304,18 @@ phpunit.xml, phpstan.neon, .github/skills/, AGENTS.md
 - `POST /login` → Email + password, issue token
 - `GET /email/verify/{id}/{hash}` → Verify email hash, mark `email_verified_at`, fire `Verified` event
 - `POST /auth/system/google` → Validate Google token via Socialite, create/link SystemUser, download avatar
+- `GET /auth/status` → Retrieve exhibitor authentication/verification status.
+- `GET /booth` → List booths with filtering (min_price, max_price, area, hall_id, hall_type, number).
+- `GET /booth/my` → List booths owned by current exhibitor.
+- `POST /booth/request-booth` → Create booking request (optionally auto-creating a Company or using existing).
+- `GET /booth/{id}` → Retrieve details of a booth.
+- `GET /booth/{booth}/invitations`, `POST /booth/{booth}/invitations` → List and send invitations to join a booth.
+- `GET /companies/{company}/invitations`, `POST /companies/{company}/invitations` → List and send invitations to join a company.
+- `GET /invitation/{token}` → Retrieve invitation details.
+- `POST /invitation/{token}/accept` → Accept team/booth invitation and join.
+- `POST /invitation/{token}/reject` → Reject invitation.
+- `DELETE /invitation/{invitation}` → Cancel/delete a sent team or booth invitation.
+- `GET /services` → Retrieve available add-on services list.
 - Same password/profile routes as admin
 
 ---
@@ -257,10 +323,8 @@ phpunit.xml, phpstan.neon, .github/skills/, AGENTS.md
 ### 4.2 Not Yet Implemented
 
 **No endpoints for:**
-- Booth CRUD, booth QR token generation
-- Booth request workflow (apply, approve, reject, pricing)
 - Event management (create, list, update, attend)
-- Company management
+- Company CRUD (except auto-creation/lookup via booth requests)
 - Report/complaint workflow
 - Review/rating management
 - Announcement management
@@ -269,39 +333,38 @@ phpunit.xml, phpstan.neon, .github/skills/, AGENTS.md
 - Facility location search
 - Bus schedule retrieval
 
-**No read/list/filter endpoints** exist for any business entity.
-
 ---
 
 ## 5. Database Schema Summary
 
-### 5.1 Core Tables (32 migrations total)
+### 5.1 Core Tables (33 migrations total)
 
 | Table | Purpose | Key Traits | Notes |
 |-------|---------|-----------|-------|
 | `users` | Mobile visitors | soft deletes, unique (email, phone) | Avatar via media library |
-| `system_users` | Admins/Exhibitors | soft deletes, unique email, `email_verified_at` | type: admin/exhibitor; Avatar via media |
-| `companies` | Exhibitor organizations | soft deletes, unique phone | Geo: headquarters_lat/lng; social_links JSON |
+| `system_users` | Admins/Exhibitors | soft deletes, unique email, `email_verified_at` | type: admin/exhibitor; Avatar via media; google_id |
+| `companies` | Exhibitor organizations | soft deletes, unique phone | Geo: headquarters_lat/lng; social_links JSON; status |
 | `company_system_users` | Many-to-many | Composite PK (company_id, system_user_id) | Cascade delete on both sides |
-| `halls` | Physical exhibition spaces | soft deletes, unique number | type: exhibition/event; area float |
-| `booths` | Exhibition booths | soft deletes, unique qr_token, composite (hall_id, number) | svg_id for interactive map; company_id nullable; price decimal(10,2) |
+| `halls` | Physical exhibition spaces | soft deletes, unique number | type: exhibition/event; area float; full timestamps |
+| `booths` | Exhibition booths | soft deletes, unique qr_token, composite (hall_id, number) | svg_id for interactive map; company_id nullable; price decimal(10,2); full timestamps |
 | `booth_system_users` | Staff assignment to booths | Composite PK (booth_id, system_user_id) | assigned_by FK; created_at only |
-| `booth_requests` | Booth booking applications | soft deletes | status: pending/approved/rejected; final_price snapshot |
+| `booth_requests` | Booth booking applications | soft deletes | status: pending/approved/rejected; final_price snapshot; full timestamps |
 | `booth_request_services` | Line items for requests | — | quantity int; unit_price decimal(10,2); no timestamps |
-| `services` | Booth add-on services | — | price decimal(10,2); is_active boolean; unique name |
+| `services` | Booth add-on services | — | price decimal(10,2); is_active boolean; unique name; full timestamps |
 | `event_halls` | Dedicated event venues | — | unique number; price_per_hour decimal(10,2); no timestamps |
-| `events` | Exhibition events | soft deletes, unique qr_token | Polymorphic eventable (Company/SystemUser); status, type; date datetime |
+| `events` | Exhibition events | soft deletes, unique qr_token | Polymorphic eventable (Company/SystemUser); status, type, avg_rating; date datetime |
 | `event_speakers` | Event presenters | — | name; no timestamps; cascade on event delete |
 | `leads` | User/Exhibitor views | Composite unique (user_id, leadable_type, leadable_id) | created_at only; no updated_at |
 | `saved` | User bookmarks | Composite unique (user_id, savedable_type, savedable_id) | created_at only; polymorphic savedable |
 | `reviews` | 1-5 ratings + comments | Composite unique (user_id, reviewable_type, reviewable_id) | Polymorphic reviewable; soft deletes on related entities |
 | `reports` | Complaints/Issues | — | Polymorphic reporter/reportable; resolved_by FK (nullable) |
-| `announcements` | Push notifications | — | receiver: visitor/exhibitor/all; is_active boolean; created_at only |
+| `announcements` | Push notifications | — | receiver: visitor/exhibitor/all; is_active boolean; full timestamps |
 | `facilities` | Toilets, mosques, etc. | — | gender, type, svg_id; no timestamps |
-| `bus_catalog` | Transportation schedules | — | duration int; start_time/end_time time; no timestamps |
-| `device_tokens` | FCM push tokens | Polymorphic tokenable | fcm_token unique; oauth_access_token_id char(80) |
-| `otp_codes` | OTP verification | Unique session_id | type: registration/password_reset/phone_update; attempts counter |
-| `media` | Spatie MediaLibrary | — | Polymorphic model; centralized file storage |
+| `bus_catalog` | Transportation schedules | — | duration int; start_time/end_time time; full timestamps |
+| `device_tokens` | FCM push tokens | Polymorphic tokenable | fcm_token unique; oauth_access_token_id char(80); full timestamps |
+| `otp_codes` | OTP verification | Unique session_id | type: registration/password_reset/phone_update; attempts counter; full timestamps |
+| `media` | Spatie MediaLibrary | — | Polymorphic model; centralized file storage (uuid, conversions_disk, manipulations, custom_properties, responsive_images, order_column) |
+| `invitations` | Team invitations to join companies/booths | sender_id FK, status default 'pending' | Polymorphic inviteable (Company/Booth); unique token; expires_at |
 
 **Passport OAuth Tables:** `oauth_clients`, `oauth_access_tokens`, `oauth_refresh_tokens`, `oauth_auth_codes`, `oauth_device_codes`
 
@@ -381,6 +444,12 @@ belongsTo(SystemUser::class)
 hasMany(BoothRequestService::class, 'request_id')
 ```
 
+**Invitation:**
+```php
+belongsTo(SystemUser::class, 'sender_id')
+morphTo('inviteable') // Company or Booth
+```
+
 All relationships include **soft deletes** on the model side, allowing safe data recovery.
 
 ---
@@ -447,16 +516,18 @@ All relationships include **soft deletes** on the model side, allowing safe data
 - Logout only revokes the current token; other devices remain authenticated
 - Password change revokes all OTHER tokens (current session survives)
 
-### 7.4 Authorization (NOT IMPLEMENTED)
+### 7.4 Authorization
 
-⚠️ **No authorization policies exist.** All authenticated routes assume authorization.
+**Authorization & Policies:**
+- Model authorization policies exist in `app/Policies/` to enforce access controls:
+  - `BoothPolicy`: Enforces invitation and access rules for Booths.
+  - `CompanyPolicy`: Restricts listing/viewing of companies to admins, approved company staff, or general viewing if the company is approved.
+  - `InvitationPolicy`: Restricts accepting/rejecting invitations to target users, and deleting/canceling invitations to the original sender.
+  - `SystemUserPolicy`: Restricts listing and viewing system users/managers to admin users only.
+- Admin routes (`/v1/admin/*`) are protected using the `type.admin` middleware which aliases `EnsureUserIsAdmin::class`. This verifies that the authenticated `system` user has the `SystemUserType::ADMIN` enum value, preventing exhibitors from executing admin functions.
+- Other controller actions currently assume authorization based on authentication guards (`auth:mobile` and `auth:system`).
 
-**Security Gap:**
-- Admin routes (`/v1/admin/*`) use `auth:system` guard but never check `type == 'admin'`
-- Exhibitor can call admin endpoints by creating an account as admin
-- Booth assignment staff are managed only via the `booth_system_users` pivot; no policy enforcement
-
-**Recommended Fix:** Create policies for Booth, Company, Event, etc.; add authorization checks in controllers.
+**Security Recommendation:** Extend policies to other entities (e.g. `Event`, `Service`, `BoothRequest`) and continue integrating `Gate::authorize()` checks in controllers.
 
 ---
 
@@ -716,20 +787,30 @@ public function register(RegisterRequest $request) {
 
 ## 12. Response Format Standards
 
-### 12.1 API Resources (Minimal Coverage)
+### 12.1 API Resources
 
-**Only 2 resources exist; most entities lack resources.**
+**Comprehensive resource coverage is implemented to transform API outputs:**
 
 | Resource | Location | Transforms |
 |----------|----------|-----------|
 | `UserResource` | [app/Http/Resources/Mobile/UserResource.php](app/Http/Resources/Mobile/UserResource.php) | id, first_name, last_name, email, job, location, birthday (Y-m-d), gender, phone, avatar (media URL) |
+| `BoothResource` (Mobile) | [app/Http/Resources/Mobile/BoothResource.php](app/Http/Resources/Mobile/BoothResource.php) | id, number, area, type, is_booked, company, hall |
 | `ProfileResource` | [app/Http/Resources/SystemUser/Shared/ProfileResource.php](app/Http/Resources/SystemUser/Shared/ProfileResource.php) | id, name, email, type (Enum value), avatar (media URL or null) |
+| `BoothResource` (System) | [app/Http/Resources/SystemUser/Shared/BoothResource.php](app/Http/Resources/SystemUser/Shared/BoothResource.php) | id, hall_id, company_id, qr_token, svg_id, number, area, price, created_at, updated_at, is_booked, hall, company |
+| `BoothRequestResource` | [app/Http/Resources/SystemUser/Shared/BoothRequestResource.php](app/Http/Resources/SystemUser/Shared/BoothRequestResource.php) | id, booth_id, company_id, system_user_id, final_price, status, reason_for_booking, created_at, updated_at, services, company, booth, system_user |
+| `BoothRequestServiceResource` | [app/Http/Resources/SystemUser/Shared/BoothRequestServiceResource.php](app/Http/Resources/SystemUser/Shared/BoothRequestServiceResource.php) | id, request_id, service_id, quantity, unit_price, name |
+| `CompanyResource` | [app/Http/Resources/SystemUser/Shared/CompanyResource.php](app/Http/Resources/SystemUser/Shared/CompanyResource.php) | id, name, business_sector, social_links, phone, year_founded, description, headquarters_lat, headquarters_lng, status, logo, gallery |
+| `ServiceResource` | [app/Http/Resources/SystemUser/Shared/ServiceResource.php](app/Http/Resources/SystemUser/Shared/ServiceResource.php) | id, name, price, is_active |
+| `SystemUserResource` | [app/Http/Resources/SystemUser/Shared/SystemUserResource.php](app/Http/Resources/SystemUser/Shared/SystemUserResource.php) | id, name, email, type |
+| `InvitaionResource` | [app/Http/Resources/SystemUser/Exhibitor/InvitaionResource.php](app/Http/Resources/SystemUser/Exhibitor/InvitaionResource.php) | id, sender_id, email, token, status, expires_at, created_at, updated_at, sender, inviteable |
+| `CompanyDirectoryResource` | [app/Http/Resources/SystemUser/Admin/CompanyDirectoryResource.php](app/Http/Resources/SystemUser/Admin/CompanyDirectoryResource.php) | id, name, business_sector, phone, status, logo, managers_count, booths_count, loaded managers, loaded booths |
+| `ManagerResource` | [app/Http/Resources/SystemUser/Admin/ManagerResource.php](app/Http/Resources/SystemUser/Admin/ManagerResource.php) | id, name, email, avatar, companies_count, booths_count, loaded portfolios |
 
 ### 12.2 Missing Resources
 
-No resources for: Booth, Company, Event, BoothRequest, Review, Report, Announcement, Lead, Saved, Facility, Service
+No resources for: Event, Review, Report, Announcement, Lead, Saved, Facility, BusCatalog.
 
-**Impact:** Direct model serialization used in responses; includes all non-hidden attributes. Future endpoints should add resources.
+**Impact:** Standardized resources ensure API contracts remain clean. Future endpoints should map models to their respective resources.
 
 ### 12.3 Media Library Integration
 
@@ -847,6 +928,7 @@ SESSION_DRIVER=database
 - Passport OAuth2 token lifecycle
 - Rate limiting on auth endpoints
 - FCM device token management
+- Enforced granular access controls via `BoothPolicy`, `CompanyPolicy`, `InvitationPolicy`, and `SystemUserPolicy`
 
 ✅ **Profile Management**
 - View own profile (all user types)
@@ -868,6 +950,20 @@ SESSION_DRIVER=database
 - Rate limiting middleware
 - Form request validation
 
+✅ **Admin Booths & Booking Requests**
+- CRUD endpoints for Services & Booth management
+- Approve/reject booking requests with conflict detection
+- Statistics for booking requests (total, pending, approved)
+
+✅ **Exhibitor Team Management**
+- Sent invitation list and invitation creation for Companies & Booths
+- Accepting or rejecting invitations
+- Canceling/deleting pending invitations
+
+✅ **Admin Directories**
+- Company Directory (paginated list, show details, filters for name, sector, status, sorts)
+- Manager/Exhibitor Directory (paginated list, show details with portfolio, directory statistics)
+
 ✅ **External Integrations**
 - WhatsApp OTP delivery (UltraMsg API)
 - Google OAuth token validation (Socialite)
@@ -876,21 +972,17 @@ SESSION_DRIVER=database
 
 ### 15.2 Partial/In-Progress
 
-⚠️ **Authorization:** Models exist; policies don't. Admin routes lack role validation.
+⚠️ **Authorization:** Standard policies exist for Booths, Companies, Invitations, and SystemUsers. Policies for other models (e.g. `Event`, `Service`, `BoothRequest`) are not yet written.
 
-⚠️ **API Resources:** Only 2 resources out of 20+ entities. Most endpoints would serialize models directly.
+⚠️ **API Resources:** Resources are created for Booths, BoothRequests, Companies, Services, Invitations, and Directories. Others (Events, Reports, etc.) still need them.
 
-⚠️ **Queue System:** Active with database driver; only WhatsApp job is queued. Email notifications not yet queued.
-
-⚠️ **Database:** Schema defined; business logic in endpoints not yet implemented.
+⚠️ **Queue System:** Active with database driver; WhatsApp jobs are queued. Email notifications not yet queued.
 
 ### 15.3 Not Started
 
-❌ **Booth Management:** No endpoints for CRUD, QR generation, availability tracking, or request workflow.
-
 ❌ **Event Management:** No endpoints for creation, attendance, speaker management.
 
-❌ **Company Management:** Models exist; no CRUD endpoints.
+❌ **Company Write Management:** Create, update, or delete endpoints for Companies (other than auto-creation/lookup via booth requests) do not exist (only read-only directory exists for Admin).
 
 ❌ **Reporting & Complaints:** Models exist; no workflow endpoints.
 
@@ -898,9 +990,7 @@ SESSION_DRIVER=database
 
 ❌ **Announcement Management:** Models exist; no delivery/targeting logic.
 
-❌ **Facilities & Services:** Models exist; no search or listing endpoints.
-
-❌ **Testing:** Only boilerplate tests exist; no feature or unit tests.
+❌ **Testing:** Pest setup is configured, but only basic tests exist (need to expand feature tests).
 
 ❌ **Frontend Client:** React/Vue setup exists (Vite); no UI code.
 
@@ -910,52 +1000,41 @@ SESSION_DRIVER=database
 
 ### 16.1 High Priority (Blocking MVP)
 
-1. **Booth CRUD & Request Workflow**
-   - Create endpoints: `POST /booths`, `GET /booths/{id}`, `PATCH /booths/{id}`, `DELETE /booths/{id}`
-   - QR token generation and retrieval
-   - Booth request workflow: `POST /booth-requests`, `PATCH /booth-requests/{id}/approve`, `/reject`
-   - Price calculations and billing
-
-2. **Event Management**
+1. **Event Management**
    - Create/update/list events (Company or SystemUser can host)
    - Event hall booking and conflict detection
    - Attendee tracking via Lead model
    - Speaker management
 
-3. **Authorization Policies**
-   - Create `app/Policies/` for Booth, Company, Event, BoothRequest
-   - Check policies in controllers (e.g., only company staff can update booth requests)
-   - Admin override checks
+2. **Extend Authorization Policies**
+   - Create remaining policies for Event, BoothRequest, etc.
+   - Enforce policy checks across all controllers
 
-4. **Read/List Endpoints**
-   - `GET /booths` with filtering (hall, company, available status)
+3. **Remaining Read/List Endpoints**
    - `GET /events` with date range, type, organizer filters
-   - `GET /companies` with search
+   - `GET /companies` for visitors/exhibitors with search
    - `GET /announcements` for visitor/exhibitor
 
 ### 16.2 Medium Priority
 
-5. **Review & Rating System**
+4. **Review & Rating System**
    - `POST /reviews` (rate booth/event)
    - `GET /reviews/{id}` (retrieve single review)
    - Auto-calculate `avg_rating` on Event/Booth
    - Report review (already modeled; endpoints missing)
 
-6. **Reporting & Resolution Workflow**
+5. **Reporting & Resolution Workflow**
    - `POST /reports` (file complaint)
    - `GET /reports` (admin list)
    - `PATCH /reports/{id}/resolve` (admin resolves with notes)
 
-7. **Lead & Analytics**
+6. **Lead & Analytics**
    - `POST /leads` (implicit on booth/event view; or explicit endpoint)
    - `GET /my-activity` (return user's lead history)
    - Admin analytics dashboard endpoints
 
-8. **API Resources & Collection Pagination**
-   - Create resources for all 20+ entities
-   - Add `BothCollection`, `EventCollection` with metadata
-   - Implement pagination: `?page=1&per_page=20`
-   - Sorting & filtering using `spatie/laravel-query-builder`
+7. **Spatie QueryBuilder Pagination & Filtering**
+   - Implement query pagination and sorting on future models.
 
 ### 16.3 Lower Priority
 
@@ -983,10 +1062,6 @@ SESSION_DRIVER=database
 ### 17.1 Security Issues
 
 🔴 **CRITICAL:**
-- **No authorization on protected routes.** Admin routes don't check `type == 'admin'`. Exhibitors can call admin endpoints.
-  - **Fix:** Add policies; check in controllers
-  - **Files to Update:** All admin controllers; add authorization middleware or use `authorize()` in services
-
 - **Rate limiting on password reset is weak.** 3 per hour per phone allows brute force by changing IP.
   - **Fix:** Implement account lockout or exponential backoff; log attempts
   - **File:** [AppServiceProvider](app/Providers/AppServiceProvider.php)
@@ -1010,10 +1085,6 @@ SESSION_DRIVER=database
 - **No repositories.** Services query models directly; tight coupling makes testing harder.
   - **Fix:** Create repository layer for data access; inject into services
   - **Impact:** Affects all service classes in [app/Services](app/Services)
-
-- **No pagination or filtering implemented.** Future list endpoints will be slow on large datasets.
-  - **Fix:** Use `spatie/laravel-query-builder` (installed but unused); add to all GET list endpoints
-  - **Files:** Future controllers for Booth, Event, Company, etc.
 
 - **Soft deletes not scoped by default.** Queries will return deleted records unless explicitly excluded.
   - **Fix:** Use `withoutTrashed()` or `onlyTrashed()` where needed; add global scopes if appropriate
@@ -1229,6 +1300,6 @@ This document is a comprehensive snapshot of the EMS backend as of June 2026. It
 
 ---
 
-**Document Version:** 1.0  
-**Generated:** 2026-06-16  
+**Document Version:** 1.1  
+**Generated:** 2026-07-11  
 **Status:** Accurate as of last codebase scan

@@ -2,11 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Hall;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Booth;
 use App\Models\Company;
+use App\Models\Hall;
+use App\Models\SystemUser;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class BoothSeeder extends Seeder
@@ -18,8 +19,11 @@ class BoothSeeder extends Seeder
     {
         $halls = Hall::all();
         $companies = Company::all();
-        
-        Booth::create([
+        $elcoach = SystemUser::where('name', 'Elcoach')->firstOrFail();
+        $fawzy = SystemUser::where('name', 'Fawzy')->firstOrFail();
+        $elza3eem = SystemUser::where('name', 'Elza3eem')->firstOrFail();
+
+        $boothA01 = Booth::create([
             'hall_id' => $halls->random()->id,
             'company_id' => $companies->random()->id,
             'qr_token' => (string) Str::uuid(),
@@ -29,7 +33,7 @@ class BoothSeeder extends Seeder
             'price' => 250.00,
         ]);
 
-        Booth::create([
+        $boothA02 = Booth::create([
             'hall_id' => $halls->random()->id,
             'company_id' => $companies->random()->id,
             'qr_token' => (string) Str::uuid(),
@@ -39,7 +43,7 @@ class BoothSeeder extends Seeder
             'price' => 300.00,
         ]);
 
-        Booth::create([
+        $boothA03 = Booth::create([
             'hall_id' => $halls->random()->id,
             'company_id' => $companies->random()->id,
             'qr_token' => (string) Str::uuid(),
@@ -49,7 +53,7 @@ class BoothSeeder extends Seeder
             'price' => 180.00,
         ]);
 
-        Booth::create([
+        $boothB01 = Booth::create([
             'hall_id' => $halls->random()->id,
             'company_id' => $companies->random()->id,
             'qr_token' => (string) Str::uuid(),
@@ -62,11 +66,38 @@ class BoothSeeder extends Seeder
         Booth::create([
             'hall_id' => $halls->random()->id,
             'company_id' => null,
-            'qr_token' => (string) Str::uuid(),
+            'qr_token' => null,
             'number' => 'B-02',
             'svg_id' => 'booth-b02',
             'area' => 7.0,
             'price' => 160.00,
+        ]);
+
+        DB::table('booth_system_users')->insert([
+            [
+                'booth_id' => $boothA01->id,
+                'system_user_id' => $elcoach->id,
+                'assigned_by' => $fawzy->id,
+                'created_at' => now(),
+            ],
+            [
+                'booth_id' => $boothA02->id,
+                'system_user_id' => $elza3eem->id,
+                'assigned_by' => $fawzy->id,
+                'created_at' => now(),
+            ],
+            [
+                'booth_id' => $boothA03->id,
+                'system_user_id' => $elcoach->id,
+                'assigned_by' => $fawzy->id,
+                'created_at' => now(),
+            ],
+            [
+                'booth_id' => $boothB01->id,
+                'system_user_id' => $fawzy->id,
+                'assigned_by' => null,
+                'created_at' => now(),
+            ],
         ]);
     }
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\V1\SystemUser\Admin;
 
 use App\DTOs\SystemUser\ServiceDTO;
 use App\DTOs\SystemUser\UpdateServiceDTO;
+use App\Filter\MaxFilter;
+use App\Filter\MinFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Admin\StoreServiceRequest;
 use App\Http\Requests\SystemUser\Admin\UpdateServiceRequest;
@@ -12,6 +14,7 @@ use App\Models\Service;
 use App\Services\SystemUser\Admin\ServiceService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 #[Group('SystemUser/Admin/Services')]
@@ -22,6 +25,9 @@ class ServiceController extends Controller
     ){}
 
     #[QueryParameter('filter[name]', type: 'string', description: 'Filter services partially by name. Example: Screen')]
+    #[QueryParameter('filter[is_active]', type: 'boolean', description: 'Filter services partially by availability. Example: 1')]
+    #[QueryParameter('filter[min_price]', 'Filter services by minimum price', required: false, type: 'number')]
+    #[QueryParameter('filter[max_price]', 'Filter services by maximum price', required: false, type: 'number')]
     #[QueryParameter('sort', type: 'string', description: 'Sort by field (price, name). Prefix with "-" for descending. Example: -price')]
     #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 15')]
     /**
@@ -31,7 +37,11 @@ class ServiceController extends Controller
     {
 
         $services = QueryBuilder::for(Service::class)
-            ->allowedFilters('name')
+            ->allowedFilters(
+                'name', 'is_active',
+                AllowedFilter::custom('min_price', new MinFilter(), 'price'),
+                AllowedFilter::custom('max_price', new MaxFilter(), 'price'),
+            )
             ->allowedSorts('price', 'name')
             ->paginate(request()->query('per_page', 15));
 

@@ -24,7 +24,7 @@ class StoreBoothRequestRequest extends FormRequest
     public function rules(): array
     {
         $boothRules = [
-            'booth_id' => ['required', 'integer', 'exists:booths,id'],
+            'booth_id' => ['required', 'integer', 'exists:booths,id', Rule::exists('booths', 'id')->whereNull('company_id')],
             'company_id' => ['required_without:new_company','prohibits:new_company', 'nullable', 'integer', 'exists:companies,id'],
             'new_company' => ['required_without:company_id','prohibits:company_id', 'nullable', 'array'],
 

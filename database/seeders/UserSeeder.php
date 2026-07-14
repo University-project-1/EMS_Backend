@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
             'birthday' => '2006-02-06',
         ]);
 
-        SystemUser::create([
+        $fawzy = SystemUser::create([
             'name' => 'Fawzy',
             'email' => 'fawzy.sukkar2005@gmail.com',
             'password' => '12345678',
@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        SystemUser::create([
+        $elza3eem = SystemUser::create([
             'name' => 'Elza3eem',
             'email' => 'abdalrahmansalloum200@gmail.com',
             'type' => SystemUserType::ADMIN,
@@ -42,12 +42,27 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        SystemUser::create([
+        $elcoach = SystemUser::create([
             'name' => 'Elcoach',
             'email' => 'zuheiralhomsi73@gmail.com',
             'type' => SystemUserType::EXHIBITOR,
             'password' => '12345678',
             'email_verified_at' => now(),
         ]);
+
+        $fawzyAvatar = database_path('assets/fawzy.jpg');
+        if (is_file($fawzyAvatar)) {
+            $fawzy->addMedia($fawzyAvatar)->toMediaCollection('avatar');
+        }
+
+        $elza3eemAvatar = database_path('assets/Elza3em.png');
+        if (is_file($elza3eemAvatar)) {
+            $elza3eem->addMedia($elza3eemAvatar)->toMediaCollection('avatar');
+        }
+
+        $elcoachAvatar = database_path('assets/RGB.jpg');
+        if (is_file($elcoachAvatar)) {
+            $elcoach->addMedia($elcoachAvatar)->toMediaCollection('avatar');
+        }
     }
 }

@@ -1,16 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\SystemUser\Shared;
+namespace App\Http\Controllers\Api\V1\Shared;
 
 use App\Filter\MaxFilter;
 use App\Filter\MinFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Shared\HallResource;
 use App\Models\Hall;
+use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
+#[Group('Halls')]
 class HallController extends Controller
 {
     #[QueryParameter('filter[type]', 'Filter halls by exact type', required: false, type: 'string')]
@@ -20,6 +22,9 @@ class HallController extends Controller
     #[QueryParameter('include', 'Include related resources (booths)', required: false, type: 'string')]
     #[QueryParameter('fields', 'Specify fields to return for related resources (e.g., fields[booths]=id,hall_id,number)', required: false, type: 'string')]
     #[QueryParameter('sort', 'Sort results by field (area). Prefix with - for descending order', required: false, type: 'string')]
+    /**
+     * all halls
+     */
     public function index()
     {
         $halls = QueryBuilder::for(Hall::class)
@@ -40,6 +45,9 @@ class HallController extends Controller
         );
     }
 
+    /**
+     * show hall
+     */
     public function show(Hall $hall)
     {
         $hall->load('booths');

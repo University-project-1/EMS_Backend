@@ -14,8 +14,15 @@ class CompanyService
     public function __construct(){}
 
     public function create(SystemUser $user, CompanyDTO $dto){
-        Log::info('in create comp');
         $company = $user->companies()->create($dto->toArray());
+        if($dto->logo){
+            $company->addMedia($dto->logo)->toMediaCollection('logo');
+        }
+        if (!empty($dto->gallery)) {
+            foreach ($dto->gallery as $image) {
+                $company->addMedia($image)->toMediaCollection('gallery');
+            }
+        }
         return $company;
     }
 }

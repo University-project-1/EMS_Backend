@@ -21,9 +21,11 @@ class BoothResource extends JsonResource
             'area' => $this->area,
             'price' => $this->price,
             'svg_id' => $this->svg_id,
-
+            'is_booked' => !is_null($this->qr_token),
             'hall_id' => $this->whenLoaded('hall', $this->hall_id),
             'company_id' => $this->whenLoaded('company', $this->company_id),
+
+            'created_at' => $this->created_at
         ];
     }
 }

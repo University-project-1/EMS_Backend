@@ -30,8 +30,7 @@ class AuthController extends Controller
         $result = $this->authService->register($dto);
         return successResponse(
             data: ['user'  => new ProfileResource($result['user']), 'token' => $result['token']],
-            message: __('auth.register_success'),
-            code: 200
+            message: __($result['message']),
         );
     }
 

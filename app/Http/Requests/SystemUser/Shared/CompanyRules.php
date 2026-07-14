@@ -23,6 +23,9 @@ class CompanyRules
             $p . 'social_links.*' => ['required_with:' . $p . 'social_links', 'url'],
             $p . 'headquarters_lat' => [$req, 'numeric', 'between:-90,90'],
             $p . 'headquarters_lng' => [$req, 'numeric', 'between:-180,180'],
+            $p . 'logo' => [$req, 'image', 'mimes:jpg,png,jpeg,webp', 'max:4096'],
+            $p . 'gallery' => ['nullable', 'array', 'max:10'],
+            $p . 'gallery.*' => ['image', 'mimes:jpg,png,jpeg,webp', 'max:4096'],
         ];
     }
 }
