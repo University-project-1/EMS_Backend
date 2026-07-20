@@ -27,7 +27,7 @@ class BoothController extends Controller
                 AllowedFilter::custom('company_name', new CompanyNameFilter()),
             )
             ->allowedIncludes('company', 'hall')
-            ->paginate(10);
+            ->cursorPaginate(10);
         return successResponse(
             data: BoothResource::collection($booths),
             message: 'booths returned successfully',

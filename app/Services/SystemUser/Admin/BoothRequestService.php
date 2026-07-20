@@ -16,28 +16,31 @@ class BoothRequestService
     /**
      * Create a new class instance.
      */
-    public function __construct(){}
+    public function __construct() {}
 
-    public function getConflictingRequests(BoothRequest $request){
-        return $boothRequests = BoothRequest::where('id','!=', $request->id)
+    public function getConflictingRequests(BoothRequest $request)
+    {
+        return $boothRequests = BoothRequest::where('id', '!=', $request->id)
             ->where('booth_id', $request->booth_id)
             ->where('status', Status::PENDING)
             ->with(['company', 'company.logoMedia'])
             ->paginate(3);
     }
 
-    public function approve(BoothRequest $boothRequest){
-        if($boothRequest->status !== Status::PENDING){
+    public function approve(BoothRequest $boothRequest)
+    {
+        if ($boothRequest->status !== Status::PENDING) {
             throw new HttpException(400, __('booth.invalid_status'));
         }
-        return DB::transaction(function() use ($boothRequest){
+
+        return DB::transaction(function () use ($boothRequest) {
             $boothRequest->update(['status' => Status::APPROVED]);
             Company::findOrFail($boothRequest->company_id)->update(['status' => Status::APPROVED]);
             Booth::where('id', $boothRequest->booth_id)
-            ->update([
-                'company_id' => $boothRequest->company_id,
-                'qr_token'=>'B-' . $boothRequest->booth_id . '-' . Str::random(10),
-            ]);
+                ->update([
+                    'company_id' => $boothRequest->company_id,
+                    'qr_token' => 'B-'.$boothRequest->booth_id.'-'.Str::random(10),
+                ]);
 
             BoothRequest::where('id', '!=', $boothRequest->id)
                 ->where('booth_id', $boothRequest->booth_id)
@@ -48,11 +51,12 @@ class BoothRequestService
         });
     }
 
-    public function reject(BoothRequest $boothRequest){
-        if($boothRequest->status !== Status::PENDING){
+    public function reject(BoothRequest $boothRequest)
+    {
+        if ($boothRequest->status !== Status::PENDING) {
             throw new HttpException(400, __('booth.invalid_status'));
         }
-        Company::findOrFail($boothRequest->company_id)->update(['status' => Status::APPROVED]);
+
         return $boothRequest->update(['status' => Status::REJECTED]);
     }
 }

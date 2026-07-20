@@ -25,6 +25,7 @@ class StoreEventRequest extends FormRequest
                 ->where('system_user_id', $this->user('system')->id)
                 ->exists();
         }
+
         return true;
     }
 
@@ -36,16 +37,18 @@ class StoreEventRequest extends FormRequest
     public function rules(): array
     {
         $eventRules = [
-            'event_hall_id' => ['required','integer','exists:event_halls,id',new EventHallAvailable($this->input('start_at'),$this->input('duration'),)],
-            'company_id' => ['required_without:new_company','prohibits:new_company','nullable','integer','exists:companies,id',],
-            'new_company' => ['required_without:company_id','prohibits:company_id','nullable','array',],
-            'type' => ['required',Rule::enum(EventType::class),],
-            'title' => ['required','string','max:255',],
-            'description' => ['required','string','max:5000',],
-            'start_at' => ['required','date','after:now',],
-            'duration' => ['required','integer','min:1','max:4',],
-            'speakers' => ['required','array','min:1','max:20',],
-            'speakers.*.name' => ['required','string','max:255'],
+            'event_hall_id' => ['required', 'integer', 'exists:event_halls,id', new EventHallAvailable($this->input('start_at'), $this->input('duration'))],
+            'company_id' => ['prohibits:new_company', 'nullable', 'integer', 'exists:companies,id'],
+            'new_company' => ['prohibits:company_id', 'nullable', 'array'],
+            'type' => ['required', Rule::enum(EventType::class)],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:5000'],
+            'start_at' => ['required', 'date', 'after:now'],
+            'duration' => ['required', 'integer', 'min:1', 'max:4'],
+            'speakers' => ['required', 'array', 'min:1', 'max:20'],
+            'speakers.*.name' => ['required', 'string', 'max:255'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,png,jpeg,webp', 'max:4096'],
+
         ];
 
         $companyRules = CompanyRules::get('new_company');

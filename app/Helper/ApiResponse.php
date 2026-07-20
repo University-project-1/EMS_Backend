@@ -2,12 +2,23 @@
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 if (! function_exists('successResponse')) {
     function successResponse($data = null, string $message = 'Success', int $status = 200)
     {
-        if ($data instanceof AnonymousResourceCollection && $data->resource instanceof LengthAwarePaginator) {
+        if ($data instanceof AnonymousResourceCollection && $data->resource instanceof CursorPaginator) {
+            $paginator = $data->resource;
+
+            $data = [
+                'data' => $data->collection,
+                'per_page' => $paginator->perPage(),
+                'next_cursor' => $paginator->nextCursor()?->encode(),
+                'previous_cursor' => $paginator->previousCursor()?->encode(),
+                'has_more_pages' => $paginator->hasMorePages(),
+            ];
+        } elseif ($data instanceof AnonymousResourceCollection && $data->resource instanceof LengthAwarePaginator) {
             $paginator = $data->resource;
 
             $data = [
@@ -31,13 +42,12 @@ if (! function_exists('errorResponse')) {
     function errorResponse(?string $message = null, mixed $errors = null, int $code = 400): JsonResponse
     {
         return response()->json([
-            'status'  => false,
+            'status' => false,
             'message' => $message,
-            'errors'    => $errors,
+            'errors' => $errors,
         ], $code);
     }
 }
-
 
 /*
 ====================
