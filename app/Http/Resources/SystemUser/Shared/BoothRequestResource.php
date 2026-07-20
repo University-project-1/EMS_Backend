@@ -14,6 +14,7 @@ class BoothRequestResource extends JsonResource
             'id' => $this->id,
             'booth_id' => $this->booth_id,
             'company_id' => $this->company_id,
+            'company_name' => $this->whenLoaded('company', fn () => $this->company?->name),
             'status' => $this->status,
             'reason_for_booking' => $this->reason_for_booking,
             'final_price' => (float) $this->final_price,
