@@ -38,7 +38,8 @@ class ServiceController extends Controller
 
         $services = QueryBuilder::for(Service::class)
             ->allowedFilters(
-                'name', 'is_active',
+                'name',
+                AllowedFilter::exact('is_active'),
                 AllowedFilter::custom('min_price', new MinFilter(), 'price'),
                 AllowedFilter::custom('max_price', new MaxFilter(), 'price'),
             )

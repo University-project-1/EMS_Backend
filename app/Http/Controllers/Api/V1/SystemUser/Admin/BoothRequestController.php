@@ -50,14 +50,15 @@ class BoothRequestController extends Controller
     public function index()
     {
         $boothRequests = QueryBuilder::for(BoothRequest::class)
-            ->allowedFilters(
-                'name',
-                AllowedFilter::exact('status'),
-                AllowedFilter::custom('created_date', new DateFilter, 'created_at'),
-            )
-            ->allowedSorts('created_at')
-            ->allowedIncludes('company')
-            ->paginate(request()->query('per_page', 15));
+        ->with('company:id,name')
+        ->allowedFilters(
+            'company.name',
+            AllowedFilter::exact('status'),
+            AllowedFilter::custom('created_date', new DateFilter(), 'created_at'),
+        )
+        ->allowedSorts('created_at')
+        ->paginate(request()->query('per_page', 15));
+
 
         return successResponse(
             data: BoothRequestResource::collection($boothRequests),
