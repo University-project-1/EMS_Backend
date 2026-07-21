@@ -54,7 +54,7 @@ class EventRequestController extends Controller
 
         $eventRequests = QueryBuilder::for(Event::class)
             ->allowedFilters(
-                'title',
+                AllowedFilter::partial('title'),
                 AllowedFilter::exact('status'),
                 AllowedFilter::custom('created_date', new DateFilter, 'created_at'),
             )

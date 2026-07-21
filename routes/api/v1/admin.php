@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController as AdminEve
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ManagerDirectoryController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ServiceController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\VisitorController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
@@ -70,13 +71,20 @@ Route::prefix('admin')->group(function () {
             Route::get('{eventHall}', [EventHallController::class, 'show'])->name('admin.event_halls.show');
             Route::patch('{eventHall}', [AdminEventHallController::class, 'update']);
         });
-
+        
+        // event request
         Route::prefix('events/requests')->group(function () {
             Route::get('', [EventRequestController::class, 'index'])->name('admin.event_requests.index');
             Route::get('/stats', [EventRequestController::class, 'statistics']);
             Route::get('{event}', [EventRequestController::class, 'show'])->name('admin.event_requests.show');
             Route::post('{event}/approve', [EventRequestController::class, 'approve'])->name('admin.event_requests.approve');
             Route::patch('{event}/reject', [EventRequestController::class, 'reject'])->name('admin.event_requests.reject');
+        });
+
+        // visitor
+        Route::prefix('visitor/')->group(function(){
+            Route::get('', [VisitorController::class, 'index']);
+            Route::get('stats', [VisitorController::class, 'statistics']);
         });
     });
 });
