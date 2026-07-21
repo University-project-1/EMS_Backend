@@ -58,5 +58,15 @@ class CompanySeeder extends Seeder
         if (is_file($companyBLogo)) {
             $companyB->addMedia($companyBLogo)->toMediaCollection('logo');
         }
+
+        $companyCLogo = database_path('assets/fawzy.jpg');
+        if (is_file($companyCLogo)) {
+            $companyB->addMedia($companyCLogo)->toMediaCollection('logo');
+        }
+
+        $companyDLogo = database_path('assets/RGBs.png');
+        if (is_file($companyDLogo)) {
+            $companyB->addMedia($companyDLogo)->toMediaCollection('logo');
+        }
     }
 }
