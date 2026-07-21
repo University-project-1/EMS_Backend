@@ -7,6 +7,7 @@ use App\DTOs\SystemUser\RegisterDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Exhibitor\RegisterExhibitorRequest;
 use App\Http\Requests\SystemUser\Shared\LoginSystemUserRequest;
+use App\Http\Resources\SystemUser\Shared\ProfileResource;
 use App\Models\SystemUser;
 use App\Services\SystemUser\Exhibitor\AuthService;
 use App\Services\SystemUser\Exhibitor\GoogleAuthService;
@@ -28,9 +29,8 @@ class AuthController extends Controller
         $dto = RegisterDTO::fromRequest($request->validated());
         $result = $this->authService->register($dto);
         return successResponse(
-            data: ['user'  => $result['user'], 'token' => $result['token']],
-            message: 'verify your account',
-            code: 200
+            data: ['user'  => new ProfileResource($result['user']), 'token' => $result['token']],
+            message: __($result['message']),
         );
     }
 
@@ -47,7 +47,19 @@ class AuthController extends Controller
 
         return successResponse(
             data: $user,
-            message: 'Email verified successfully'
+            message: __('auth.email_verified')
+        );
+    }
+
+    /**
+     * resend verification email
+     */
+    public function resendVerificationEmail(Request $request)
+    {
+        $this->authService->resendVerificationEmail($request->user('system'));
+
+        return successResponse(
+            message: __('auth.verification_sent')
         );
     }
     /**
@@ -58,8 +70,8 @@ class AuthController extends Controller
         $result = $this->authService->login($dto);
 
         return successResponse(
-            message: 'login successfully',
-            data: ['user' => $result['user'], 'token'=>$result['token']],
+            message: __('auth.login_success'),
+            data: ['user' => new ProfileResource($result['user']), 'token'=>$result['token']],
         );
     }
 
@@ -70,7 +82,7 @@ class AuthController extends Controller
         $request->user()->token()->revoke();
         return successResponse(
             data: null,
-            message: 'logged out successfully',
+            message: __('auth.logout_success'),
         );
     }
 
@@ -87,9 +99,9 @@ class AuthController extends Controller
             $result = $this->googleAuthService->handleGoogleProviderToken($request->token);
 
             return successResponse(
-                message: 'Authenticated successfully.',
+                message: __('auth.google_auth_success'),
                 data: [
-                    'user' => $result['user'],
+                    'user' => new ProfileResource($result['user']),
                     'access_token' => $result['token']
                 ]
             );
@@ -99,5 +111,18 @@ class AuthController extends Controller
                 message: $e->getMessage(),
             );
         }
+    }
+
+    /**
+     * check account verification
+     */
+    public function checkStatus(Request $request)
+    {
+        return successResponse(
+            message: __('auth.status_fetched'),
+            data: [
+                'is_verified' => $request->user('system')->hasVerifiedEmail(),
+            ]
+        );
     }
 }

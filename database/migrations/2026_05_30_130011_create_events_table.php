@@ -17,11 +17,19 @@ return new class extends Migration
             $table->decimal('avg_rating', 3, 2)->default(0);
             $table->string('type')->default('other');
             $table->string('status')->default('pending');
-            $table->string('qr_token')->unique();
-            $table->dateTime('date');
+            $table->string('qr_token')->unique()->nullable();
+            $table->dateTime('start_at');
             $table->integer('duration');
+            $table->dateTime('end_at');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index([
+                'event_hall_id',
+                'status',
+                'start_at',
+                'end_at',
+            ]);
         });
     }
 

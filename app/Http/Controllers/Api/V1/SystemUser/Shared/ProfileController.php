@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1\SystemUser\Shared;
 
 
-use App\DTOs\SystemUser\ProfileUpdateDTO;
+use App\DTOs\SystemUser\UpdateProfileDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Shared\UpdateProfileRequest;
 use App\Http\Resources\SystemUser\Shared\ProfileResource;
@@ -27,7 +27,7 @@ class ProfileController extends Controller
 
         return successResponse(
             data: new ProfileResource($user),
-            message: 'Profile retrieved successfully.',
+            message: __('profile.show_success'),
         );
     }
 
@@ -37,7 +37,7 @@ class ProfileController extends Controller
     public function update(UpdateProfileRequest $request)
     {
         $user = $request->user();
-        $dto = ProfileUpdateDTO::fromRequest($request->validated());
+        $dto = UpdateProfileDTO::fromRequest($request->validated());
 
         $updatedUser = $this->profileService->update($user, $dto);
 
@@ -45,7 +45,7 @@ class ProfileController extends Controller
 
         return successResponse(
             data: new ProfileResource($updatedUser),
-            message: __('Profile updated successfully.')
+            message: __('profile.update_success')
         );
     }
 }

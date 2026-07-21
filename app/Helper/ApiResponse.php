@@ -1,29 +1,53 @@
 <?php
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 if (! function_exists('successResponse')) {
-    function successResponse(mixed $data = null, string $message = 'success', int $code = 200): JsonResponse
+    function successResponse($data = null, string $message = 'Success', int $status = 200)
     {
+        if ($data instanceof AnonymousResourceCollection && $data->resource instanceof CursorPaginator) {
+            $paginator = $data->resource;
+
+            $data = [
+                'data' => $data->collection,
+                'per_page' => $paginator->perPage(),
+                'next_cursor' => $paginator->nextCursor()?->encode(),
+                'previous_cursor' => $paginator->previousCursor()?->encode(),
+                'has_more_pages' => $paginator->hasMorePages(),
+            ];
+        } elseif ($data instanceof AnonymousResourceCollection && $data->resource instanceof LengthAwarePaginator) {
+            $paginator = $data->resource;
+
+            $data = [
+                'data' => $data->collection,
+                'current_page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+            ];
+        }
+
         return response()->json([
-            'status'  => true,
+            'status' => true,
             'message' => $message,
-            'data'    => $data,
-        ], $code);
+            'data' => $data,
+        ], $status);
     }
 }
 
 if (! function_exists('errorResponse')) {
-    function errorResponse(string $message = 'error', mixed $data = null, int $code = 400): JsonResponse
+    function errorResponse(?string $message = null, mixed $errors = null, int $code = 400): JsonResponse
     {
         return response()->json([
-            'status'  => false,
+            'status' => false,
             'message' => $message,
-            'data'    => $data,
+            'errors' => $errors,
         ], $code);
     }
 }
-
 
 /*
 ====================

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('hall_id')->constrained('halls');
             $table->foreignId('company_id')->nullable()->constrained('companies')->nullOnDelete();
-            $table->string('qr_token')->unique();
+            $table->string('qr_token')->nullable()->unique();
             $table->string('number');
             $table->float('area');
             $table->decimal('price', 10, 2);

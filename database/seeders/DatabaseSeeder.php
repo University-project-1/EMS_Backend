@@ -2,11 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\SystemUser;
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,37 +14,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Artisan::call('passport:client', [
-            '--personal' => true,
-            '--name' => 'System Access Client',
-            '--provider' => 'system_users',
-        ]);
-        $this->command->info('Personal access client "System Access Client" created successfully.');
-
-        Artisan::call('passport:client', [
-            '--personal' => true,
-            '--name' => 'System Access Client',
-            '--provider' => 'users',
-        ]);
-        $this->command->info('Personal access client "User Access Client" created successfully.');
-
-        User::create([
-            'first_name' => 'Wasem',
-            'last_name' => 'Alhariri',
-            'email' => 'wasemalhariri13@gmail.com',
-            'phone' => '+963994801706',
-            'location' => 'Syria,Damascus',
-            'job' => 'Software Engineer',
-            'gender' => 'male',
-            'password' => '12345678',
-            'birthday' => '2006-02-06',
-        ]);
-
-        SystemUser::create([
-            'name' => 'Fawzy',
-            'email' => 'fawzy.sukkar2005@gmail.com',
-            'password' => '12345678',
+        $this->call([
+            PassportSeeder::class,
+            UserSeeder::class,
+            CompanySeeder::class,
+            ServiceSeeder::class,
+            HallSeeder::class,
+            FacilitySeeder::class,
+            BoothSeeder::class,
+            BoothRequestSeeder::class,
+            EventSeeder::class,
         ]);
     }
-
 }

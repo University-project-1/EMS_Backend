@@ -10,7 +10,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Mobile\Auth\LoginRequest;
 use App\Http\Requests\Mobile\Auth\RegisterRequest;
 use App\Http\Requests\Mobile\Auth\ResendOtpRequest;
-use App\Http\Requests\Mobile\Auth\VerifyRegisterRequest;
 use App\Http\Requests\Mobile\VerifyOtpRequest;
 use App\Http\Resources\Mobile\UserResource;
 use App\Services\Mobile\AuthService;

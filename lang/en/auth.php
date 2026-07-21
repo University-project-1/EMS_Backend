@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'password' => 'The provided password is incorrect.',
+    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'invalid_credentials' => 'Invalid credentials.',
+    'invalid_registration_state' => 'Invalid registration state.',
+    'registration_session_expired' => 'Registration session expired or not found.',
+    'invalid_or_expired_session' => 'Invalid or expired session.',
+    'too_many_failed_attempts' => 'Too many failed attempts. Session blocked.',
+    'invalid_otp' => 'The OTP code is incorrect.',
+    'otp_cooldown' => 'Please wait before requesting another OTP.',
+    'otp_daily_limit' => 'Daily OTP limit exceeded.',
+    'invalid_reset_token' => 'The password reset token is invalid or has expired.',
+    'failed' => 'Invalid credentials.',
+    'unauthenticated' => 'unauthenticated',
+    'forbidden' => 'You are not allowed to perform this action.',
+    'login_success' => 'Login successful.',
+    'logout_success' => 'Logged out successfully.',
+    'register_success' => 'Please verify your account.',
+    'email_verified' => 'Email verified successfully.',
+    'verification_sent' => 'Verification link sent successfully.',
+    'google_auth_success' => 'Authenticated successfully.',
+    'status_fetched' => 'User status fetched successfully.',
+    'google_invalid_token' => 'Invalid or expired Google token.',
+    'email_not_verified' => 'Your email address is not verified.',
+];

@@ -10,36 +10,62 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
     /**
      * Create a new class instance.
      */
-    public function __construct(){}
+    public function __construct(
+        private readonly InvitationService $invitationService,
+    ){}
 
     public function login(LoginDTO $dto){
         $exhibitor = SystemUser::where('email', $dto->email)->first();
-        if(!Hash::check($dto->password, $exhibitor->password)){
+        if(!$exhibitor || !Hash::check($dto->password, $exhibitor->password)){
             throw new AuthenticationException();
         }
+
+        if(!$exhibitor->hasVerifiedEmail()){
+            throw ValidationException::withMessages([
+                'email' => [__(__('auth.email_not_verified'))],
+            ]);
+        }
+
         $token = $exhibitor->createToken('exhibitor_token')->accessToken;
         return ['success', 'token'=>$token, 'user' => $exhibitor];
     }
 
     public function register(RegisterDTO $dto){
+        if ($dto->inviteToken) {
+            $invitation = $this->invitationService->getInvitationByToken($dto->inviteToken);
+
+            if ($invitation->email !== $dto->email) {
+                abort(400, __('invitation.email_mismatch'));
+            }
+        }
         return DB::transaction(function() use ($dto){
             $exhibitor = SystemUser::updateOrCreate(
-                ['name' => $dto->name],
+                ['email' => $dto->email],
                 [
-                    'email' => $dto->email,
+                    'name' => $dto->name,
                     'password' => Hash::make($dto->password),
                 ]
             );
-            event(new Registered($exhibitor));
+            $message = "auth.verification_sent";
+            if ($dto->inviteToken) {
+                $exhibitor->markEmailAsVerified();
+                $this->invitationService->approve($dto->inviteToken);
+                $message = "auth.email_verified";
+
+            } else {
+                event(new Registered($exhibitor));
+            }
 
             $token = $exhibitor->createToken('exhibitor_token')->accessToken;
             return [
+                'message' => $message,
                 'user'  => $exhibitor,
                 'token' => $token,
             ];
@@ -49,7 +75,9 @@ class AuthService
     public function verifyEmail(SystemUser $user, string $hash)
     {
         if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            return errorResponse('invalid verification link or hash.');
+            throw ValidationException::withMessages([
+                'verification' => [__('validation.invalid_link')]
+            ]);
         }
 
         if ($user->hasVerifiedEmail()) {
@@ -59,6 +87,14 @@ class AuthService
         $user->markEmailAsVerified();
 
         event(new Verified($user));
+    }
+    public function resendVerificationEmail(SystemUser $user): void
+    {
+        if ($user->hasVerifiedEmail()) {
+            abort(400, __('validation.already_verified'));
+        }
+
+        $user->sendEmailVerificationNotification();
     }
 
 }

@@ -3,13 +3,13 @@
 namespace App\Providers;
 
 use Dedoc\Scramble\Scramble;
-use Illuminate\Support\ServiceProvider;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
-use Dedoc\Scramble\Support\Generator\OpenApi;
-use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,39 +39,39 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('login_register', function (Request $request) {
             return Limit::perMinute(10)->by($request->ip())->response(function () {
-                return errorResponse('Too many login or register attempts. Please try again later.', [], 429);
+                return errorResponse(__('rate_limit.login_register'), [], 429);
             });
         });
 
         RateLimiter::for('verify_otp', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip())->response(function () {
-                return errorResponse('Too many verification attempts. Please wait a minute.', [], 429);
+                return errorResponse(__('rate_limit.verify_otp'), [], 429);
             });
         });
 
         RateLimiter::for('forgot_password', function (Request $request) {
             $phone = $request->input('phone') ?? $request->ip();
 
-            return Limit::perHour(3)->by($phone)->response(function () {
-                return errorResponse('Daily or hourly OTP limit reached for this phone number. Try again later.', [], 429);
+            return Limit::perMinute(10)->by($phone)->response(function () { // perHour to perMinute for testing
+                return errorResponse(__('rate_limit.forgot_password'), [], 429);
             });
         });
 
-        RateLimiter::for('profile_update', function (Request $request) {
+        RateLimiter::for('profile_update', function (Request $request) { // 2 to 20 for testing
             return Limit::perMinute(20)->by($request->user()->id)->response(function () {
-                return errorResponse('Too many profile update requests. Please wait a moment.', [], 429);
+                return errorResponse(__('rate_limit.profile_update'), [], 429);
             });
         });
 
         RateLimiter::for('password_update', function (Request $request) {
-            return Limit::perMinute(3)->by($request->user()->id)->response(function () {
-                return errorResponse('Too many password change attempts. Account actions slowed down for security.', [], 429);
+            return Limit::perMinute(10)->by($request->user()->id)->response(function () { // 3 to 10 for testing
+                return errorResponse(__('rate_limit.password_update'), [], 429);
             });
         });
 
         RateLimiter::for('phone_update_request', function (Request $request) {
             return Limit::perHour(2)->by($request->user()->id)->response(function () {
-                return errorResponse('You can only request a phone number update twice per hour.', [], 429);
+                return errorResponse(__('rate_limit.phone_update_request'), [], 429);
             });
         });
     }

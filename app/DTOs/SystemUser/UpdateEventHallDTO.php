@@ -3,26 +3,26 @@
 namespace App\DTOs\SystemUser;
 
 use App\DTOs\PatchDTO;
+use App\Http\Requests\SystemUser\Admin\UpdateEventHallRequest;
 use App\Trait\HasUpdatePayload;
-use Illuminate\Http\UploadedFile;
 
-class ProfileUpdateDTO extends PatchDTO
+class UpdateEventHallDTO extends PatchDTO
 {
     use HasUpdatePayload;
-
+    /**
+     * Create a new class instance.
+     */
     public function __construct(
-        public readonly ?string $name,
-        public readonly ?UploadedFile $avatar,
+        public readonly ?float $price_per_hour,
         array $payload,
-    ) {
+    ){
         parent::__construct($payload);
     }
 
     public static function fromRequest(array $data): self
     {
         return new self(
-            name: $data['name'] ?? null,
-            avatar: $data['avatar'] ?? null,
+            price_per_hour: $data['price_per_hour'],
             payload: $data,
         );
     }

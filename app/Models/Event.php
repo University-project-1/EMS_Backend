@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enum\EventType;
 use App\Enum\Status;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +16,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-#[Fillable(['eventable_type', 'eventable_id', 'event_hall_id', 'type', 'status', 'qr_token', 'date', 'duration', 'title', 'description'])]
+/**
+ * @property Status $status
+ * @property EventType $type
+ */
+#[Fillable(['eventable_type', 'eventable_id', 'event_hall_id', 'type', 'status', 'qr_token', 'start_at', 'end_at', 'duration', 'title', 'description'])]
 class Event extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia, SoftDeletes;
@@ -23,11 +28,33 @@ class Event extends Model implements HasMedia
     protected function casts(): array
     {
         return [
-            'date' => 'datetime',
+            'start_at' => 'datetime',
+            'end_at' => 'datetime',
             'duration' => 'integer',
             'status' => Status::class,
             'type' => EventType::class,
         ];
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('event-logo')->singleFile();
+    }
+
+    public function scopeAccessibleBy(Builder $query, SystemUser $systemUser): Builder
+    {
+        return $query->where(function (Builder $query) use ($systemUser): void {
+            $query->where(function (Builder $query) use ($systemUser): void {
+                $query->where('eventable_type', SystemUser::class)
+                    ->where('eventable_id', $systemUser->getKey());
+            })->orWhere(function (Builder $query) use ($systemUser): void {
+                $query->where('eventable_type', Company::class)
+                    ->whereIn(
+                        'eventable_id',
+                        $systemUser->companies()->select('companies.id')
+                    );
+            });
+        });
     }
 
     public function eventable(): MorphTo

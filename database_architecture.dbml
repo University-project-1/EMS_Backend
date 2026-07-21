@@ -20,8 +20,10 @@ Table system_users {
   id integer [primary key]
   name varchar
   email varchar [unique]
-  password varchar
-  role varchar [note: 'admin, exhibitor']
+  password varchar [note: Nullable]
+  google_id varchar [note: Nullable]
+  type varchar [default: 'exhibitor', note: 'admin, exhibitor']
+  email_verified_at timestamp [note: Nullable]
   created_at timestamp
   updated_at timestamp
   deleted_at timestamp [note: 'Soft Delete']
@@ -33,11 +35,12 @@ Table companies {
   name varchar
   business_sector varchar
   social_links json [note: 'JSON object for website, facebook, twitter, linkedin, etc.']
-  phone varchar [unique, note: 'Company public phone']
+  phone varchar [note: 'Company public phone']
   year_founded integer
   description text
   headquarters_lat float
   headquarters_lng float
+  status varchar [default: 'pending']
   created_at timestamp
   updated_at timestamp
   deleted_at timestamp [note: 'Soft Delete']
@@ -65,8 +68,11 @@ Table booth_system_users {
 Table halls {
   id integer [primary key]
   number varchar [unique]
+  svg_id varchar [note: Nullable]
   area float
-  type varchar [note: 'company, restaurant']
+  type varchar [default: 'exhibition', note: 'company, restaurant']
+  created_at timestamp
+  updated_at timestamp
   deleted_at timestamp [note: 'Soft Delete']
 }
 
@@ -74,11 +80,13 @@ Table booths {
   id integer [primary key]
   hall_id integer
   company_id integer [note: 'Nullable. Set automatically when a request is approved']
-  qr_token varchar [unique, note: 'Secure Token for QR Generation']
+  qr_token varchar [unique, note: 'Secure Token for QR Generation. Nullable']
+  svg_id varchar [note: Nullable]
   number varchar
   area float
   price decimal
-  is_booked boolean [default: false]
+  created_at timestamp
+  updated_at timestamp
   deleted_at timestamp [note: 'Soft Delete']
   Indexes {
     (hall_id, number) [unique, note: 'Booth number must be unique within the same hall']
@@ -104,6 +112,8 @@ Table services {
   name varchar [unique]
   price decimal
   is_active boolean [default: true]
+  created_at timestamp
+  updated_at timestamp
 }
 
 Table booth_request_services {
@@ -118,6 +128,7 @@ Table booth_request_services {
 Table event_halls {
   id integer [primary key]
   number varchar [unique]
+  svg_id varchar [unique, note: Nullable]
   area float
   price_per_hour decimal
 }
@@ -134,6 +145,7 @@ Table events {
   duration integer
   title varchar
   description text
+  avg_rating decimal [default: 0]
   created_at timestamp
   updated_at timestamp
   deleted_at timestamp [note: 'Soft Delete']
@@ -151,7 +163,9 @@ Table announcements {
   title varchar
   description text
   is_active boolean [default: true]
+  receiver varchar [default: 'all']
   created_at timestamp
+  updated_at timestamp
 }
 
 // User Interactions (Leads, Saved, Reviews)
@@ -225,14 +239,15 @@ Table bus_catalog {
   start_time time
   end_time time
   duration integer
+  created_at timestamp
+  updated_at timestamp
 }
 
 Table facilities {
   id integer [primary key]
   number varchar [unique]
   gender varchar
-  latitude float
-  longitude float
+  svg_id varchar [note: Nullable]
   type varchar [note: 'toilet, mosque, etc.']
 }
 
@@ -243,6 +258,9 @@ Table device_tokens {
   tokenable_id integer
   fcm_token varchar [unique]
   device_type varchar
+  oauth_access_token_id char [note: Nullable]
+  created_at timestamp
+  updated_at timestamp
 }
 
 Table otp_codes {
@@ -254,6 +272,8 @@ Table otp_codes {
   is_used boolean [default: false]
   expires_at timestamp
   session_id varchar [unique]
+  created_at timestamp
+  updated_at timestamp
   Indexes {
     phone [name: 'idx_phone']
   }
@@ -264,12 +284,32 @@ Table media {
   id integer [primary key]
   model_type varchar
   model_id integer
+  uuid uuid [unique, note: Nullable]
   collection_name varchar
   name varchar
   file_name varchar
-  mime_type varchar
+  mime_type varchar [note: Nullable]
   disk varchar
+  conversions_disk varchar [note: Nullable]
   size integer
+  manipulations json
+  custom_properties json
+  generated_conversions json
+  responsive_images json
+  order_column integer [note: Nullable]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table invitations {
+  id integer [primary key]
+  sender_id integer
+  inviteable_type varchar
+  inviteable_id integer
+  email varchar
+  token varchar [unique]
+  status varchar [default: 'pending']
+  expires_at timestamp
   created_at timestamp
   updated_at timestamp
 }
@@ -299,3 +339,5 @@ Ref: leads.user_id > users.id [delete: cascade]
 Ref: saved.user_id > users.id [delete: cascade]
 Ref: reviews.user_id > users.id [delete: cascade]
 Ref: reports.resolved_by > system_users.id [delete: set null]
+
+Ref: invitations.sender_id > system_users.id [delete: cascade]

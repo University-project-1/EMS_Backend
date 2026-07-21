@@ -21,11 +21,12 @@ use Override;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-#[Fillable(['name', 'email', 'password', 'type', 'google_id'])]
+/** @property SystemUserType $type */
+#[Fillable(['name', 'email', 'password', 'type', 'google_id', 'email_verified_at'])]
 #[Hidden(['password'])]
 class SystemUser extends Authenticatable implements HasMedia, MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, InteractsWithMedia, Notifiable, CanResetPassword,  SoftDeletes;
+    use CanResetPassword, HasApiTokens, HasFactory, InteractsWithMedia, Notifiable,  SoftDeletes;
 
     protected function casts(): array
     {
@@ -69,6 +70,7 @@ class SystemUser extends Authenticatable implements HasMedia, MustVerifyEmail
     {
         $this->notify(new VerifyApiEmail);
     }
+
     #[Override]
     public function sendPasswordResetNotification($token)
     {
