@@ -16,9 +16,7 @@ class EventService
     /**
      * Create a new class instance.
      */
-    public function __construct(
-        public readonly CompanyService $companyService,
-    ) {}
+    public function __construct(public readonly CompanyService $companyService) {}
 
     public function store(SystemUser $user, EventDTO $dto, ?CompanyDTO $companyDto): Event
     {

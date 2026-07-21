@@ -25,7 +25,6 @@ class StoreEventRequest extends FormRequest
                 ->where('system_user_id', $this->user('system')->id)
                 ->exists();
         }
-
         return true;
     }
 

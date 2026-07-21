@@ -23,7 +23,7 @@ class EventController extends Controller
     /**
      * statistics
      */
-    public function statistics(Request $request)
+    public function statistics()
     {
         $statistics = Event::query()
             ->accessibleBy(auth('system')->user())
