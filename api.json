@@ -45,6 +45,9 @@
             "name": "SystemUser/Admin/EventRequests"
         },
         {
+            "name": "SystemUser/Admin/Visitors"
+        },
+        {
             "name": "SystemUser/Exhibitor/Auth"
         },
         {
@@ -1720,6 +1723,120 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/visitor": {
+            "get": {
+                "operationId": "visitor.index",
+                "summary": "all visitors",
+                "tags": [
+                    "SystemUser/Admin/Visitors"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[search]",
+                        "in": "query",
+                        "description": "Search visitors by first name, last name, email, or phone.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[gender]",
+                        "in": "query",
+                        "description": "Filter visitors by gender (exact match).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[job]",
+                        "in": "query",
+                        "description": "Filter visitors by job title (partial match).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[location]",
+                        "in": "query",
+                        "description": "Filter visitors by location (partial match).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[created_from]",
+                        "in": "query",
+                        "description": "Filter visitors created on or after this date (YYYY-MM-DD).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[created_to]",
+                        "in": "query",
+                        "description": "Filter visitors created on or before this date (YYYY-MM-DD).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort by first_name, created_at, or birthday. Prefix with \"-\" for descending order.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page. Default: 15, maximum: 100.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/visitor/stats": {
+            "get": {
+                "operationId": "visitor.statistics",
+                "summary": "statistics",
+                "tags": [
+                    "SystemUser/Admin/Visitors"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
