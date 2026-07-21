@@ -79,6 +79,25 @@ class EventController extends Controller
     }
 
     /**
+     * Nearest upcoming events.
+     */
+    public function nearest()
+    {
+        $events = Event::query()
+            ->where('status', Status::APPROVED->value)
+            ->where('start_at', '>=', now())
+            ->with(['speakers', 'eventable'])
+            ->withAvg('reviews', 'rating')
+            ->withCount(['leads', 'savedItems'])
+            ->orderBy('start_at')
+            ->orderBy('id')
+            ->limit(10)
+            ->get();
+
+        return successResponse(EventResource::collection($events));
+    }
+
+    /**
      * booking event hall
      */
     public function store(StoreEventRequest $request)
