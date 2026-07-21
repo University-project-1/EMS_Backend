@@ -5,9 +5,9 @@ namespace App\Services\SystemUser\Admin;
 use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\BoothRequest;
-use App\Models\Company;
 use App\Notifications\SystemUser\BoothApprovedNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -33,9 +33,14 @@ class BoothRequestService
             throw new HttpException(400, __('booth.invalid_status'));
         }
 
-        return DB::transaction(function () use ($boothRequest) {
+        // Eager load the company and its system users to prevent N+1 queries
+        $boothRequest->load('company.systemUsers');
+
+        DB::transaction(function () use ($boothRequest) {
             $boothRequest->update(['status' => Status::APPROVED]);
-            Company::findOrFail($boothRequest->company_id)->update(['status' => Status::APPROVED]);
+
+            $boothRequest->company->update(['status' => Status::APPROVED]);
+
             Booth::where('id', $boothRequest->booth_id)
                 ->update([
                     'company_id' => $boothRequest->company_id,
@@ -46,9 +51,17 @@ class BoothRequestService
                 ->where('booth_id', $boothRequest->booth_id)
                 ->where('status', Status::PENDING)
                 ->update(['status' => Status::REJECTED]);
-
-            $boothRequest->systemUser->notify(new BoothApprovedNotification($boothRequest));
         });
+
+        $usersToNotify = $boothRequest->company->systemUsers;
+
+        if (! $usersToNotify->contains('id', $boothRequest->system_user_id)) {
+            $usersToNotify->push($boothRequest->systemUser);
+        }
+
+        Notification::send($usersToNotify->unique('id'), new BoothApprovedNotification($boothRequest));
+
+        return $boothRequest;
     }
 
     public function reject(BoothRequest $boothRequest)
