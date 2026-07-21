@@ -20,9 +20,12 @@ class BoothResource extends JsonResource
             'qr_token' => $this->qr_token,
             'svg_id' => $this->svg_id,
 
-            // 'hall_id' => $this->hall->id,
             'hall_number' => $this->whenLoaded('hall', fn() => $this->hall->number),
-            'company_id' => $this->whenLoaded('company', $this->company_id),
+            'company' => CompanySummaryResource::make($this->whenLoaded('company')),
+            'is_saved' => $this->whenHas(
+                'is_saved',
+                fn (): bool => (bool) $this->getAttribute('is_saved'),
+            ),
         ];
     }
 }
