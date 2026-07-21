@@ -1052,6 +1052,14 @@
                         }
                     },
                     {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page. Default: 10",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
                         "name": "filter[min_price]",
                         "in": "query",
                         "description": "Filter booths by minimum price",
