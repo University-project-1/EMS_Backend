@@ -1,13 +1,12 @@
 <?php
 
-
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
-use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
@@ -67,13 +66,16 @@ Route::prefix('exhibitor')->group(function () {
         Route::get('services', [ServiceController::class, 'index']);
 
         // eventHall
-        Route::prefix('eventHall/')->group(function(){
+        Route::prefix('eventHall/')->group(function () {
             Route::get('', [EventHallController::class, 'index'])->name('exhibitor.event_halls.index');
             Route::get('{eventHall}', [EventHallController::class, 'show'])->name('exhibitor.event_halls.show');
         });
 
         // events
-        Route::prefix('events/')->group(function(){
+        Route::prefix('events/')->group(function () {
+            Route::get('calendar', [EventController::class, 'calendar'])->name('exhibitor.events.calendar');
+            Route::get('statistics', [EventController::class, 'statistics'])->name('exhibitor.events.statistics');
+            Route::get('', [EventController::class, 'index'])->name('exhibitor.events.index');
             Route::post('', [EventController::class, 'store']);
         });
     });

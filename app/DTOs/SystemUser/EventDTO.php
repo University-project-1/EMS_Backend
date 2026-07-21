@@ -2,6 +2,8 @@
 
 namespace App\DTOs\SystemUser;
 
+use Illuminate\Http\UploadedFile;
+
 class EventDTO
 {
     /**
@@ -16,6 +18,7 @@ class EventDTO
         public readonly string $start_at,
         public readonly int $duration,
         public readonly array $speakers,
+        public readonly ?UploadedFile $logo,
     ) {}
 
     public static function fromRequest(array $data): self
@@ -29,6 +32,7 @@ class EventDTO
             start_at: $data['start_at'],
             duration: $data['duration'],
             speakers: $data['speakers'],
+            logo: $data['logo'] ?? null,
         );
     }
 }

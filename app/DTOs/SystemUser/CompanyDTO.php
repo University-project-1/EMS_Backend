@@ -8,23 +8,25 @@ use Illuminate\Http\UploadedFile;
 class CompanyDTO
 {
     use HasSnakeCaseArray;
+
     /**
      * Create a new class instance.
      */
     public function __construct(
-            public readonly string $name,
-            public readonly string $businessSector,
-            public readonly array $socialLinks,
-            public readonly string $phone,
-            public readonly int $yearFounded,
-            public readonly string $description,
-            public readonly float $headquartersLat,
-            public readonly float $headquartersLng,
-            public readonly UploadedFile $logo,
-            public readonly ?array $gallery,
-    ){}
+        public readonly string $name,
+        public readonly string $businessSector,
+        public readonly array $socialLinks,
+        public readonly string $phone,
+        public readonly int $yearFounded,
+        public readonly string $description,
+        public readonly float $headquartersLat,
+        public readonly float $headquartersLng,
+        public readonly UploadedFile $logo,
+        public readonly ?array $gallery,
+    ) {}
 
-    public static function fromRequest(array $data){
+    public static function fromRequest(array $data): self
+    {
         return new self(
             name: $data['name'],
             businessSector: $data['business_sector'],
@@ -35,7 +37,7 @@ class CompanyDTO
             headquartersLat: $data['headquarters_lat'],
             headquartersLng: $data['headquarters_lng'],
             logo: $data['logo'],
-            gallery: $data['gallery'],
+            gallery: $data['gallery'] ?? null,
         );
     }
 }

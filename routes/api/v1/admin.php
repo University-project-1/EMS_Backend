@@ -5,9 +5,10 @@ use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothController;
-use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController as AdminEventHallController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\CompanyDirectoryController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController as AdminEventHallController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\EventRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ManagerDirectoryController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
@@ -64,10 +65,18 @@ Route::prefix('admin')->group(function () {
         Route::resource('service', ServiceController::class);
 
         // eventHall
-        Route::prefix('eventHall/')->group(function(){
+        Route::prefix('eventHall/')->group(function () {
             Route::get('', [EventHallController::class, 'index'])->name('admin.event_halls.index');
             Route::get('{eventHall}', [EventHallController::class, 'show'])->name('admin.event_halls.show');
             Route::patch('{eventHall}', [AdminEventHallController::class, 'update']);
+        });
+
+        Route::prefix('events/requests')->group(function () {
+            Route::get('', [EventRequestController::class, 'index'])->name('admin.event_requests.index');
+            Route::get('/stats', [EventRequestController::class, 'statistics']);
+            Route::get('{event}', [EventRequestController::class, 'show'])->name('admin.event_requests.show');
+            Route::post('{event}/approve', [EventRequestController::class, 'approve'])->name('admin.event_requests.approve');
+            Route::patch('{event}/reject', [EventRequestController::class, 'reject'])->name('admin.event_requests.reject');
         });
     });
 });

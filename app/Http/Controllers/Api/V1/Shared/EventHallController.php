@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Shared;
 
+use App\Enum\Status;
 use App\Filter\MaxFilter;
 use App\Filter\MinFilter;
 use App\Http\Controllers\Controller;
@@ -10,6 +11,7 @@ use App\Models\EventHall;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedInclude;
 use Spatie\QueryBuilder\QueryBuilder;
 
 #[Group('EventHall')]
@@ -30,12 +32,19 @@ class EventHallController extends Controller
         $eventHalls = QueryBuilder::for(EventHall::class)
             ->allowedFilters(
                 AllowedFilter::exact('number'),
-                AllowedFilter::custom('min_area', new MinFilter(), 'area'),
-                AllowedFilter::custom('max_area', new MaxFilter(), 'area'),
-                AllowedFilter::custom('min_price', new MinFilter(), 'price_per_hour'),
-                AllowedFilter::custom('max_price', new MaxFilter(), 'price_per_hour'),
+                AllowedFilter::custom('min_area', new MinFilter, 'area'),
+                AllowedFilter::custom('max_area', new MaxFilter, 'area'),
+                AllowedFilter::custom('min_price', new MinFilter, 'price_per_hour'),
+                AllowedFilter::custom('max_price', new MaxFilter, 'price_per_hour'),
             )
-            ->allowedIncludes('events')
+            ->allowedIncludes(
+                AllowedInclude::callback(
+                    'events',
+                    fn ($events) => $events
+                        ->where('status', Status::APPROVED->value)
+                        ->with('media'),
+                ),
+            )
             ->allowedSorts(
                 'number',
                 'area',
@@ -43,14 +52,20 @@ class EventHallController extends Controller
             )
             ->get();
 
-        return successResponse(EventHallResource::collection($eventHalls),);
+        return successResponse(EventHallResource::collection($eventHalls));
     }
 
     /**
      * show
      */
-    public function show(EventHall $eventHall){
-        $eventHall->load('events');
-        return successResponse(EventHallResource::make($eventHall),);
+    public function show(EventHall $eventHall)
+    {
+        $eventHall->load([
+            'events' => fn ($events) => $events
+                ->where('status', Status::APPROVED->value)
+                ->with('media'),
+        ]);
+
+        return successResponse(EventHallResource::make($eventHall));
     }
 }
