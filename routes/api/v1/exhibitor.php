@@ -74,6 +74,7 @@ Route::prefix('exhibitor')->group(function () {
         // events
         Route::prefix('events/')->group(function () {
             Route::get('calendar', [EventController::class, 'calendar'])->name('exhibitor.events.calendar');
+            Route::get('nearest', [EventController::class, 'nearest'])->name('exhibitor.events.nearest');
             Route::get('statistics', [EventController::class, 'statistics'])->name('exhibitor.events.statistics');
             Route::get('', [EventController::class, 'index'])->name('exhibitor.events.index');
             Route::post('', [EventController::class, 'store']);
