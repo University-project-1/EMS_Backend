@@ -10,6 +10,7 @@ use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Database\Eloquent\Builder;
 
 #[Group('Visitor/Booth')]
 class BoothController extends Controller
@@ -27,6 +28,10 @@ class BoothController extends Controller
                 AllowedFilter::custom('company_name', new CompanyNameFilter()),
             )
             ->allowedIncludes('company', 'hall')
+            ->withExists([
+                'savedItems as is_saved' => fn (Builder $savedItems): Builder => $savedItems
+                    ->where('user_id', auth('mobile')->user()->getKey()),
+            ])
             ->cursorPaginate(10);
         return successResponse(
             data: BoothResource::collection($booths),

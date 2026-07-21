@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Mobile\BoothController;
 use App\Http\Controllers\Api\V1\Mobile\EventController;
 use App\Http\Controllers\Api\V1\Mobile\PasswordController;
 use App\Http\Controllers\Api\V1\Mobile\ProfileController;
+use App\Http\Controllers\Api\V1\Mobile\SavedController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
@@ -72,6 +73,13 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     Route::prefix('halls')->group(function () {
         Route::get('/', [HallController::class, 'index']);
         Route::get('/{hall}', [HallController::class, 'show']);
+    });
+
+    //saved
+    Route::prefix('saved')->group(function(){
+        Route::post('events/{event}', [SavedController::class, 'toggleEvent']);
+        Route::post('booths/{booth}', [SavedController::class, 'toggleBooth']);
+        Route::get('booths', [SavedController::class, 'savedBooths']);
     });
 
 });
