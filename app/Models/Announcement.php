@@ -13,8 +13,6 @@ class Announcement extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
 
-    public const UPDATED_AT = null;
-
     protected function casts(): array
     {
         return [

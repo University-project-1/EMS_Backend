@@ -4,7 +4,6 @@ namespace App\Services\SystemUser\Exhibitor;
 
 use App\DTOs\SystemUser\CompanyDTO;
 use App\Models\SystemUser;
-use Illuminate\Support\Facades\Log;
 
 class CompanyService
 {

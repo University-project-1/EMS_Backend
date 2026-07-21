@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\AnnouncementController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController as AdminEventHallController;
@@ -62,6 +63,15 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::resource('service', ServiceController::class);
+
+        Route::prefix('announcements')->group(function(){
+            Route::get('/', [AnnouncementController::class, 'index']);
+            Route::get('/{announcement}', [AnnouncementController::class, 'show']);
+            Route::post('/', [AnnouncementController::class, 'store']);
+            Route::patch('/{announcement}', [AnnouncementController::class, 'update']);
+            Route::delete('/{announcement}', [AnnouncementController::class, 'delete']);
+        });
+        // Route::resource('announcement', AnnouncementController::class);
 
         // eventHall
         Route::prefix('eventHall/')->group(function(){
