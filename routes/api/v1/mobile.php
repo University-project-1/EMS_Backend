@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Mobile\AnnouncementController;
 use App\Http\Controllers\Api\V1\Mobile\AuthController;
 use App\Http\Controllers\Api\V1\Mobile\BoothController;
 use App\Http\Controllers\Api\V1\Mobile\PasswordController;
@@ -48,6 +49,9 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function(){
     Route::post('/phone/request', [ProfileController::class, 'requestPhoneUpdate']);
     Route::post('/phone/verify', [ProfileController::class, 'verifyPhoneUpdate'])->middleware('throttle:verify_otp');
   });
+
+  // announcments
+Route::get('announcements', [AnnouncementController::class, 'index']);
 
   // booths
   Route::prefix('booth/')->group(function(){

@@ -5,7 +5,6 @@ namespace App\Services\SystemUser\Admin;
 use App\DTOs\SystemUser\AnnouncementDTO;
 use App\DTOs\SystemUser\UpdateAnnouncementDTO;
 use App\Models\Announcement;
-use Illuminate\Support\Facades\Log;
 
 class AnnouncementService
 {

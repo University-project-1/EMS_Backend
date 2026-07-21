@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AnnouncementController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
@@ -64,6 +64,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::delete('/{invitation}', [InvitationController::class, 'delete']);
         });
 
+        Route::get('announcements', [AnnouncementController::class, 'index']);
         Route::get('services', [ServiceController::class, 'index']);
 
         // eventHall
