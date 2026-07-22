@@ -21,7 +21,7 @@ class BoothController extends Controller
 {
     public function __construct(
         private readonly UpdateBoothService $updateBoothService,
-    ){}
+    ) {}
 
     /**
      * all
@@ -34,19 +34,22 @@ class BoothController extends Controller
     #[QueryParameter('filter[max_area]', 'Filter booths by maximum area', required: false, type: 'number')]
     #[QueryParameter('include', 'Include related resources (company, hall)', required: false, type: 'string')]
     #[QueryParameter('sort', 'Sort results by field (price, area). Prefix with - for descending order', required: false, type: 'string')]
-    public function index(){
+    #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 10')]
+    public function index()
+    {
         $booths = QueryBuilder::for(Booth::class)
             ->allowedFilters(
                 AllowedFilter::exact('number'),
-                AllowedFilter::custom('booked', new BookedBoothFilter()),
-                AllowedFilter::custom('min_price', new MinFilter(), 'price'),
-                AllowedFilter::custom('max_price', new MaxFilter(), 'price'),
-                AllowedFilter::custom('min_area', new MinFilter(), 'area'),
-                AllowedFilter::custom('max_area', new MaxFilter(), 'area')
+                AllowedFilter::custom('booked', new BookedBoothFilter),
+                AllowedFilter::custom('min_price', new MinFilter, 'price'),
+                AllowedFilter::custom('max_price', new MaxFilter, 'price'),
+                AllowedFilter::custom('min_area', new MinFilter, 'area'),
+                AllowedFilter::custom('max_area', new MaxFilter, 'area')
             )
             ->allowedIncludes('company', 'hall')
             ->allowedSorts('price', 'area')
-            ->paginate(10);
+            ->paginate(request()->query('per_page', 10));
+
         return successResponse(
             data: BoothResource::collection($booths),
             message: __('booth.list_success'),
@@ -56,8 +59,10 @@ class BoothController extends Controller
     /**
      * show
      */
-    public function show(Booth $booth){
+    public function show(Booth $booth)
+    {
         $booth->loadMissing(['hall', 'company']);
+
         return successResponse(
             data: new BoothResource($booth),
             message: __('booth.show_success'),
@@ -67,7 +72,8 @@ class BoothController extends Controller
     /**
      * update
      */
-    public function update(Booth $booth, UpdateBoothRequest $request){
+    public function update(Booth $booth, UpdateBoothRequest $request)
+    {
         $dto = BoothUpdateDTO::fromRequest($request->validated());
         $updatedBooth = $this->updateBoothService->update($booth, $dto);
 
@@ -77,4 +83,3 @@ class BoothController extends Controller
         );
     }
 }
-

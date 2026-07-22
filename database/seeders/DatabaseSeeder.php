@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Database\Seeders\ServiceSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,6 +21,7 @@ class DatabaseSeeder extends Seeder
             CompanySeeder::class,
             ServiceSeeder::class,
             HallSeeder::class,
+            FacilitySeeder::class,
             BoothSeeder::class,
             BoothRequestSeeder::class,
             EventSeeder::class,

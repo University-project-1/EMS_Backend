@@ -18,6 +18,11 @@ class ServiceSeeder extends Seeder
             ['name' => 'Audio Visual Support', 'price' => 300.00, 'is_active' => true],
             ['name' => 'Security Staff', 'price' => 180.00, 'is_active' => true],
             ['name' => 'Logistics Support', 'price' => 220.00, 'is_active' => true],
+            ['name' => 'Internet Package', 'price' => 120.00, 'is_active' => true],
+            ['name' => 'Furniture Rental', 'price' => 190.00, 'is_active' => true],
+            ['name' => 'Lighting Setup', 'price' => 160.00, 'is_active' => true],
+            ['name' => 'Printing Services', 'price' => 95.00, 'is_active' => true],
+            ['name' => 'Cleaning Crew', 'price' => 110.00, 'is_active' => true],
         ];
 
         foreach ($services as $service) {
