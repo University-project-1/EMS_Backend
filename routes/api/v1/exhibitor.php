@@ -59,7 +59,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::post('/{company}/invitations', [InvitationController::class, 'storeForCompany']);
         });
 
-        Route::prefix('invitation')->group(function () {
+        Route::prefix('invitations')->group(function () {
             Route::post('/{invitation:token}/accept', [InvitationController::class, 'approve']);
             Route::post('/{invitation:token}/reject', [InvitationController::class, 'reject']);
             Route::delete('{invitation:token}', [InvitationController::class, 'destroy']);

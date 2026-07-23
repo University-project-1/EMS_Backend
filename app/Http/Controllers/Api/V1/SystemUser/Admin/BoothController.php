@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\SystemUser\Admin;
 
-use App\DTOs\SystemUser\BoothUpdateDTO;
+use App\DTOs\SystemUser\UpdateBoothDTO;
 use App\Filter\BookedBoothFilter;
 use App\Filter\MaxFilter;
 use App\Filter\MinFilter;
@@ -74,7 +74,7 @@ class BoothController extends Controller
      */
     public function update(Booth $booth, UpdateBoothRequest $request)
     {
-        $dto = BoothUpdateDTO::fromRequest($request->validated());
+        $dto = UpdateBoothDTO::fromRequest($request->validated());
         $updatedBooth = $this->updateBoothService->update($booth, $dto);
 
         return successResponse(

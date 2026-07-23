@@ -5,7 +5,7 @@ namespace App\DTOs\SystemUser;
 use App\DTOs\PatchDTO;
 use App\Trait\HasUpdatePayload;
 
-class BoothUpdateDTO extends PatchDTO
+class UpdateBoothDTO extends PatchDTO
 {
 
     use HasUpdatePayload;

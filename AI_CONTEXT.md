@@ -99,7 +99,7 @@ app/
 │   ├── PatchDTO.php                 [Base class for PATCH operations with field tracking]
 │   ├── Mobile/UpdateProfileDTO.php
 │   ├── Shared/UpdatePasswordDTO.php
-│   └── SystemUser/LoginDTO.php, RegisterDTO.php, ProfileUpdateDTO.php, BoothRequestDTO.php, BoothUpdateDTO.php, CompanyDTO.php, ServiceDTO.php, UpdateServiceDTO.php
+│   └── SystemUser/LoginDTO.php, RegisterDTO.php, ProfileUpdateDTO.php, BoothRequestDTO.php, UpdateBoothDTO.php, CompanyDTO.php, ServiceDTO.php, UpdateServiceDTO.php
 ├── Enum/                            [8 backing enums for domain validation]
 │   ├── Status.php                   [pending, approved, rejected]
 │   ├── SystemUserType.php           [admin, exhibitor]

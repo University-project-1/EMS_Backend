@@ -2,7 +2,7 @@
 
 namespace App\Services\SystemUser\Admin;
 
-use App\DTOs\SystemUser\BoothUpdateDTO;
+use App\DTOs\SystemUser\UpdateBoothDTO;
 use App\Models\Booth;
 use Http\Discovery\Exception\NotFoundException;
 
@@ -13,7 +13,7 @@ class UpdateBoothService
      */
     public function __construct(){}
 
-    public function update(Booth $booth, BoothUpdateDTO $dto){
+    public function update(Booth $booth, UpdateBoothDTO $dto){
         if(!$booth){
             throw new NotFoundException();
         }
