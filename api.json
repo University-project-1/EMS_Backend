@@ -39,6 +39,9 @@
             "name": "SystemUser/Admin/Services"
         },
         {
+            "name": "SystemUser/Admin/Announcement"
+        },
+        {
             "name": "EventHall"
         },
         {
@@ -51,10 +54,13 @@
             "name": "SystemUser/Exhibitor/Auth"
         },
         {
+            "name": "SystemUser/Exhibitor/Invitations"
+        },
+        {
             "name": "SystemUser/Exhibitor/Booths"
         },
         {
-            "name": "SystemUser/Exhibitor/Invitations"
+            "name": "SystemUser/Exhibitor/Announcement"
         },
         {
             "name": "SystemUser/Exhibitor/Services"
@@ -70,6 +76,9 @@
         },
         {
             "name": "Visitor/Profile"
+        },
+        {
+            "name": "SystemUser/Visitor/Announcement"
         },
         {
             "name": "Visitor/Booth"
@@ -758,6 +767,184 @@
                 "summary": "show hall",
                 "tags": [
                     "Halls"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/announcements": {
+            "get": {
+                "operationId": "v1.systemUser.admin.announcement.index",
+                "tags": [
+                    "SystemUser/Admin/Announcement"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[title]",
+                        "in": "query",
+                        "description": "Filter announcements by partial title",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[description]",
+                        "in": "query",
+                        "description": "Filter announcements by partial description",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[receiver]",
+                        "in": "query",
+                        "description": "Filter by receiver (Exhibitors, visitors, all)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[is_active]",
+                        "in": "query",
+                        "description": "Filter by active status",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort results (title, created_at). Prefix with - for descending order",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "announcement.store",
+                "tags": [
+                    "SystemUser/Admin/Announcement"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreAnnouncementRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/announcements/{announcement}": {
+            "get": {
+                "operationId": "announcement.show",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'announcements' order by ordinal_position asc)",
+                "tags": [
+                    "SystemUser/Admin/Announcement"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "announcement.update",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'announcements' order by ordinal_position asc)",
+                "tags": [
+                    "SystemUser/Admin/Announcement"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "announcement.destroy",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'announcements' order by ordinal_position asc)",
+                "tags": [
+                    "SystemUser/Admin/Announcement"
                 ],
                 "responses": {
                     "200": {
@@ -1844,6 +2031,47 @@
                 }
             }
         },
+        "/v1/exhibitor/announcements": {
+            "get": {
+                "operationId": "v1.systemUser.exhibitor.announcement.index",
+                "tags": [
+                    "SystemUser/Exhibitor/Announcement"
+                ],
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort results. Prefix with - for descending order. Default: -created_at",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page. Use 3 for latest widget.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/exhibitor/login": {
             "post": {
                 "operationId": "v1.systemUser.exhibitor.auth.login",
@@ -1909,6 +2137,35 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/v1/exhibitor/register/{invitation}": {
+            "post": {
+                "operationId": "auth.registerViaInvite",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'invitations' order by ordinal_position asc)",
+                "summary": "register Via Invite",
+                "tags": [
+                    "SystemUser/Exhibitor/Auth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     }
                 },
                 "security": []
@@ -2439,11 +2696,32 @@
                 }
             }
         },
+        "/v1/exhibitor/invitations/{invitation}": {
+            "get": {
+                "operationId": "invitation.show",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'invitations' order by ordinal_position asc)",
+                "tags": [
+                    "SystemUser/Exhibitor/Invitations"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
         "/v1/exhibitor/booth/{booth}/invitations": {
             "get": {
                 "operationId": "invitation.boothInvitations",
                 "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
-                "summary": "booth Invitations",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
                 ],
@@ -2469,7 +2747,6 @@
             "post": {
                 "operationId": "invitation.storeForBooth",
                 "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
-                "summary": "invite For Booth",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
                 ],
@@ -2500,7 +2777,6 @@
             "get": {
                 "operationId": "invitation.companyInvitations",
                 "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'companies' order by ordinal_position asc)",
-                "summary": "company Invitations",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
                 ],
@@ -2526,7 +2802,6 @@
             "post": {
                 "operationId": "invitation.storeForCompany",
                 "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'companies' order by ordinal_position asc)",
-                "summary": "invite For Company",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
                 ],
@@ -2553,59 +2828,12 @@
                 }
             }
         },
-        "/v1/exhibitor/invitation/{token}": {
-            "get": {
-                "operationId": "invitation.show",
-                "summary": "show",
-                "tags": [
-                    "SystemUser/Exhibitor/Invitations"
-                ],
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/AuthorizationException"
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            }
-        },
-        "/v1/exhibitor/invitation/{token}/accept": {
+        "/v1/exhibitor/invitation/{invitation}/accept": {
             "post": {
                 "operationId": "invitation.approve",
-                "summary": "approve",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'invitations' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
-                ],
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
                 ],
                 "responses": {
                     "200": {
@@ -2627,22 +2855,12 @@
                 }
             }
         },
-        "/v1/exhibitor/invitation/{token}/reject": {
+        "/v1/exhibitor/invitation/{invitation}/reject": {
             "post": {
                 "operationId": "invitation.reject",
-                "summary": "reject",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'invitations' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
-                ],
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
                 ],
                 "responses": {
                     "200": {
@@ -2666,9 +2884,8 @@
         },
         "/v1/exhibitor/invitation/{invitation}": {
             "delete": {
-                "operationId": "invitation.delete",
+                "operationId": "invitation.destroy",
                 "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'invitations' order by ordinal_position asc)",
-                "summary": "cancele invitation",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
                 ],
@@ -2860,6 +3077,47 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/v1/visitor/announcements": {
+            "get": {
+                "operationId": "v1.mobile.announcement.index",
+                "tags": [
+                    "SystemUser/Visitor/Announcement"
+                ],
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort results. Prefix with - for descending order. Default: -created_at",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page. Use 3 for latest widget.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -4134,14 +4392,6 @@
                         "type": "string",
                         "minLength": 8
                     },
-                    "invite_token": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "minLength": 20,
-                        "maxLength": 20
-                    },
                     "password_confirmation": {
                         "type": "string",
                         "minLength": 8
@@ -4250,6 +4500,46 @@
                     "password_confirmation"
                 ],
                 "title": "ResetPasswordRequest"
+            },
+            "StoreAnnouncementRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 2048
+                    },
+                    "receiver": {
+                        "type": "string",
+                        "enum": [
+                            "Exhibitors",
+                            "visitors",
+                            "all"
+                        ]
+                    },
+                    "is_active": {
+                        "type": [
+                            "boolean",
+                            "null"
+                        ]
+                    },
+                    "media": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 8192
+                    }
+                },
+                "required": [
+                    "title",
+                    "description",
+                    "receiver"
+                ],
+                "title": "StoreAnnouncementRequest"
             },
             "StoreBoothRequestRequest": {
                 "type": "object",
