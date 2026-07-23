@@ -9,7 +9,7 @@ use Dedoc\Scramble\Attributes\Group;
 use Spatie\QueryBuilder\QueryBuilder;
 use Dedoc\Scramble\Attributes\QueryParameter;
 
-#[Group('SystemUser/Visitor/Announcement')]
+#[Group('Visitor/Announcement')]
 class AnnouncementController extends Controller
 {
     #[QueryParameter('sort', 'Sort results. Prefix with - for descending order. Default: -created_at', required: false, type: 'string')]
