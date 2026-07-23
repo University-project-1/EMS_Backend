@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api\V1\SystemUser\Exhibitor;
 use App\DTOs\SystemUser\LoginDTO;
 use App\DTOs\SystemUser\RegisterDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SystemUser\Exhibitor\InvitationRegisterRequest;
 use App\Http\Requests\SystemUser\Exhibitor\RegisterExhibitorRequest;
 use App\Http\Requests\SystemUser\Shared\LoginSystemUserRequest;
 use App\Http\Resources\SystemUser\Shared\ProfileResource;
+use App\Models\Invitation;
 use App\Models\SystemUser;
 use App\Services\SystemUser\Exhibitor\AuthService;
 use App\Services\SystemUser\Exhibitor\GoogleAuthService;
@@ -35,9 +37,19 @@ class AuthController extends Controller
     }
 
     /**
+     * register Via Invite
+     */
+    public function registerViaInvite(Invitation $invitation, InvitationRegisterRequest $request){
+        $dto = RegisterDTO::fromInvitationRequest($request->validated(), $invitation);
+        $result = $this->authService->registerViaInvitation($invitation, $dto);
+        return successResponse(
+            data: ['user'  => new ProfileResource($result['user']), 'token' => $result['token']],
+            message: __($result['message']),
+        );
+    }
+
+    /**
      * verify
-     * @param mixed $id
-     * @param mixed $hash
      */
     public function verify(string $id, string $hash)
     {
@@ -73,6 +85,10 @@ class AuthController extends Controller
             message: __('auth.login_success'),
             data: ['user' => new ProfileResource($result['user']), 'token'=>$result['token']],
         );
+    }
+
+    public function loginViaInvite(){
+        
     }
 
     /**

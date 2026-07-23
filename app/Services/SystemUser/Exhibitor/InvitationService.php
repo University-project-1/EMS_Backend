@@ -14,12 +14,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class InvitationService
 {
-    public function __construct() {}
-
     public function invite(Model $inviteable, SystemUser $sender, string $email): Invitation
     {
         $user = SystemUser::where('email', $email)->first();
-        if ($user && $inviteable->systemUsers()->where('system_user_id', $user->id)->exists()) {
+        if ($user && $inviteable->systemUsers()->where('system_users.id', $user->id)->exists()) {
             abort(400, __('teams.alreadyExist'));
         }
 
@@ -41,34 +39,60 @@ class InvitationService
 
     public function approve(Invitation $invitation): void
     {
-        $user = SystemUser::where('email', $invitation->email)->first();
+        DB::transaction(function () use ($invitation) {
+            $lockedInvitation = Invitation::where('id', $invitation->id)->lockForUpdate()->first();
 
-        if (! $user) {
-            throw new HttpException(404, __('errors.user_not_found'));
-        }
-        DB::transaction(function () use ($invitation, $user) {
-            $invitation->inviteable->systemUsers()->syncWithoutDetaching($user->id);
-            $invitation->update(['status' => Status::APPROVED]);
+            if (! $lockedInvitation || ! $lockedInvitation->isValid()) {
+                throw new HttpException(410, __('errors.invalid_or_expired_token'));
+            }
+
+            $user = SystemUser::where('email', $lockedInvitation->email)->first();
+            if (! $user) {
+                throw new HttpException(404, __('errors.user_not_found'));
+            }
+
+            $lockedInvitation->inviteable->systemUsers()->syncWithoutDetaching([$user->id]);
+            $lockedInvitation->update(['status' => Status::APPROVED]);
         });
     }
 
     public function reject(Invitation $invitation): void
     {
+        $this->check($invitation);
         $invitation->update(['status' => Status::REJECTED]);
+    }
+    public function delete(Invitation $invitation): void
+    {
+        DB::transaction(function () use ($invitation) {
+            if ($invitation->status === Status::APPROVED) {
+                $invitedUser = SystemUser::where('email', $invitation->email)->first();
+
+                if ($invitedUser && $invitation->inviteable) {
+                    $invitation->inviteable->systemUsers()->detach($invitedUser->id);
+                }
+            }
+            $invitation->delete();
+        });
     }
 
     public function getInvitationByToken(string $token): Invitation
     {
         $invitation = Invitation::with(['sender', 'inviteable'])
             ->where('token', $token)
-            ->where('status', Status::PENDING)
-            ->where('expires_at', '>', now())
             ->first();
 
-        if (! $invitation) {
-            abort(404, __('errors.invalid_or_expired_token'));
+        if (! $invitation || ! $invitation->isValid()) {
+            abort(410, __('errors.invalid_or_expired_token'));
         }
 
         return $invitation;
+    }
+    public function check(Invitation $invitation): bool
+    {
+        if (! $invitation->isValid()) {
+            abort(410, __('errors.invalid_or_expired_token'));
+        }
+
+        return true;
     }
 }

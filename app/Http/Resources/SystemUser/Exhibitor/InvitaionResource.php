@@ -3,6 +3,7 @@
 namespace App\Http\Resources\SystemUser\Exhibitor;
 
 use App\Http\Resources\SystemUser\Shared\SystemUserResource;
+use App\Models\SystemUser;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,6 +21,7 @@ class InvitaionResource extends JsonResource
             'email' => $this->email,
             'status' => $this->status,
             'token' => $this->when($this->status === 'pending', $this->token),
+            'is_user_exists' => SystemUser::where('email', $this->email)->exists(),
             'expires_at' => $this->expires_at,
             'is_expired' => $this->expires_at < now() && $this->status === 'pending',
 

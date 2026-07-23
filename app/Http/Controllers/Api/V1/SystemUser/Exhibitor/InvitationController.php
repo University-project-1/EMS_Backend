@@ -19,13 +19,10 @@ class InvitationController extends Controller
         public readonly InvitationService $invitationService,
     ) {}
 
-    /**
-     * company Invitations
-     */
     public function companyInvitations(Company $company)
     {
         Gate::authorize('manageInvitations', $company);
-        $invitations = $company->invitations()->with('sender')->latest()->paginate(5);
+        $invitations = $company->invitations()->with('sender')->latest()->paginate(10);
 
         return successResponse(
             data: InvitaionResource::collection($invitations),
@@ -33,9 +30,6 @@ class InvitationController extends Controller
         );
     }
 
-    /**
-     * booth Invitations
-     */
     public function boothInvitations(Booth $booth)
     {
         Gate::authorize('manageInvitations', $booth);
@@ -47,23 +41,16 @@ class InvitationController extends Controller
         );
     }
 
-    /**
-     * show
-     */
-    public function show(string $token)
+    public function show(Invitation $invitation)
     {
-        $invitation = $this->invitationService->getInvitationByToken($token);
-        Gate::authorize('view', $invitation);
+        $this->invitationService->check($invitation);
 
         return successResponse(
-            data: new InvitaionResource($invitation),
+            data: new InvitaionResource($invitation->load(['sender', 'inviteable'])),
             message: __('invitation.show_success'),
         );
     }
 
-    /**
-     * invite For Company
-     */
     public function storeForCompany(Request $request, Company $company)
     {
         Gate::authorize('manageInvitations', $company);
@@ -77,9 +64,6 @@ class InvitationController extends Controller
         );
     }
 
-    /**
-     * invite For Booth
-     */
     public function storeForBooth(Request $request, Booth $booth)
     {
         Gate::authorize('manageInvitations', $booth);
@@ -93,13 +77,10 @@ class InvitationController extends Controller
         );
     }
 
-    /**
-     * cancele invitation
-     */
-    public function delete(Invitation $invitation)
+    public function destroy(Invitation $invitation)
     {
         Gate::authorize('delete', $invitation);
-        $invitation->delete();
+        $this->invitationService->delete($invitation);
 
         return successResponse(
             data: null,
@@ -107,12 +88,8 @@ class InvitationController extends Controller
         );
     }
 
-    /**
-     * approve
-     */
-    public function approve(string $token)
+    public function approve(Invitation $invitation)
     {
-        $invitation = $this->invitationService->getInvitationByToken($token);
         Gate::authorize('accept', $invitation);
         $this->invitationService->approve($invitation);
 
@@ -121,12 +98,8 @@ class InvitationController extends Controller
         );
     }
 
-    /**
-     * reject
-     */
-    public function reject(string $token)
+    public function reject(Invitation $invitation)
     {
-        $invitation = $this->invitationService->getInvitationByToken($token);
         Gate::authorize('reject', $invitation);
         $this->invitationService->reject($invitation);
 

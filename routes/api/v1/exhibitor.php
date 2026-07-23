@@ -17,7 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('exhibitor')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register']);
-    Route::post('register/{invvitation}', [AuthController::class, 'register']);
+    Route::get('invitations/{invitation:token}', [InvitationController::class, 'show']);
+    Route::post('register/{invitation:token}', [AuthController::class, 'registerViaInvite']);
     Route::post('/email/resend-verification', [AuthController::class, 'resendVerificationEmail'])
         ->middleware(['auth:system', 'throttle:verify_otp']);
     Route::post('/auth/system/google', [AuthController::class, 'googleAuth']);
@@ -59,10 +60,9 @@ Route::prefix('exhibitor')->group(function () {
         });
 
         Route::prefix('invitation')->group(function () {
-            Route::get('/{token}', [InvitationController::class, 'show']);
-            Route::post('/{token}/accept', [InvitationController::class, 'approve']);
-            Route::post('/{token}/reject', [InvitationController::class, 'reject']);
-            Route::delete('/{invitation}', [InvitationController::class, 'delete']);
+            Route::post('/{invitation:token}/accept', [InvitationController::class, 'approve']);
+            Route::post('/{invitation:token}/reject', [InvitationController::class, 'reject']);
+            Route::delete('{invitation:token}', [InvitationController::class, 'destroy']);
         });
 
         Route::get('announcements', [AnnouncementController::class, 'index']);
