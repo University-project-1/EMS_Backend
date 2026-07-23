@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('exhibitor')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register']);
+    Route::post('register/{invvitation}', [AuthController::class, 'register']);
     Route::post('/email/resend-verification', [AuthController::class, 'resendVerificationEmail'])
         ->middleware(['auth:system', 'throttle:verify_otp']);
     Route::post('/auth/system/google', [AuthController::class, 'googleAuth']);

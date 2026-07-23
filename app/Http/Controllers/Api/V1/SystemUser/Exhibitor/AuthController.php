@@ -56,7 +56,7 @@ class AuthController extends Controller
      */
     public function resendVerificationEmail(Request $request)
     {
-        $this->authService->resendVerificationEmail($request->user('system'));
+        $this->authService->resendVerificationEmail($request->user('system')) ;
 
         return successResponse(
             message: __('auth.verification_sent')

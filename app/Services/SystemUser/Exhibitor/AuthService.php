@@ -38,13 +38,7 @@ class AuthService
     }
 
     public function register(RegisterDTO $dto){
-        if ($dto->inviteToken) {
-            $invitation = $this->invitationService->getInvitationByToken($dto->inviteToken);
 
-            if ($invitation->email !== $dto->email) {
-                abort(400, __('invitation.email_mismatch'));
-            }
-        }
         return DB::transaction(function() use ($dto){
             $exhibitor = SystemUser::updateOrCreate(
                 ['email' => $dto->email],
@@ -53,19 +47,11 @@ class AuthService
                     'password' => Hash::make($dto->password),
                 ]
             );
-            $message = "auth.verification_sent";
-            if ($dto->inviteToken) {
-                $exhibitor->markEmailAsVerified();
-                $this->invitationService->approve($dto->inviteToken);
-                $message = "auth.email_verified";
 
-            } else {
-                event(new Registered($exhibitor));
-            }
-
+            event(new Registered($exhibitor));
             $token = $exhibitor->createToken('exhibitor_token')->accessToken;
             return [
-                'message' => $message,
+                'message' => "auth.verification_sent",
                 'user'  => $exhibitor,
                 'token' => $token,
             ];
@@ -88,7 +74,7 @@ class AuthService
 
         event(new Verified($user));
     }
-    public function resendVerificationEmail(SystemUser $user): void
+    public function resendVerificationEmail(SystemUser $user)
     {
         if ($user->hasVerifiedEmail()) {
             abort(400, __('validation.already_verified'));
