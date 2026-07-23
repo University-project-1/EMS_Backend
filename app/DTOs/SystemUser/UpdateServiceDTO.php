@@ -22,9 +22,9 @@ class UpdateServiceDTO extends PatchDTO
 
     public static function fromRequest(array $data){
         return new self(
-            name: $data['name'],
-            price: $data['price'],
-            isActive: $data['is_active'],
+            name: $data['name'] ?? null,
+            price: $data['price'] ?? null,
+            isActive: $data['is_active'] ?? null,
             payload: $data,
         );
     }

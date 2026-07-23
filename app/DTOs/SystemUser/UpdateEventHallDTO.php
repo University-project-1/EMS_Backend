@@ -22,7 +22,7 @@ class UpdateEventHallDTO extends PatchDTO
     public static function fromRequest(array $data): self
     {
         return new self(
-            price_per_hour: $data['price_per_hour'],
+            price_per_hour: $data['price_per_hour'] ?? null,
             payload: $data,
         );
     }
