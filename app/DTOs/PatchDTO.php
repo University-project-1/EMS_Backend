@@ -2,8 +2,12 @@
 
 namespace App\DTOs;
 
+use App\Trait\HasUpdatePayload;
+
 abstract class PatchDTO
 {
+    use HasUpdatePayload;
+
     public function __construct(
         protected array $payload
     ) {}

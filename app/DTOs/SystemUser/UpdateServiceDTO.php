@@ -3,11 +3,9 @@
 namespace App\DTOs\SystemUser;
 
 use App\DTOs\PatchDTO;
-use App\Trait\HasUpdatePayload;
 
 class UpdateServiceDTO extends PatchDTO
 {
-    use HasUpdatePayload;
     /**
      * Create a new class instance.
      */

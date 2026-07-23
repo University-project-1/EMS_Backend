@@ -3,12 +3,9 @@
 namespace App\DTOs\SystemUser;
 
 use App\DTOs\PatchDTO;
-use App\Http\Requests\SystemUser\Admin\UpdateEventHallRequest;
-use App\Trait\HasUpdatePayload;
 
 class UpdateEventHallDTO extends PatchDTO
 {
-    use HasUpdatePayload;
     /**
      * Create a new class instance.
      */

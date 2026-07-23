@@ -3,12 +3,10 @@
 namespace App\DTOs\SystemUser;
 
 use App\DTOs\PatchDTO;
-use App\Trait\HasUpdatePayload;
 use Illuminate\Http\UploadedFile;
 
 class UpdateProfileDTO extends PatchDTO
 {
-    use HasUpdatePayload;
 
     public function __construct(
         public readonly ?string $name,
