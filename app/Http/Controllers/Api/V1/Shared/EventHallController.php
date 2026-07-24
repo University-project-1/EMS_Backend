@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Shared;
 
 use App\Enum\Status;
+use App\Filter\BookedBoothFilter;
 use App\Filter\MaxFilter;
 use App\Filter\MinFilter;
 use App\Http\Controllers\Controller;
@@ -21,6 +22,7 @@ class EventHallController extends Controller
      * all
      */
     #[QueryParameter('filter[number]', 'Filter by hall number', required: false, type: 'string')]
+    #[QueryParameter('filter[booked]', 'Filter booths by booking status', required: false, type: 'boolean')]
     #[QueryParameter('filter[min_area]', 'Minimum area', required: false, type: 'number')]
     #[QueryParameter('filter[max_area]', 'Maximum area', required: false, type: 'number')]
     #[QueryParameter('filter[min_price]', 'Minimum price per hour', required: false, type: 'number')]
@@ -32,6 +34,7 @@ class EventHallController extends Controller
         $eventHalls = QueryBuilder::for(EventHall::class)
             ->allowedFilters(
                 AllowedFilter::exact('number'),
+                AllowedFilter::custom('booked', new BookedBoothFilter),
                 AllowedFilter::custom('min_area', new MinFilter, 'area'),
                 AllowedFilter::custom('max_area', new MaxFilter, 'area'),
                 AllowedFilter::custom('min_price', new MinFilter, 'price_per_hour'),
