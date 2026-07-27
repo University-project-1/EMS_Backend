@@ -21,7 +21,7 @@ class UpdateAnnouncementRequest extends FormRequest
             'description' => ['sometimes', 'string', 'max:2048'],
             'receiver' => ['sometimes', 'string', 'in:Exhibitors,visitors,all'],
             'is_active' => ['sometimes', 'nullable', 'boolean'],
-            'media' => ['sometimes', 'nullable', 'mimes:png,jpg,jpeg,webg,pdf', 'max:8192']
+            'media' => ['sometimes', 'nullable', 'file', 'mimes:png,jpg,jpeg,webg,pdf', 'max:8192']
 
         ];
     }
