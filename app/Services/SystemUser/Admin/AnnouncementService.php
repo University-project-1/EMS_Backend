@@ -5,6 +5,7 @@ namespace App\Services\SystemUser\Admin;
 use App\DTOs\SystemUser\AnnouncementDTO;
 use App\DTOs\SystemUser\UpdateAnnouncementDTO;
 use App\Models\Announcement;
+use Illuminate\Http\UploadedFile;
 
 class AnnouncementService
 {
@@ -22,6 +23,10 @@ class AnnouncementService
     public function edit(Announcement $announcement, UpdateAnnouncementDTO $dto){
         $updatedData = $dto->updatePayload();
         $announcement->update($updatedData);
-        return $announcement;
+        if ($dto->media instanceof UploadedFile) {
+            $announcement->clearMediaCollection('announcements');
+            $announcement->addMedia($dto->media)->toMediaCollection('announcements');
+        }
+        return $announcement->refresh();
     }
 }
