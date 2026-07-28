@@ -912,6 +912,7 @@
         "/v1/admin/announcements": {
             "get": {
                 "operationId": "v1.systemUser.admin.announcement.index",
+                "summary": "all",
                 "tags": [
                     "SystemUser/Admin/Announcement"
                 ],
@@ -975,6 +976,7 @@
             },
             "post": {
                 "operationId": "announcement.store",
+                "summary": "store",
                 "tags": [
                     "SystemUser/Admin/Announcement"
                 ],
@@ -1011,6 +1013,7 @@
         "/v1/admin/announcements/{announcement}": {
             "get": {
                 "operationId": "announcement.show",
+                "summary": "show",
                 "tags": [
                     "SystemUser/Admin/Announcement"
                 ],
@@ -1046,6 +1049,7 @@
             },
             "patch": {
                 "operationId": "announcement.update",
+                "summary": "update",
                 "tags": [
                     "SystemUser/Admin/Announcement"
                 ],
@@ -1093,6 +1097,7 @@
             },
             "delete": {
                 "operationId": "announcement.destroy",
+                "summary": "delete",
                 "tags": [
                     "SystemUser/Admin/Announcement"
                 ],
