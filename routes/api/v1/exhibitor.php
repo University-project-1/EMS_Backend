@@ -35,15 +35,18 @@ Route::prefix('exhibitor')->group(function () {
 
         Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('throttle:password_update');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-
+        
+        // profile
         Route::get('profile', [ProfileController::class, 'show']);
         Route::post('profile', [ProfileController::class, 'update']);
 
+        // halls
         Route::prefix('halls')->group(function () {
             Route::get('/', [HallController::class, 'index']);
             Route::get('/{hall}', [HallController::class, 'show']);
         });
 
+        // booths
         Route::prefix('booth')->group(function () {
             Route::get('/', [BoothController::class, 'index']);
             Route::get('/my', [BoothController::class, 'ownedBooths']);
@@ -53,18 +56,21 @@ Route::prefix('exhibitor')->group(function () {
             Route::post('/{booth}/invitations', [InvitationController::class, 'storeForBooth']);
         });
 
+        // companies
         Route::prefix('companies')->group(function () {
             Route::get('/{company}/profile', [CompanyController::class, 'show']);
             Route::get('/{company}/invitations', [InvitationController::class, 'companyInvitations']);
             Route::post('/{company}/invitations', [InvitationController::class, 'storeForCompany']);
         });
 
+        // invitations
         Route::prefix('invitations')->group(function () {
             Route::post('/{invitation:token}/accept', [InvitationController::class, 'approve']);
             Route::post('/{invitation:token}/reject', [InvitationController::class, 'reject']);
             Route::delete('{invitation:token}', [InvitationController::class, 'destroy']);
         });
 
+        // announcments
         Route::get('announcements', [AnnouncementController::class, 'index']);
         Route::get('services', [ServiceController::class, 'index']);
 

@@ -30,14 +30,18 @@ Route::prefix('admin')->group(function () {
         Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('throttle:password_update');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
+        // profile
         Route::get('profile', [ProfileController::class, 'show']);
         Route::post('profile', [ProfileController::class, 'update']);
 
+        // halls
         Route::prefix('halls')->group(function () {
             Route::get('/', [HallController::class, 'index']);
             Route::get('/{hall}', [HallController::class, 'show']);
         });
 
+
+        // booths
         Route::prefix('booths')->group(function () {
 
             Route::prefix('requests')->group(function () {
@@ -53,19 +57,23 @@ Route::prefix('admin')->group(function () {
             Route::patch('/{booth}', [BoothController::class, 'update']);
         });
 
+        // companies
         Route::prefix('companies')->group(function () {
             Route::get('/', [CompanyDirectoryController::class, 'index']);
             Route::get('/{company}', [CompanyDirectoryController::class, 'show']);
         });
 
+        // managers
         Route::prefix('managers')->group(function () {
             Route::get('/directory', [ManagerDirectoryController::class, 'directory']);
             Route::get('/', [ManagerDirectoryController::class, 'index']);
             Route::get('/{manager}', [ManagerDirectoryController::class, 'show']);
         });
 
+        // services
         Route::resource('service', ServiceController::class);
 
+        // announcments
         Route::prefix('announcements')->group(function(){
             Route::get('/', [AnnouncementController::class, 'index']);
             Route::get('/{announcement}', [AnnouncementController::class, 'show']);

@@ -74,5 +74,11 @@ class AppServiceProvider extends ServiceProvider
                 return errorResponse(__('rate_limit.phone_update_request'), [], 429);
             });
         });
+
+        RateLimiter::for('report', function(Request $reqeust){
+            return Limit::perHour(5)->by($reqeust->user()->id)->response(function(){
+                return errorResponse(__('rate_limit.report'), [], 429);
+            });
+        });
     }
 }
