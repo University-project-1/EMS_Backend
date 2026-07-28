@@ -7,5 +7,5 @@ return [
     'profile_update' => 'Too many profile update requests. Please wait a moment and try again.',
     'password_update' => 'Too many password change attempts. Please try again later.',
     'phone_update_request' => 'You can only request a phone number update twice per hour.',
-
+    'report' => 'You have reached the allowed limit for submitting reports. Please try again later.',
 ];

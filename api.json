@@ -78,7 +78,7 @@
             "name": "Visitor/Profile"
         },
         {
-            "name": "SystemUser/Visitor/Announcement"
+            "name": "Visitor/Announcement"
         },
         {
             "name": "Visitor/Booth"
@@ -113,6 +113,14 @@
                         "description": "Filter by hall number",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[booked]",
+                        "in": "query",
+                        "description": "Filter booths by booking status",
+                        "schema": {
+                            "type": "boolean"
                         }
                     },
                     {
@@ -188,10 +196,20 @@
         "/v1/admin/eventHall/{eventHall}": {
             "get": {
                 "operationId": "admin.event_halls.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'event_halls' order by ordinal_position asc)",
                 "summary": "show",
                 "tags": [
                     "EventHall"
+                ],
+                "parameters": [
+                    {
+                        "name": "eventHall",
+                        "in": "path",
+                        "required": true,
+                        "description": "The event hall ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -204,6 +222,9 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -211,11 +232,30 @@
             },
             "patch": {
                 "operationId": "eventHall.update",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'event_halls' order by ordinal_position asc)",
                 "summary": "update",
                 "tags": [
                     "EventHall"
                 ],
+                "parameters": [
+                    {
+                        "name": "eventHall",
+                        "in": "path",
+                        "required": true,
+                        "description": "The event hall ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateEventHallRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -226,6 +266,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -250,6 +293,14 @@
                         "description": "Filter by hall number",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[booked]",
+                        "in": "query",
+                        "description": "Filter booths by booking status",
+                        "schema": {
+                            "type": "boolean"
                         }
                     },
                     {
@@ -325,10 +376,20 @@
         "/v1/exhibitor/eventHall/{eventHall}": {
             "get": {
                 "operationId": "exhibitor.event_halls.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'event_halls' order by ordinal_position asc)",
                 "summary": "show",
                 "tags": [
                     "EventHall"
+                ],
+                "parameters": [
+                    {
+                        "name": "eventHall",
+                        "in": "path",
+                        "required": true,
+                        "description": "The event hall ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -340,6 +401,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -361,6 +425,14 @@
                         "description": "Filter by hall number",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[booked]",
+                        "in": "query",
+                        "description": "Filter booths by booking status",
+                        "schema": {
+                            "type": "boolean"
                         }
                     },
                     {
@@ -436,10 +508,20 @@
         "/v1/visitor/eventHall/{eventHall}": {
             "get": {
                 "operationId": "visitor.event_halls.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'event_halls' order by ordinal_position asc)",
                 "summary": "show",
                 "tags": [
                     "EventHall"
+                ],
+                "parameters": [
+                    {
+                        "name": "eventHall",
+                        "in": "path",
+                        "required": true,
+                        "description": "The event hall ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -451,6 +533,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -545,10 +630,20 @@
         "/v1/admin/halls/{hall}": {
             "get": {
                 "operationId": "v1.shared.hall.show_0",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'halls' order by ordinal_position asc)",
                 "summary": "show hall",
                 "tags": [
                     "Halls"
+                ],
+                "parameters": [
+                    {
+                        "name": "hall",
+                        "in": "path",
+                        "required": true,
+                        "description": "The hall ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -560,6 +655,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -654,10 +752,20 @@
         "/v1/exhibitor/halls/{hall}": {
             "get": {
                 "operationId": "v1.shared.hall.show_0",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'halls' order by ordinal_position asc)",
                 "summary": "show hall",
                 "tags": [
                     "Halls"
+                ],
+                "parameters": [
+                    {
+                        "name": "hall",
+                        "in": "path",
+                        "required": true,
+                        "description": "The hall ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -669,6 +777,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -763,10 +874,20 @@
         "/v1/visitor/halls/{hall}": {
             "get": {
                 "operationId": "v1.shared.hall.show_0",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'halls' order by ordinal_position asc)",
                 "summary": "show hall",
                 "tags": [
                     "Halls"
+                ],
+                "parameters": [
+                    {
+                        "name": "hall",
+                        "in": "path",
+                        "required": true,
+                        "description": "The hall ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -779,6 +900,9 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -788,6 +912,7 @@
         "/v1/admin/announcements": {
             "get": {
                 "operationId": "v1.systemUser.admin.announcement.index",
+                "summary": "all",
                 "tags": [
                     "SystemUser/Admin/Announcement"
                 ],
@@ -796,14 +921,6 @@
                         "name": "filter[title]",
                         "in": "query",
                         "description": "Filter announcements by partial title",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "filter[description]",
-                        "in": "query",
-                        "description": "Filter announcements by partial description",
                         "schema": {
                             "type": "string"
                         }
@@ -859,13 +976,14 @@
             },
             "post": {
                 "operationId": "announcement.store",
+                "summary": "store",
                 "tags": [
                     "SystemUser/Admin/Announcement"
                 ],
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "$ref": "#/components/schemas/StoreAnnouncementRequest"
                             }
@@ -895,9 +1013,20 @@
         "/v1/admin/announcements/{announcement}": {
             "get": {
                 "operationId": "announcement.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'announcements' order by ordinal_position asc)",
+                "summary": "show",
                 "tags": [
                     "SystemUser/Admin/Announcement"
+                ],
+                "parameters": [
+                    {
+                        "name": "announcement",
+                        "in": "path",
+                        "required": true,
+                        "description": "The announcement ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -910,6 +1039,9 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -917,10 +1049,30 @@
             },
             "patch": {
                 "operationId": "announcement.update",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'announcements' order by ordinal_position asc)",
+                "summary": "update",
                 "tags": [
                     "SystemUser/Admin/Announcement"
                 ],
+                "parameters": [
+                    {
+                        "name": "announcement",
+                        "in": "path",
+                        "required": true,
+                        "description": "The announcement ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateAnnouncementRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -931,6 +1083,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -942,9 +1097,20 @@
             },
             "delete": {
                 "operationId": "announcement.destroy",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'announcements' order by ordinal_position asc)",
+                "summary": "delete",
                 "tags": [
                     "SystemUser/Admin/Announcement"
+                ],
+                "parameters": [
+                    {
+                        "name": "announcement",
+                        "in": "path",
+                        "required": true,
+                        "description": "The announcement ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -956,6 +1122,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -1122,10 +1291,20 @@
         "/v1/admin/booths/requests/{boothRequest}": {
             "get": {
                 "operationId": "boothRequest.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booth_requests' order by ordinal_position asc)",
                 "summary": "show request",
                 "tags": [
                     "SystemUser/Admin/BoothRequests"
+                ],
+                "parameters": [
+                    {
+                        "name": "boothRequest",
+                        "in": "path",
+                        "required": true,
+                        "description": "The booth request ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -1138,6 +1317,9 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -1147,11 +1329,30 @@
         "/v1/admin/booths/requests/approve/{boothRequest}": {
             "post": {
                 "operationId": "boothRequest.approve",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booth_requests' order by ordinal_position asc)",
                 "summary": "approve request",
                 "tags": [
                     "SystemUser/Admin/BoothRequests"
                 ],
+                "parameters": [
+                    {
+                        "name": "boothRequest",
+                        "in": "path",
+                        "required": true,
+                        "description": "The booth request ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApproveEventRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -1170,6 +1371,9 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     },
@@ -1182,10 +1386,20 @@
         "/v1/admin/booths/requests/reject/{boothRequest}": {
             "patch": {
                 "operationId": "boothRequest.reject",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booth_requests' order by ordinal_position asc)",
                 "summary": "reject request",
                 "tags": [
                     "SystemUser/Admin/BoothRequests"
+                ],
+                "parameters": [
+                    {
+                        "name": "boothRequest",
+                        "in": "path",
+                        "required": true,
+                        "description": "The booth request ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -1197,6 +1411,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -1309,10 +1526,20 @@
         "/v1/admin/booths/{booth}": {
             "get": {
                 "operationId": "v1.systemUser.admin.booth.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
                 "summary": "show",
                 "tags": [
                     "SystemUser/Admin/Booths"
+                ],
+                "parameters": [
+                    {
+                        "name": "booth",
+                        "in": "path",
+                        "required": true,
+                        "description": "The booth ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -1325,6 +1552,9 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -1332,11 +1562,30 @@
             },
             "patch": {
                 "operationId": "booth.update",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
                 "summary": "update",
                 "tags": [
                     "SystemUser/Admin/Booths"
                 ],
+                "parameters": [
+                    {
+                        "name": "booth",
+                        "in": "path",
+                        "required": true,
+                        "description": "The booth ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateBoothRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -1347,6 +1596,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -1429,9 +1681,19 @@
         "/v1/admin/companies/{company}": {
             "get": {
                 "operationId": "companyDirectory.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'companies' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Admin/CompanyDirectory"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -1446,6 +1708,9 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -1554,10 +1819,20 @@
         "/v1/admin/events/requests/{event}": {
             "get": {
                 "operationId": "admin.event_requests.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'events' order by ordinal_position asc)",
                 "summary": "show request",
                 "tags": [
                     "SystemUser/Admin/EventRequests"
+                ],
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "required": true,
+                        "description": "The event ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -1570,6 +1845,9 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -1579,11 +1857,30 @@
         "/v1/admin/events/requests/{event}/approve": {
             "post": {
                 "operationId": "admin.event_requests.approve",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'events' order by ordinal_position asc)",
                 "summary": "approve request",
                 "tags": [
                     "SystemUser/Admin/EventRequests"
                 ],
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "required": true,
+                        "description": "The event ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApproveEventRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -1602,6 +1899,9 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     },
@@ -1614,10 +1914,20 @@
         "/v1/admin/events/requests/{event}/reject": {
             "patch": {
                 "operationId": "admin.event_requests.reject",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'events' order by ordinal_position asc)",
                 "summary": "reject request",
                 "tags": [
                     "SystemUser/Admin/EventRequests"
+                ],
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "required": true,
+                        "description": "The event ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -1629,6 +1939,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -1731,9 +2044,19 @@
         "/v1/admin/managers/{manager}": {
             "get": {
                 "operationId": "managerDirectory.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'system_users' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Admin/ManagerDirectory"
+                ],
+                "parameters": [
+                    {
+                        "name": "manager",
+                        "in": "path",
+                        "required": true,
+                        "description": "The manager ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -1748,6 +2071,9 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -1869,10 +2195,20 @@
         "/v1/admin/service/{service}": {
             "get": {
                 "operationId": "service.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'services' order by ordinal_position asc)",
                 "summary": "show",
                 "tags": [
                     "SystemUser/Admin/Services"
+                ],
+                "parameters": [
+                    {
+                        "name": "service",
+                        "in": "path",
+                        "required": true,
+                        "description": "The service ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -1885,6 +2221,9 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -1892,11 +2231,30 @@
             },
             "put": {
                 "operationId": "service.update",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'services' order by ordinal_position asc)",
                 "summary": "update",
                 "tags": [
                     "SystemUser/Admin/Services"
                 ],
+                "parameters": [
+                    {
+                        "name": "service",
+                        "in": "path",
+                        "required": true,
+                        "description": "The service ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateServiceRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -1907,6 +2265,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -2145,11 +2506,31 @@
         "/v1/exhibitor/register/{invitation}": {
             "post": {
                 "operationId": "auth.registerViaInvite",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'invitations' order by ordinal_position asc)",
                 "summary": "register Via Invite",
                 "tags": [
                     "SystemUser/Exhibitor/Auth"
                 ],
+                "parameters": [
+                    {
+                        "name": "invitation",
+                        "in": "path",
+                        "required": true,
+                        "description": "The invitation token",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InvitationRegisterRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -2160,6 +2541,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
@@ -2509,10 +2893,20 @@
         "/v1/exhibitor/booth/{booth}": {
             "get": {
                 "operationId": "v1.systemUser.exhibitor.booth.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
                 "summary": "show",
                 "tags": [
                     "SystemUser/Exhibitor/Booths"
+                ],
+                "parameters": [
+                    {
+                        "name": "booth",
+                        "in": "path",
+                        "required": true,
+                        "description": "The booth ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -2524,6 +2918,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -2699,9 +3096,19 @@
         "/v1/exhibitor/invitations/{invitation}": {
             "get": {
                 "operationId": "invitation.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'invitations' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
+                ],
+                "parameters": [
+                    {
+                        "name": "invitation",
+                        "in": "path",
+                        "required": true,
+                        "description": "The invitation token",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -2713,15 +3120,28 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     }
                 },
                 "security": []
             },
             "delete": {
                 "operationId": "invitation.destroy",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'invitations' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
+                ],
+                "parameters": [
+                    {
+                        "name": "invitation",
+                        "in": "path",
+                        "required": true,
+                        "description": "The invitation token",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -2736,6 +3156,9 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -2746,9 +3169,19 @@
         "/v1/exhibitor/booth/{booth}/invitations": {
             "get": {
                 "operationId": "invitation.boothInvitations",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
+                ],
+                "parameters": [
+                    {
+                        "name": "booth",
+                        "in": "path",
+                        "required": true,
+                        "description": "The booth ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -2764,6 +3197,9 @@
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -2771,10 +3207,40 @@
             },
             "post": {
                 "operationId": "invitation.storeForBooth",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
                 ],
+                "parameters": [
+                    {
+                        "name": "booth",
+                        "in": "path",
+                        "required": true,
+                        "description": "The booth ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "email"
+                                ]
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -2791,6 +3257,9 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -2801,9 +3270,19 @@
         "/v1/exhibitor/companies/{company}/invitations": {
             "get": {
                 "operationId": "invitation.companyInvitations",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'companies' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -2819,6 +3298,9 @@
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -2826,10 +3308,40 @@
             },
             "post": {
                 "operationId": "invitation.storeForCompany",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'companies' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
                 ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "email"
+                                ]
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -2847,6 +3359,9 @@
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -2856,9 +3371,19 @@
         "/v1/exhibitor/invitations/{invitation}/accept": {
             "post": {
                 "operationId": "invitation.approve",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'invitations' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
+                ],
+                "parameters": [
+                    {
+                        "name": "invitation",
+                        "in": "path",
+                        "required": true,
+                        "description": "The invitation token",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -2873,6 +3398,9 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -2883,9 +3411,19 @@
         "/v1/exhibitor/invitations/{invitation}/reject": {
             "post": {
                 "operationId": "invitation.reject",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'invitations' order by ordinal_position asc)",
                 "tags": [
                     "SystemUser/Exhibitor/Invitations"
+                ],
+                "parameters": [
+                    {
+                        "name": "invitation",
+                        "in": "path",
+                        "required": true,
+                        "description": "The invitation token",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -2900,6 +3438,9 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -3075,47 +3616,6 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
-                    }
-                }
-            }
-        },
-        "/v1/visitor/announcements": {
-            "get": {
-                "operationId": "v1.mobile.announcement.index",
-                "tags": [
-                    "SystemUser/Visitor/Announcement"
-                ],
-                "parameters": [
-                    {
-                        "name": "sort",
-                        "in": "query",
-                        "description": "Sort results. Prefix with - for descending order. Default: -created_at",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Number of items per page. Use 3 for latest widget.",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -3362,6 +3862,47 @@
                 }
             }
         },
+        "/v1/visitor/announcements": {
+            "get": {
+                "operationId": "v1.mobile.announcement.index",
+                "tags": [
+                    "Visitor/Announcement"
+                ],
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort results. Prefix with - for descending order. Default: -created_at",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page. Use 3 for latest widget.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/auth/register": {
             "post": {
                 "operationId": "v1.mobile.auth.register",
@@ -3579,10 +4120,20 @@
         "/v1/visitor/booth/{booth}": {
             "get": {
                 "operationId": "v1.mobile.booth.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
                 "summary": "show",
                 "tags": [
                     "Visitor/Booth"
+                ],
+                "parameters": [
+                    {
+                        "name": "booth",
+                        "in": "path",
+                        "required": true,
+                        "description": "The booth ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -3594,6 +4145,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -3984,10 +4538,20 @@
         "/v1/visitor/saved/events/{event}": {
             "post": {
                 "operationId": "saved.toggleEvent",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'events' order by ordinal_position asc)",
                 "summary": "toggle event saved state",
                 "tags": [
                     "Visitor/Saved"
+                ],
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "required": true,
+                        "description": "The event ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -4000,6 +4564,9 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -4009,10 +4576,20 @@
         "/v1/visitor/saved/booths/{booth}": {
             "post": {
                 "operationId": "saved.toggleBooth",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
                 "summary": "toggle booth saved state",
                 "tags": [
                     "Visitor/Saved"
+                ],
+                "parameters": [
+                    {
+                        "name": "booth",
+                        "in": "path",
+                        "required": true,
+                        "description": "The booth ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -4024,6 +4601,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -4092,9 +4672,19 @@
         "/v1/exhibitor/companies/{company}/profile": {
             "get": {
                 "operationId": "company.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'companies' order by ordinal_position asc)",
                 "tags": [
                     "Company"
+                ],
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "description": "The company ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -4106,6 +4696,9 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -4300,6 +4893,15 @@
                 ],
                 "title": "App.Http.Requests.Mobile.ResetPassword.ResetPasswordRequest"
             },
+            "ApproveEventRequest": {
+                "type": "object",
+                "properties": {
+                    "force": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "ApproveEventRequest"
+            },
             "DeviceType": {
                 "type": "string",
                 "enum": [
@@ -4339,6 +4941,29 @@
                     "female"
                 ],
                 "title": "Gender"
+            },
+            "InvitationRegisterRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 8
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "minLength": 8
+                    }
+                },
+                "required": [
+                    "name",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "InvitationRegisterRequest"
             },
             "LoginRequest": {
                 "type": "object",
@@ -4529,6 +5154,8 @@
                             "string",
                             "null"
                         ],
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
                         "maxLength": 8192
                     }
                 },
@@ -4814,6 +5441,75 @@
                 ],
                 "title": "StoreServiceRequest"
             },
+            "UpdateAnnouncementRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 2048
+                    },
+                    "receiver": {
+                        "type": "string",
+                        "enum": [
+                            "Exhibitors",
+                            "visitors",
+                            "all"
+                        ]
+                    },
+                    "is_active": {
+                        "type": [
+                            "boolean",
+                            "null"
+                        ]
+                    },
+                    "media": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "maxLength": 8192
+                    }
+                },
+                "title": "UpdateAnnouncementRequest"
+            },
+            "UpdateBoothRequest": {
+                "type": "object",
+                "properties": {
+                    "number": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "area": {
+                        "type": "number"
+                    },
+                    "price": {
+                        "type": "number"
+                    },
+                    "svg_id": {
+                        "type": "string"
+                    },
+                    "qr_token": {
+                        "type": "string"
+                    }
+                },
+                "title": "UpdateBoothRequest"
+            },
+            "UpdateEventHallRequest": {
+                "type": "object",
+                "properties": {
+                    "price_per_hour": {
+                        "type": "number",
+                        "minimum": 0
+                    }
+                },
+                "title": "UpdateEventHallRequest"
+            },
             "UpdatePasswordRequest": {
                 "type": "object",
                 "properties": {
@@ -4867,6 +5563,23 @@
                     }
                 },
                 "title": "UpdateProfileRequest"
+            },
+            "UpdateServiceRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "price": {
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "UpdateServiceRequest"
             },
             "VerifyOtpRequest": {
                 "type": "object",
@@ -4942,6 +5655,25 @@
             },
             "AuthorizationException": {
                 "description": "Authorization error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
+            "ModelNotFoundException": {
+                "description": "Not found",
                 "content": {
                     "application/json": {
                         "schema": {

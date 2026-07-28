@@ -52,17 +52,17 @@ class UserSeeder extends Seeder
 
         $fawzyAvatar = database_path('assets/fawzy.jpg');
         if (is_file($fawzyAvatar)) {
-            $fawzy->addMedia($fawzyAvatar)->toMediaCollection('avatar');
+            $fawzy->copyMedia($fawzyAvatar)->toMediaCollection('avatar');
         }
 
         $elza3eemAvatar = database_path('assets/Elza3em.png');
         if (is_file($elza3eemAvatar)) {
-            $elza3eem->addMedia($elza3eemAvatar)->toMediaCollection('avatar');
+            $elza3eem->copyMedia($elza3eemAvatar)->toMediaCollection('avatar');
         }
 
-        $elcoachAvatar = database_path('assets/RGB.jpg');
+        $elcoachAvatar = database_path('assets/RGBs.jpg');
         if (is_file($elcoachAvatar)) {
-            $elcoach->addMedia($elcoachAvatar)->toMediaCollection('avatar');
+            $elcoach->copyMedia($elcoachAvatar)->toMediaCollection('avatar');
         }
     }
 }

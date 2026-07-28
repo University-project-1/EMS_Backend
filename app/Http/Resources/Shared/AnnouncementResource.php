@@ -20,7 +20,7 @@ class AnnouncementResource extends JsonResource
             'description' => $this->description,
             'receiver' => $this->receiver,
             'is_active' => $this->is_active,
-            'media' => $this->getFirstMediaUrl('announcement') ?: null
+            'media' => $this->getFirstMediaUrl('announcements') ?: null
         ];
     }
 }

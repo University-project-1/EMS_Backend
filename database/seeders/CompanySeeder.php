@@ -122,22 +122,22 @@ class CompanySeeder extends Seeder
 
         $companyALogo = database_path('assets/alawael.png');
         if (is_file($companyALogo)) {
-            $companyA->addMedia($companyALogo)->toMediaCollection('logo');
+            $companyA->copyMedia($companyALogo)->toMediaCollection('logo');
         }
 
         $companyBLogo = database_path('assets/RBCs.png');
         if (is_file($companyBLogo)) {
-            $companyB->addMedia($companyBLogo)->toMediaCollection('logo');
+            $companyB->copyMedia($companyBLogo)->toMediaCollection('logo');
         }
 
         $companyCLogo = database_path('assets/fawzy.jpg');
         if (is_file($companyCLogo)) {
-            $companyB->addMedia($companyCLogo)->toMediaCollection('logo');
+            $companyC->copyMedia($companyCLogo)->toMediaCollection('logo');
         }
 
-        $companyDLogo = database_path('assets/RGBs.png');
+        $companyDLogo = database_path('assets/RGBs.jpg');
         if (is_file($companyDLogo)) {
-            $companyB->addMedia($companyDLogo)->toMediaCollection('logo');
+            $companyD->copyMedia($companyDLogo)->toMediaCollection('logo');
         }
     }
 }

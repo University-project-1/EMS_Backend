@@ -56,7 +56,7 @@ class EventRequestController extends Controller
             ->allowedFilters(
                 AllowedFilter::partial('title'),
                 AllowedFilter::exact('status'),
-                AllowedFilter::custom('created_date', new DateFilter, 'created_at'),
+                AllowedFilter::custom('created_date', new DateFilter(), 'created_at'),
             )
             ->allowedSorts('created_at')
             ->allowedIncludes('eventable', 'speakers')

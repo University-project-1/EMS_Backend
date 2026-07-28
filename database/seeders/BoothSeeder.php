@@ -23,6 +23,7 @@ class BoothSeeder extends Seeder
         '10D-01' => ['company' => 'GreenFoods Co.', 'system_user' => 'Elza3eem', 'assigned_by' => 'Fawzy'],
         '11F-01' => ['company' => 'Dar Al feker', 'system_user' => 'Elcoach', 'assigned_by' => 'Fawzy'],
         '25B-01' => ['company' => 'GreenFoods Co.', 'system_user' => 'Fawzy', 'assigned_by' => null],
+        '25B-02' => ['company' => 'Metro Tech Labs', 'system_user' => 'Elza3eem', 'assigned_by' => 'Fawzy'],
     ];
 
     /** @var list<float> */
