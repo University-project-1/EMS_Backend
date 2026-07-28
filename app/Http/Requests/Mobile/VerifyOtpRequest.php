@@ -24,9 +24,9 @@ class VerifyOtpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone'    => ['required', 'string', new Phone()],
+            'phone' => ['required', 'string', new Phone()],
             'session_id' => ['required', 'string', 'uuid'],
-            'otp'      => ['required', 'string', 'digits:6'],
+            'otp' => ['required', 'string', 'digits:6'],
         ];
     }
 }

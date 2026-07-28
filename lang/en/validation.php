@@ -289,4 +289,8 @@ return [
     'phone' => 'The phone number is invalid',
     'invalid_link' => 'Invalid verification link or hash.',
     'already_verified' => 'Email is already verified.',
+    'event_id.exists' => 'someThing went wrong, please try again later.',
+    'booth_id.exists' => 'someThing went wrong, please try again later.',
+    'invalid_status' => 'someThing went wrong, please try again later.',
+    'hall_unavailable' => 'hall unavailable',
 ];

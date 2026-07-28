@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Admin\CompanyDirectoryController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController as AdminEventHallController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ManagerDirectoryController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\ReportController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\VisitorController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
@@ -30,14 +31,18 @@ Route::prefix('admin')->group(function () {
         Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('throttle:password_update');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
+        // profile
         Route::get('profile', [ProfileController::class, 'show']);
         Route::post('profile', [ProfileController::class, 'update']);
 
+        // halls
         Route::prefix('halls')->group(function () {
             Route::get('/', [HallController::class, 'index']);
             Route::get('/{hall}', [HallController::class, 'show']);
         });
 
+
+        // booths
         Route::prefix('booths')->group(function () {
 
             Route::prefix('requests')->group(function () {
@@ -53,19 +58,23 @@ Route::prefix('admin')->group(function () {
             Route::patch('/{booth}', [BoothController::class, 'update']);
         });
 
+        // companies
         Route::prefix('companies')->group(function () {
             Route::get('/', [CompanyDirectoryController::class, 'index']);
             Route::get('/{company}', [CompanyDirectoryController::class, 'show']);
         });
 
+        // managers
         Route::prefix('managers')->group(function () {
             Route::get('/directory', [ManagerDirectoryController::class, 'directory']);
             Route::get('/', [ManagerDirectoryController::class, 'index']);
             Route::get('/{manager}', [ManagerDirectoryController::class, 'show']);
         });
 
+        // services
         Route::resource('service', ServiceController::class);
 
+        // announcments
         Route::prefix('announcements')->group(function(){
             Route::get('/', [AnnouncementController::class, 'index']);
             Route::get('/{announcement}', [AnnouncementController::class, 'show']);
@@ -95,6 +104,14 @@ Route::prefix('admin')->group(function () {
         Route::prefix('visitor/')->group(function(){
             Route::get('', [VisitorController::class, 'index']);
             Route::get('stats', [VisitorController::class, 'statistics']);
+        });
+
+        //reports
+        Route::prefix('reports')->group(function(){
+            Route::get('/statistics', [ReportController::class, 'statistics']);
+            Route::get('/', [ReportController::class, 'index']);
+            Route::post('/{report}/resolved', [ReportController::class, 'resolved']);
+            Route::post('/{report}/rejected', [ReportController::class, 'rejected']);
         });
     });
 });
