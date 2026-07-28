@@ -15,7 +15,7 @@ class AnnouncementService
 
     public function create(AnnouncementDTO $dto){
         $announcement = Announcement::create($dto->toArray());
-        if($dto->media) $announcement->addMedia($dto->media)->toMediaCollection('announcement');
+        if($dto->media) $announcement->addMedia($dto->media)->toMediaCollection('announcements');
         return $announcement;
     }
 

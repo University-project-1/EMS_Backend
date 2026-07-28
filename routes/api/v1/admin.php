@@ -70,7 +70,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/', [AnnouncementController::class, 'index']);
             Route::get('/{announcement}', [AnnouncementController::class, 'show']);
             Route::post('/', [AnnouncementController::class, 'store']);
-            Route::patch('/{announcement}', [AnnouncementController::class, 'update']);
+            Route::post('/{announcement}', [AnnouncementController::class, 'update']);
             Route::delete('/{announcement}', [AnnouncementController::class, 'destroy']);
         });
         // Route::resource('announcement', AnnouncementController::class);
@@ -81,7 +81,7 @@ Route::prefix('admin')->group(function () {
             Route::get('{eventHall}', [EventHallController::class, 'show'])->name('admin.event_halls.show');
             Route::patch('{eventHall}', [AdminEventHallController::class, 'update']);
         });
-        
+
         // event request
         Route::prefix('events/requests')->group(function () {
             Route::get('', [EventRequestController::class, 'index'])->name('admin.event_requests.index');
