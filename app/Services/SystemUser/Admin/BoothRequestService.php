@@ -30,7 +30,7 @@ class BoothRequestService
     public function approve(BoothRequest $boothRequest)
     {
         if ($boothRequest->status !== Status::PENDING) {
-            throw new HttpException(400, __('booth.invalid_status'));
+            throw new HttpException(400, __('validation.invalid_status'));
         }
 
         // Eager load the company and its system users to prevent N+1 queries
@@ -67,7 +67,7 @@ class BoothRequestService
     public function reject(BoothRequest $boothRequest)
     {
         if ($boothRequest->status !== Status::PENDING) {
-            throw new HttpException(400, __('booth.invalid_status'));
+            throw new HttpException(400, __('validation.invalid_status'));
         }
 
         return $boothRequest->update(['status' => Status::REJECTED]);

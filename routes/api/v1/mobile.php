@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Mobile\BoothController;
 use App\Http\Controllers\Api\V1\Mobile\EventController;
 use App\Http\Controllers\Api\V1\Mobile\PasswordController;
 use App\Http\Controllers\Api\V1\Mobile\ProfileController;
+use App\Http\Controllers\Api\V1\Mobile\ReportController;
 use App\Http\Controllers\Api\V1\Mobile\SavedController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
@@ -52,10 +53,10 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::post('/phone/verify', [ProfileController::class, 'verifyPhoneUpdate'])->middleware('throttle:verify_otp');
     });
 
-  // announcments
+    // announcments
     Route::get('announcements', [AnnouncementController::class, 'index']);
 
-  // booths
+    // booths
     Route::prefix('booth/')->group(function(){
         Route::get('', [BoothController::class, 'index']);
         Route::get('{booth}', [BoothController::class, 'show']);
@@ -85,5 +86,8 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::post('booths/{booth}', [SavedController::class, 'toggleBooth']);
         Route::get('booths', [SavedController::class, 'savedBooths']);
     });
+
+    // reports
+    Route::post('report', [ReportController::class, 'store'])->middleware('throttle:report');
 
 });

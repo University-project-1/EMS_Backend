@@ -86,7 +86,7 @@ class EventController extends Controller
         $events = Event::query()
             ->where('status', Status::APPROVED->value)
             ->where('start_at', '>=', now())
-            ->with(['speakers', 'eventable'])
+            ->with(['speakers', 'eventable', 'media'])
             ->withAvg('reviews', 'rating')
             ->withCount(['leads', 'savedItems'])
             ->orderBy('start_at')

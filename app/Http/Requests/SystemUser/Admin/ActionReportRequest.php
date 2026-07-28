@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Mobile\ResetPassword;
+namespace App\Http\Requests\SystemUser\Admin;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ResetPasswordRequest extends FormRequest
+class ActionReportRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,7 @@ class ResetPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reset_token' => ['required', 'string'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'notes' => ['nullable'],
         ];
     }
 }

@@ -32,7 +32,7 @@ class EventRequestService
             $event->refresh();
 
             if ($event->status !== Status::PENDING) {
-                throw new HttpException(400, __('event.invalid_status'));
+                throw new HttpException(400, __('validation.invalid_status'));
             }
 
             $hasApprovedConflict = Event::query()
@@ -44,7 +44,7 @@ class EventRequestService
                 ->exists();
 
             if ($hasApprovedConflict) {
-                throw new HttpException(409, __('event.hall_unavailable'));
+                throw new HttpException(409, __('validation.hall_unavailable'));
             }
 
             $event->update([
