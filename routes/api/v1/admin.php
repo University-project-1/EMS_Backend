@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Admin\CompanyDirectoryController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController as AdminEventHallController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ManagerDirectoryController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\ReportController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\VisitorController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
@@ -103,6 +104,14 @@ Route::prefix('admin')->group(function () {
         Route::prefix('visitor/')->group(function(){
             Route::get('', [VisitorController::class, 'index']);
             Route::get('stats', [VisitorController::class, 'statistics']);
+        });
+
+        //reports
+        Route::prefix('reports')->group(function(){
+            Route::get('/statistics', [ReportController::class, 'statistics']);
+            Route::get('/', [ReportController::class, 'index']);
+            Route::post('/{report}/resolved', [ReportController::class, 'resolved']);
+            Route::post('/{report}/rejected', [ReportController::class, 'rejected']);
         });
     });
 });

@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-#[Fillable(['hall_id', 'company_id', 'qr_token', 'number', 'svg_id', 'area', 'price', 'is_booked'])]
+#[Fillable(['hall_id', 'company_id', 'qr_token', 'number', 'svg_id', 'area', 'price'])]
 class Booth extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia, SoftDeletes;

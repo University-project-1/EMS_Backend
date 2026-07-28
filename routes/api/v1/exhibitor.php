@@ -28,6 +28,9 @@ Route::prefix('exhibitor')->group(function () {
     Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->middleware('throttle:forgot_password');
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
 
+    // nearest events
+    Route::get('events/nearest', [EventController::class, 'nearest'])->name('exhibitor.events.nearest');
+
     Route::middleware(['auth:system', 'verified'])->group(function () {
         // store fcm token
         Route::post('fcm/register-token', [FCMController::class, 'store'])
@@ -83,7 +86,6 @@ Route::prefix('exhibitor')->group(function () {
         // events
         Route::prefix('events/')->group(function () {
             Route::get('calendar', [EventController::class, 'calendar'])->name('exhibitor.events.calendar');
-            Route::get('nearest', [EventController::class, 'nearest'])->name('exhibitor.events.nearest');
             Route::get('statistics', [EventController::class, 'statistics'])->name('exhibitor.events.statistics');
             Route::get('', [EventController::class, 'index'])->name('exhibitor.events.index');
             Route::post('', [EventController::class, 'store']);
