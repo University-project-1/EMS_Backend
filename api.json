@@ -925,14 +925,6 @@
                         }
                     },
                     {
-                        "name": "filter[description]",
-                        "in": "query",
-                        "description": "Filter announcements by partial description",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "filter[receiver]",
                         "in": "query",
                         "description": "Filter by receiver (Exhibitors, visitors, all)",
@@ -989,7 +981,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "$ref": "#/components/schemas/StoreAnnouncementRequest"
                             }
@@ -1070,7 +1062,7 @@
                 ],
                 "requestBody": {
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "$ref": "#/components/schemas/UpdateAnnouncementRequest"
                             }
@@ -5157,6 +5149,8 @@
                             "string",
                             "null"
                         ],
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
                         "maxLength": 8192
                     }
                 },
@@ -5472,6 +5466,8 @@
                             "string",
                             "null"
                         ],
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
                         "maxLength": 8192
                     }
                 },

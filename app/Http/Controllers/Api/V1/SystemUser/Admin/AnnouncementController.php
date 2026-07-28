@@ -23,7 +23,6 @@ class AnnouncementController extends Controller
     ){}
 
     #[QueryParameter('filter[title]', 'Filter announcements by partial title', required: false, type: 'string')]
-    #[QueryParameter('filter[description]', 'Filter announcements by partial description', required: false, type: 'string')]
     #[QueryParameter('filter[receiver]', 'Filter by receiver (Exhibitors, visitors, all)', required: false, type: 'string')]
     #[QueryParameter('filter[is_active]', 'Filter by active status', required: false, type: 'boolean')]
     #[QueryParameter('sort', 'Sort results (title, created_at). Prefix with - for descending order', required: false, type: 'string')]
@@ -32,11 +31,12 @@ class AnnouncementController extends Controller
     {
         $announcements = QueryBuilder::for(Announcement::class)
             ->allowedFilters(
-                'title', 'description',
+                'title',
                 AllowedFilter::exact('receiver'),
                 AllowedFilter::exact('is_active')
             )
             ->allowedSorts('title', 'created_at')
+            ->defaultSort('-created_at')
             ->paginate(request()->query('per_page', 10));
         return successResponse(data: AnnouncementResource::collection($announcements));
     }
