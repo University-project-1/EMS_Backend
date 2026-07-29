@@ -19,7 +19,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class EventHallController extends Controller
 {
     /**
-     * all
+     * all event halls
      */
     #[QueryParameter('filter[number]', 'Filter by hall number', required: false, type: 'string')]
     #[QueryParameter('filter[booked]', 'Filter booths by booking status', required: false, type: 'boolean')]

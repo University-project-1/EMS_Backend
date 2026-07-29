@@ -111,7 +111,7 @@
         "/v1/admin/eventHall": {
             "get": {
                 "operationId": "admin.event_halls.index",
-                "summary": "all",
+                "summary": "all event halls",
                 "tags": [
                     "EventHall"
                 ],
@@ -291,7 +291,7 @@
         "/v1/exhibitor/eventHall": {
             "get": {
                 "operationId": "exhibitor.event_halls.index",
-                "summary": "all",
+                "summary": "all event halls",
                 "tags": [
                     "EventHall"
                 ],
@@ -423,7 +423,7 @@
         "/v1/visitor/eventHall": {
             "get": {
                 "operationId": "visitor.event_halls.index",
-                "summary": "all",
+                "summary": "all event halls",
                 "tags": [
                     "EventHall"
                 ],
