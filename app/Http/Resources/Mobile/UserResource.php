@@ -24,7 +24,7 @@ class UserResource extends JsonResource
             'birthday' => $this->birthday?->format('Y-m-d'),
             'gender' => $this->gender,
             'phone' => $this->phone,
-            'avatar' => $this->getFirstMediaUrl('user-avatars') ?? null,
+            'avatar' => $this->getFirstMediaUrl('user-avatars'),
         ];
     }
 }
