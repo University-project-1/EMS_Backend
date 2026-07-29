@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Mobile\AnnouncementController;
 use App\Http\Controllers\Api\V1\Mobile\AuthController;
 use App\Http\Controllers\Api\V1\Mobile\BoothController;
+use App\Http\Controllers\Api\V1\Mobile\CompanyController;
 use App\Http\Controllers\Api\V1\Mobile\EventController;
 use App\Http\Controllers\Api\V1\Mobile\PasswordController;
 use App\Http\Controllers\Api\V1\Mobile\ProfileController;
@@ -61,6 +62,12 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     Route::prefix('booth/')->group(function(){
         Route::get('', [BoothController::class, 'index']);
         Route::get('{booth}', [BoothController::class, 'show']);
+    });
+
+    //companies
+    Route::prefix('companies')->group(function(){
+        Route::get('/', [CompanyController::class, 'index']);
+        Route::get('/{company}', [CompanyController::class, 'show']);
     });
 
     // eventHall

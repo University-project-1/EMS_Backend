@@ -7,11 +7,13 @@ use App\Http\Resources\SystemUser\Admin\CompanyDirectoryResource;
 use App\Http\Resources\SystemUser\Shared\CompanyResource;
 use App\Models\Booth;
 use App\Models\Company;
+use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Support\Facades\Gate;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
+#[Group('Visitor/Companies')]
 class CompanyController extends Controller
 {
     /**
@@ -23,13 +25,11 @@ class CompanyController extends Controller
     #[QueryParameter('per_page', 'Number of items per page. Default: 15', required: false, type: 'integer')]
     public function index()
     {
-        Gate::authorize('viewAny', Company::class);
-
         $companies = QueryBuilder::for(Company::class)
             ->allowedFilters('name', AllowedFilter::exact('business_sector'))
             ->allowedSorts('name', 'created_at')
             ->with(['logoMedia', 'booths' => function ($query) {
-                $query->withAvg('ratings', 'rating');
+                $query->withAvg('reviews', 'rating');
             }])
             ->paginate(request()->query('per_page', 15));
 
@@ -44,8 +44,7 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        Gate::authorize('view', $company);
-        $company->loadMissing(['galleryMedia', 'booths.hall']);
+        $company->loadMissing(['galleryMedia', 'booths.hall', 'events']);
 
         return successResponse(
             data: new CompanyResource($company),
