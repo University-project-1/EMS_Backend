@@ -11,9 +11,11 @@ return new class extends Migration
         Schema::create('booth_request_services', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('request_id')->constrained('booth_requests')->cascadeOnDelete();
-            $table->foreignId('service_id')->constrained('services');
+            $table->foreignId('service_id')->constrained('services')->restrictOnDelete();
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2);
+
+            $table->unique(['request_id', 'service_id']);
         });
     }
 

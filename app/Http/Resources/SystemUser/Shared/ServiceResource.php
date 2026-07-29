@@ -19,6 +19,12 @@ class ServiceResource extends JsonResource
             'name' => $this->name,
             'price' => $this->price,
             'is_active' => $this->is_active,
+
+            'quantity' => $this->whenPivotLoaded('booth_request_services', fn () => $this->pivot->quantity),
+            'unit_price' => $this->whenPivotLoaded('booth_request_services', fn () => (float) $this->pivot->unit_price),
+            'total_price' => $this->whenPivotLoaded('booth_request_services', function () {
+                return (float) ($this->pivot->quantity * $this->pivot->unit_price);
+            }),
         ];
     }
 }

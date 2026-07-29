@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('sender_id')->constrained('system_users')->cascadeOnDelete();
             $table->morphs('inviteable');
-            $table->string('email');
-            $table->string('token')->unique();
+            $table->string('email')->index();
+            $table->string('token')->index()->unique();
             $table->string('status')->default('pending');
             $table->timestamp('expires_at');
             $table->timestamps();

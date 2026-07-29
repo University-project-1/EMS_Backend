@@ -44,4 +44,14 @@ class BoothRequest extends Model implements HasMedia
     {
         return $this->hasMany(BoothRequestService::class, 'request_id');
     }
+
+    public function attachedServices()
+    {
+        return $this->belongsToMany(
+            Service::class,
+            'booth_request_services',
+            'request_id',
+            'service_id'
+        )->withPivot(['quantity', 'unit_price']);
+    }
 }

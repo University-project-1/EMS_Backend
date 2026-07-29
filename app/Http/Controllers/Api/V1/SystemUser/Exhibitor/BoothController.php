@@ -88,17 +88,27 @@ class BoothController extends Controller
     /**
      * My booths
      */
-    public function ownedBooths(Request $request){
+    public function ownedBooths(Request $request)
+    {
         $userId = $request->user('system')->id;
 
-        $booths = Booth::with(['company'])
-            ->whereHas('systemUsers', fn($q) => $q->whereKey($userId))
-            ->orWhereHas('company.systemUsers', fn($q) => $q->whereKey($userId))
-            ->latest()
-            ->paginate(5);
+        $booths = Booth::with([
+            'company',
+            'hall',
+            'boothRequests' => function ($query) {
+                $query->where('status', 'APPROVED');
+            },
+            'boothRequests.attachedServices'
+        ])
+        ->where(function ($query) use ($userId) {
+            $query->whereHas('systemUsers', fn($q) => $q->whereKey($userId))
+                ->orWhereHas('company.systemUsers', fn($q) => $q->whereKey($userId));
+        })
+        ->latest()
+        ->paginate(5);
 
         return successResponse(
-            data: BoothResource::collection($booths)->response()->getData(true),
+            data: BoothResource::collection($booths),
             message: __('booth.list_success')
         );
     }
