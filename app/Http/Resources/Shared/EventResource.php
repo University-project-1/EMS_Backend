@@ -41,7 +41,9 @@ class EventResource extends JsonResource
                 fn (mixed $average): float => round((float) $average, 2),
             ),
             'qr_scans_count' => $this->whenCounted('leads'),
+            'reviews_count' => $this->whenCounted('reviews'),
             'saved_count' => $this->whenCounted('savedItems'),
+            'leads_count' => $this->whenCounted('leads'),
             'is_saved' => $this->whenHas(
                 'is_saved',
                 fn (): bool => (bool) $this->getAttribute('is_saved'),
