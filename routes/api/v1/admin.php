@@ -79,7 +79,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/', [AnnouncementController::class, 'index']);
             Route::get('/{announcement}', [AnnouncementController::class, 'show']);
             Route::post('/', [AnnouncementController::class, 'store']);
-            Route::post('/{announcement}', [AnnouncementController::class, 'update']);
+            Route::patch('/{announcement}', [AnnouncementController::class, 'update']);
             Route::delete('/{announcement}', [AnnouncementController::class, 'destroy']);
         });
         // Route::resource('announcement', AnnouncementController::class);

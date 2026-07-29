@@ -17,7 +17,7 @@ class ReportController extends Controller
      * store
      */
     public function store(StoreReportRequest $request){
-        $this->reportService->store(ReportDTO::formRequest($request->validated()), auth('mobile')->user());
+        $this->reportService->store(ReportDTO::fromRequest($request->validated()), auth('mobile')->user());
 
         return successResponse();
     }

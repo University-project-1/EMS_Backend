@@ -19,10 +19,9 @@ class UpdateAnnouncementRequest extends FormRequest
         return [
             'title' => ['sometimes', 'string', 'max:255'],
             'description' => ['sometimes', 'string', 'max:2048'],
-            'receiver' => ['sometimes', 'string', 'in:Exhibitors,visitors,all'],
+            'receiver' => ['sometimes', 'string', 'in:exhibitors,visitors,all'],
             'is_active' => ['sometimes', 'nullable', 'boolean'],
-            'media' => ['sometimes', 'nullable', 'file', 'mimes:png,jpg,jpeg,webg,pdf', 'max:8192']
-
+            'media' => ['sometimes', 'nullable', 'file', 'mimes:png,jpg,jpeg,webp,pdf', 'max:8192'],
         ];
     }
 }

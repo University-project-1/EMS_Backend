@@ -26,7 +26,6 @@ class ReportResource extends JsonResource
                 return [
                     'id' => $this->reporter->id,
                     'name' => $this->reporter->first_name . ' ' . $this->reporter->last_name,
-                    
                 ];
             }),
             'resolved_by' => $this->whenLoaded('resolvedBy', function(){
