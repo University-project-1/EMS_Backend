@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests\SystemUser\Shared;
 
+use App\Enum\BusinessSectors;
+use Illuminate\Validation\Rule;
+
 /**
  * Summary of CompanyRules
  * Rules for company to use in booths and events booking flow
@@ -15,7 +18,7 @@ class CompanyRules
 
         return [
             $p . 'name' => [$req, 'string', 'max:255'],
-            $p . 'business_sector' => [$req, 'string', 'max:255'],
+            $p . 'business_sector' => [$req, 'string', 'max:255', Rule::enum(BusinessSectors::class)],
             $p . 'phone' => [$req, 'string', 'max:20'],
             $p . 'description' => [$req, 'string', 'max:1800'],
             $p . 'year_founded' => [$req, 'digits:4', 'integer', 'max:' . date('Y')],

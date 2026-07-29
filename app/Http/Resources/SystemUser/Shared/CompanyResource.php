@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\SystemUser\Shared;
 
+use App\Http\Resources\Shared\EventResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -34,6 +35,9 @@ class CompanyResource extends JsonResource
                     'url' => $media->getUrl()
                 ])
             ),
+
+            'booths' => BoothResource::collection($this->whenLoaded('booths')),
+            'events' => EventResource::collection($this->whenLoaded('events')),
         ];
     }
 }

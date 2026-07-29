@@ -23,6 +23,9 @@ class BoothResource extends JsonResource
             'price' => $this->price,
             'svg_id' => $this->svg_id,
             'is_booked' => !is_null($this->qr_token),
+
+
+            'average_rating' => $this->whenAggregated('reviews', 'rating', 'avg', fn (mixed $average): float => round((float) $average, 2)),
             'hall_id' => new HallResource($this->whenLoaded('hall')),
             'company' => $this->whenLoaded('company', function() {
                 return [

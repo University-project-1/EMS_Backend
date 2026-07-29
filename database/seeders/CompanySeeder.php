@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enum\BusinessSectors;
 use App\Enum\Status;
 use App\Models\Company;
 use App\Models\SystemUser;
@@ -16,7 +17,7 @@ class CompanySeeder extends Seeder
     {
         $companyA = Company::create([
             'name' => 'Dar Al feker',
-            'business_sector' => 'Lectures & Exhibitions',
+            'business_sector' => BusinessSectors::CULTURE,
             'social_links' => ['website' => 'https://dar.com', 'linkedin' => 'https://linkedin.com/company/dar'],
             'phone' => '+963112223334',
             'year_founded' => 2015,
@@ -28,7 +29,7 @@ class CompanySeeder extends Seeder
 
         $companyB = Company::create([
             'name' => 'GreenFoods Co.',
-            'business_sector' => 'Food & Beverage',
+            'business_sector' => BusinessSectors::FOOD_AND_BEVERAGE,
             'social_links' => ['website' => 'https://greenfoods.example', 'facebook' => 'https://facebook.com/greenfoods'],
             'phone' => '+963114445556',
             'year_founded' => 2008,
@@ -40,7 +41,7 @@ class CompanySeeder extends Seeder
 
         $companyC = Company::create([
             'name' => 'North Star Events',
-            'business_sector' => 'Event Management',
+            'business_sector' => BusinessSectors::MEDIA,
             'social_links' => ['website' => 'https://northstar-events.example', 'instagram' => 'https://instagram.com/northstarevents'],
             'phone' => '+963115556667',
             'year_founded' => 2019,
@@ -52,7 +53,7 @@ class CompanySeeder extends Seeder
 
         $companyD = Company::create([
             'name' => 'Artisan Market House',
-            'business_sector' => 'Retail & Craft',
+            'business_sector' => BusinessSectors::HUMANITARIAN,
             'social_links' => ['website' => 'https://artisan-market.example', 'facebook' => 'https://facebook.com/artisanmarkethouse'],
             'phone' => '+963116667778',
             'year_founded' => 2012,
@@ -64,7 +65,7 @@ class CompanySeeder extends Seeder
 
         $companyE = Company::create([
             'name' => 'Metro Tech Labs',
-            'business_sector' => 'Technology',
+            'business_sector' => BusinessSectors::TECH,
             'social_links' => ['website' => 'https://metrotechlabs.example', 'linkedin' => 'https://linkedin.com/company/metrotechlabs'],
             'phone' => '+963117778889',
             'year_founded' => 2021,
@@ -76,7 +77,7 @@ class CompanySeeder extends Seeder
 
         $companyF = Company::create([
             'name' => 'Summit Retail Group',
-            'business_sector' => 'Wholesale & Distribution',
+            'business_sector' => BusinessSectors::TOURISM,
             'social_links' => ['website' => 'https://summitretail.example', 'x' => 'https://x.com/summitretailgroup'],
             'phone' => '+963118889990',
             'year_founded' => 2010,

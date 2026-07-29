@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\BusinessSectors;
 use App\Enum\Status;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,6 +22,7 @@ class Company extends Model implements HasMedia
     protected function casts(): array
     {
         return [
+            'business_sector' => BusinessSectors::class,
             'social_links' => 'array',
             'year_founded' => 'integer',
             'headquarters_lat' => 'float',
