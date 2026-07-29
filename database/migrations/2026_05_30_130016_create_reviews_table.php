@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->morphs('reviewable');
-            $table->integer('rating');
+            $table->unsignedTinyInteger('rating');
             $table->text('comment')->nullable();
             $table->timestamps();
             $table->unique(['user_id', 'reviewable_type', 'reviewable_id']);

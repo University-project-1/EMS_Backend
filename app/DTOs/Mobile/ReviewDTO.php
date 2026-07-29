@@ -2,7 +2,7 @@
 
 namespace App\DTOs\Mobile;
 
-class ReportDTO
+class ReviewDTO
 {
     /**
      * Create a new class instance.
@@ -10,17 +10,16 @@ class ReportDTO
     public function __construct(
         public readonly ?int $event_id,
         public readonly ?int $booth_id,
-        public readonly string $title,
-        public readonly ?string $description,
+        public readonly int $rating,
+        public readonly ?string $comment,
     ){}
 
-    public static function fromRequest(array $data): self
-    {
+    public static function fromRequest(array $data): self{
         return new self(
             event_id: $data['event_id'] ?? null,
             booth_id: $data['booth_id'] ?? null,
-            title: $data['title'],
-            description: $data['description'] ?? null
+            rating: $data['rating'],
+            comment: $data['comment'] ?? null,
         );
     }
 }
