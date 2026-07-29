@@ -42,7 +42,7 @@ class EventHallAvailable implements ValidationRule
             ->exists();
 
         if ($exists) {
-            $fail(__('event.hall_unavailable'));
+            $fail(__('validation.hall_unavailable'));
         }
     }
 }

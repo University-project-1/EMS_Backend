@@ -50,6 +50,7 @@ class EventController extends Controller
             ->allowedIncludes('eventable', 'speakers')
             ->with('media')
             ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
             ->withExists([
                 'savedItems as is_saved' => fn (Builder $savedItems): Builder => $savedItems
                     ->where('user_id', $user->getKey()),

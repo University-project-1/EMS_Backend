@@ -51,7 +51,7 @@ class EventController extends Controller
             ->selectRaw('1 as can_view_qr')
             ->with(['media', 'speakers', 'eventable'])
             ->withAvg('reviews', 'rating')
-            ->withCount(['leads', 'savedItems'])
+            ->withCount(['leads', 'savedItems', 'reviews'])
             ->latest('created_at')
             ->paginate(10);
 
