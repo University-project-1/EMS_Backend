@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Mobile\EventController;
 use App\Http\Controllers\Api\V1\Mobile\PasswordController;
 use App\Http\Controllers\Api\V1\Mobile\ProfileController;
 use App\Http\Controllers\Api\V1\Mobile\ReportController;
+use App\Http\Controllers\Api\V1\Mobile\ReviewController;
 use App\Http\Controllers\Api\V1\Mobile\SavedController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
@@ -89,5 +90,13 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
 
     // reports
     Route::post('report', [ReportController::class, 'store'])->middleware('throttle:report');
+
+    // reviews
+    Route::prefix('reviews/')->group(function(){
+        Route::post('', [ReviewController::class, 'store']);
+        Route::get('booth/{booth}', [ReviewController::class, 'boothReviews']);
+        Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
+        Route::delete('{review}', [ReviewController::class, 'destroy']);
+    });
 
 });
