@@ -14,11 +14,35 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
+        $wasem = User::create([
             'first_name' => 'Wasem',
             'last_name' => 'Alhariri',
             'email' => 'wasemalhariri13@gmail.com',
             'phone' => '+963994801706',
+            'location' => 'Syria,Damascus',
+            'job' => 'Software Engineer',
+            'gender' => 'male',
+            'password' => '12345678',
+            'birthday' => '2006-02-06',
+        ]);
+
+        $memo = User::create([
+            'first_name' => 'Mehyar',
+            'last_name' => 'Kheder',
+            'email' => 'mehyarkhuder11e@gmail.com',
+            'phone' => '+963968378834',
+            'location' => 'Syria,Jaramana',
+            'job' => 'Software Engineer',
+            'gender' => 'male',
+            'password' => '12345678',
+            'birthday' => '2005-11-26',
+        ]);
+
+        $ZN = User::create([
+            'first_name' => 'Mohamad',
+            'last_name' => 'Zealnoun',
+            'email' => 'mzyalnoun@gmail.com',
+            'phone' => '+963935367608',
             'location' => 'Syria,Damascus',
             'job' => 'Software Engineer',
             'gender' => 'male',
@@ -63,6 +87,11 @@ class UserSeeder extends Seeder
         $elcoachAvatar = database_path('assets/RGBs.jpg');
         if (is_file($elcoachAvatar)) {
             $elcoach->copyMedia($elcoachAvatar)->toMediaCollection('avatar');
+        }
+
+        $wasemAvatar = database_path('assets/wasem.png');
+        if(is_file($wasemAvatar)){
+            $wasem->copyMedia($wasemAvatar)->toMediaCollection('user-avatars');
         }
     }
 }
