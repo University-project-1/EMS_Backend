@@ -3,13 +3,10 @@
 namespace App\Http\Controllers\Api\V1\Mobile;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\SystemUser\Admin\CompanyDirectoryResource;
 use App\Http\Resources\SystemUser\Shared\CompanyResource;
-use App\Models\Booth;
 use App\Models\Company;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
-use Illuminate\Support\Facades\Gate;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
