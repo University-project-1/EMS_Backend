@@ -6,6 +6,7 @@ use App\Enum\Status;
 use App\Models\Company;
 use App\Models\Event;
 use App\Models\EventHall;
+use App\Services\Shared\QrCodeService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -13,6 +14,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class EventRequestService
 {
+    public function __construct(
+        private QrCodeService $qrCodeService
+    ){}
     public function getConflictingRequests(Event $event): LengthAwarePaginator
     {
         return Event::query()
@@ -46,12 +50,14 @@ class EventRequestService
             if ($hasApprovedConflict) {
                 throw new HttpException(409, __('validation.hall_unavailable'));
             }
-
+            $token = 'E-'.$event->id.'-'.Str::random(10);
             $event->update([
                 'status' => Status::APPROVED,
-                'qr_token' => 'E-'.$event->id.'-'.Str::random(10),
+                'qr_token' => $token,
             ]);
-
+            $event->addMediaFromString($this->qrCodeService->generateSvg($token))
+                ->usingFileName("{$token}.svg")
+                ->toMediaCollection('qr_code');
             if ($event->eventable_type === Company::class) {
                 $event->eventable->update(['status' => Status::APPROVED]);
             }

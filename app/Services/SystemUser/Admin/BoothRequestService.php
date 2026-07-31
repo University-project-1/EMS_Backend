@@ -6,6 +6,7 @@ use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\BoothRequest;
 use App\Notifications\SystemUser\BoothApprovedNotification;
+use App\Services\Shared\QrCodeService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
@@ -16,7 +17,9 @@ class BoothRequestService
     /**
      * Create a new class instance.
      */
-    public function __construct() {}
+    public function __construct(
+        private readonly QrCodeService $qrCodeService
+    ) {}
 
     public function getConflictingRequests(BoothRequest $request)
     {
@@ -41,16 +44,22 @@ class BoothRequestService
 
             $boothRequest->company->update(['status' => Status::APPROVED]);
 
-            Booth::where('id', $boothRequest->booth_id)
-                ->update([
-                    'company_id' => $boothRequest->company_id,
-                    'qr_token' => 'B-'.$boothRequest->booth_id.'-'.Str::random(10),
-                ]);
+            $token = 'B-'.$boothRequest->booth_id.'-'.Str::random(10);
+
+            $booth = Booth::findOrFail($boothRequest->booth_id);
+            $booth->update([
+                'company_id' => $boothRequest->company_id,
+                'qr_token' => $token,
+            ]);
 
             BoothRequest::where('id', '!=', $boothRequest->id)
                 ->where('booth_id', $boothRequest->booth_id)
                 ->where('status', Status::PENDING)
                 ->update(['status' => Status::REJECTED]);
+
+            $booth->addMediaFromString($this->qrCodeService->generateSvg($token))
+                ->usingFileName("{$token}.svg")
+                ->toMediaCollection('qr_code');
         });
 
         $usersToNotify = $boothRequest->company->systemUsers;

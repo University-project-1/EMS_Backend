@@ -19,6 +19,7 @@ class BoothResource extends JsonResource
             'id' => $this->id,
             'number' => $this->number,
             'qr_token' => $this->qr_token,
+            'qr_code_url' => $this->getFirstMediaUrl('qr_code'),
             'area' => $this->area,
             'price' => $this->price,
             'svg_id' => $this->svg_id,

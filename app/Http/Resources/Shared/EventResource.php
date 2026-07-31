@@ -32,6 +32,7 @@ class EventResource extends JsonResource
             'duration' => $this->duration,
             'description' => $this->description,
             'qr_token' => $this->when($this->canViewQr($request), $this->qr_token),
+            'qr_code_url' => $this->getFirstMediaUrl('qr_code'),
             'eventable' => $this->eventableResource(),
             'speakers' => SpeakerResource::collection($this->whenLoaded('speakers')),
             'average_rating' => $this->whenAggregated(
