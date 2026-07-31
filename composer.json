@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.3",
         "dedoc/scramble": "^0.13.24",
+        "endroid/qr-code": "5.0.0",
         "laravel/framework": "^13.7",
         "laravel/passport": "^13.0",
         "laravel/socialite": "^5.27",
@@ -100,6 +101,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "block-insecure": false
         }
     },
     "minimum-stability": "stable",
