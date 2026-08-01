@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Mobile;
+namespace App\Http\Resources\Shared;
 
 use App\Support\MorphResourceResolver;
 use Illuminate\Http\Request;

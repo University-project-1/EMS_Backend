@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1\Mobile;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mobile\ScanRequest;
-use App\Http\Resources\Mobile\LeadResource;
+use App\Http\Resources\Shared\LeadResource;
 use App\Services\Mobile\LeadService;
 use Dedoc\Scramble\Attributes\Group;
 
