@@ -74,7 +74,7 @@ class EventRequestService
     public function reject(Event $event): void
     {
         if ($event->status !== Status::PENDING) {
-            throw new HttpException(400, __('event.invalid_status'));
+            throw new HttpException(400, __('validation.invalid_status'));
         }
 
         $event->update(['status' => Status::REJECTED]);
