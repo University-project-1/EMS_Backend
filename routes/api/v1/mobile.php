@@ -79,6 +79,7 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     // events
     Route::prefix('events')->group(function () {
         Route::get('', [EventController::class, 'index'])->name('visitor.events.index');
+        Route::get('nearest', [EventController::class, 'nearest'])->name('visitor.events.nearest');
         Route::get('{event}', [EventController::class, 'show'])->name('visitor.events.show');
     });
 
