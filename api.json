@@ -3939,6 +3939,30 @@
                 }
             }
         },
+        "/v1/visitor/events/nearest": {
+            "get": {
+                "operationId": "visitor.events.nearest",
+                "summary": "Nearest upcoming events",
+                "tags": [
+                    "Visitor/Events"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/visitor/events/{event}": {
             "get": {
                 "operationId": "visitor.events.show",
