@@ -15,7 +15,8 @@ class LeadService
     public function getLeadStatistics(Model $leadable): array
     {
         return [
-            'latest_visitors' => $this->getLatestVisitors($leadable),
+            'leads_count' => $leadable->leads()->count(),
+            'visitors' => $this->getLatestVisitors($leadable),
             'weekly_stats' => $this->getWeeklyStats($leadable),
         ];
     }

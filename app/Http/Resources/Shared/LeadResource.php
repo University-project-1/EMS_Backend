@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Shared;
 
+use App\Http\Resources\Mobile\UserResource;
 use App\Support\MorphResourceResolver;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -21,6 +22,14 @@ class LeadResource extends JsonResource
             'leadable_id' => $this->leadable_id,
             'leadable' => MorphResourceResolver::resourceFor($this->leadable),
             'created_at' => $this->created_at,
+
+            'visitor' => UserResource::collection($this->whenLoaded('user', function(){
+                return [
+                    'name' => $this->user->first_name . ' ' . $this->user->last_name,
+                    'phone' => $this->user->phone,
+                    'job' => $this->user->job
+                ];
+            })),
         ];
     }
 }

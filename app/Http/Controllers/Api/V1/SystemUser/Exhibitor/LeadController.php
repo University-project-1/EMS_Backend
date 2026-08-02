@@ -17,6 +17,9 @@ class LeadController extends Controller
         private readonly LeadService $leadService
     ){}
 
+    /**
+     * booth Leads
+     */
     public function boothLeads(Booth $booth){
         Gate::authorize('viewLeads', $booth);
         $result = $this->leadService->getLeadStatistics($booth);
@@ -26,12 +29,13 @@ class LeadController extends Controller
         ]);
     }
 
+    /**
+     * event Leads
+     */
     public function eventLeads(Event $event){
         Gate::authorize('viewLeads', $event);
         $result = $this->leadService->getLeadStatistics($event);
-        return successResponse([
-            'latest_visitors' => LeadResource::collection($result['latest_visitors']),
-            'weekly_stats' => $result['weekly_stats']
-        ]);
+        $result['visitors'] = LeadResource::collection($result['visitors']);
+        return successResponse($result);
     }
 }
