@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\SystemUser\Admin;
 
+use App\Enum\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SystemUser\Admin\CompanyDirectoryResource;
 use App\Models\Company;
@@ -12,7 +13,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 #[Group('SystemUser/Admin/CompanyDirectory')]
-class CompanyDirectoryController extends Controller 
+class CompanyDirectoryController extends Controller
 {
     /**
      * all companies
@@ -29,6 +30,7 @@ class CompanyDirectoryController extends Controller
         $companies = QueryBuilder::for(Company::class)
             ->allowedFilters('name', AllowedFilter::exact('business_sector'), AllowedFilter::exact('status'))
             ->allowedSorts('name', 'created_at')
+            ->where('status', Status::APPROVED->value)
             ->with('logoMedia')
             ->withCount(['systemUsers', 'booths'])
             ->defaultSort('-created_at')

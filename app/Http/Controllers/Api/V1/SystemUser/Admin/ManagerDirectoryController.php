@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\SystemUser\Admin;
 
+use App\Enum\Status;
 use App\Enum\SystemUserType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SystemUser\Admin\ManagerResource;
@@ -18,11 +19,11 @@ use Spatie\QueryBuilder\QueryBuilder;
 #[Group('SystemUser/Admin/ManagerDirectory')]
 class ManagerDirectoryController extends Controller
 {
-    public function directory() 
+    public function directory()
     {
         $stats = Cache::remember('admin_directory_stats', 600, function () {
             return [
-                'total_companies' => Company::count(),
+                'total_companies' => Company::where('status', Status::APPROVED->value)->count(),
                 'total_booths' => Booth::count(),
                 'total_managers' => SystemUser::where('type', SystemUserType::EXHIBITOR->value)->count(),
             ];
