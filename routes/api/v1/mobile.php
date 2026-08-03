@@ -109,5 +109,6 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
 
     Route::prefix('leads')->group(function(){
         Route::post('/', [LeadController::class, 'store']);
+        Route::get('/history', [LeadController::class, 'index']);
     });
 });

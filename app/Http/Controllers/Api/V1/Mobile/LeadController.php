@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Mobile;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mobile\ScanRequest;
+use App\Http\Resources\Mobile\ScanHistoryResource;
 use App\Http\Resources\Shared\LeadResource;
 use App\Services\Mobile\LeadService;
 use Dedoc\Scramble\Attributes\Group;
@@ -19,5 +20,13 @@ class LeadController extends Controller
         $lead = $this->leadService->registerScan(request()->user('mobile'), $request['token']);
         $lead->load('leadable');
         return successResponse(new LeadResource($lead));
+    }
+
+    /**
+     * leads history
+     */
+    public function index(){
+        $leads = Request()->user('mobile')->leads();
+        return successResponse(ScanHistoryResource::collection($leads));
     }
 }
