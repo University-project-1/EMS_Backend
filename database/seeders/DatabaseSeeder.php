@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CompanySeeder::class,
             ServiceSeeder::class,
+            BusCatalogSeeder::class,
             HallSeeder::class,
             FacilitySeeder::class,
             BoothSeeder::class,

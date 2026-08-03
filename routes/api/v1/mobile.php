@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Mobile\AnnouncementController;
 use App\Http\Controllers\Api\V1\Mobile\AuthController;
 use App\Http\Controllers\Api\V1\Mobile\BoothController;
+use App\Http\Controllers\Api\V1\Mobile\BusCatalogController;
 use App\Http\Controllers\Api\V1\Mobile\CompanyController;
 use App\Http\Controllers\Api\V1\Mobile\EventController;
 use App\Http\Controllers\Api\V1\Mobile\PasswordController;
@@ -59,13 +60,13 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     Route::get('announcements', [AnnouncementController::class, 'index']);
 
     // booths
-    Route::prefix('booth/')->group(function(){
+    Route::prefix('booth/')->group(function () {
         Route::get('', [BoothController::class, 'index']);
         Route::get('{booth}', [BoothController::class, 'show']);
     });
 
-    //companies
-    Route::prefix('companies')->group(function(){
+    // companies
+    Route::prefix('companies')->group(function () {
         Route::get('/', [CompanyController::class, 'index']);
         Route::get('/{company}', [CompanyController::class, 'show']);
     });
@@ -89,8 +90,8 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::get('/{hall}', [HallController::class, 'show']);
     });
 
-    //saved
-    Route::prefix('saved')->group(function(){
+    // saved
+    Route::prefix('saved')->group(function () {
         Route::post('events/{event}', [SavedController::class, 'toggleEvent']);
         Route::post('booths/{booth}', [SavedController::class, 'toggleBooth']);
         Route::get('booths', [SavedController::class, 'savedBooths']);
@@ -100,11 +101,14 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     Route::post('report', [ReportController::class, 'store'])->middleware('throttle:report');
 
     // reviews
-    Route::prefix('reviews/')->group(function(){
+    Route::prefix('reviews/')->group(function () {
         Route::post('', [ReviewController::class, 'store']);
         Route::get('booth/{booth}', [ReviewController::class, 'boothReviews']);
         Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
         Route::delete('{review}', [ReviewController::class, 'destroy']);
     });
+
+    // bus catalog
+    Route::get('bus-catalog', [BusCatalogController::class, 'index'])->name('visitor.bus_catalog.index');
 
 });
