@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\LeadController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
@@ -38,7 +39,7 @@ Route::prefix('exhibitor')->group(function () {
 
         Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('throttle:password_update');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-        
+
         // profile
         Route::get('profile', [ProfileController::class, 'show']);
         Route::post('profile', [ProfileController::class, 'update']);
@@ -76,6 +77,11 @@ Route::prefix('exhibitor')->group(function () {
         // announcments
         Route::get('announcements', [AnnouncementController::class, 'index']);
         Route::get('services', [ServiceController::class, 'index']);
+
+        Route::prefix('leads')->group(function(){
+            Route::get('/{booth}', [LeadController::class, 'boothLeads']);
+            Route::get('/{event}', [LeadController::class, 'eventLeads']);
+        });
 
         // eventHall
         Route::prefix('eventHall/')->group(function () {
