@@ -100,6 +100,9 @@
         },
         {
             "name": "Visitor/Review"
+        },
+        {
+            "name": "Visitor/BusCatalog"
         }
     ],
     "security": [
@@ -3719,6 +3722,30 @@
                 "summary": "show",
                 "tags": [
                     "Visitor/Booth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/visitor/bus-catalog": {
+            "get": {
+                "operationId": "visitor.bus_catalog.index",
+                "summary": "all",
+                "tags": [
+                    "Visitor/BusCatalog"
                 ],
                 "responses": {
                     "200": {
