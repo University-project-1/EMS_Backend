@@ -1,17 +1,20 @@
 <?php
 
-namespace App\Notifications\SystemUser;
+namespace App\Notifications\SystemUser\Exhibitor;
 
 use App\Models\BoothRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Queue\SerializesModels;
 
 class BoothApprovedNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, SerializesModels;
 
+    public int $tries = 3;
+    public int $backoff = 60;
     public function __construct(
         public readonly BoothRequest $boothRequest
     ) {}
