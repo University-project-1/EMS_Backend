@@ -84,6 +84,24 @@ class EventController extends Controller
         return successResponse(EventResource::make($event));
     }
 
+    /**
+     * Nearest upcoming events.
+     */
+    public function nearest()
+    {
+        $events = Event::query()
+            ->where('status', Status::APPROVED->value)
+            ->where('start_at', '>=', now())
+            ->with(['speakers', 'eventable', 'media'])
+            ->withAvg('reviews', 'rating')
+            ->orderBy('start_at')
+            ->orderBy('id')
+            ->limit(5)
+            ->get();
+
+        return successResponse(EventResource::collection($events));
+    }
+
     private function authenticatedUser(Request $request): User
     {
         $user = $request->user('mobile');
