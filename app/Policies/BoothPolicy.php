@@ -13,6 +13,12 @@ class BoothPolicy
         return $this->manageInvitations($systemUser, $booth) || $systemUser->type === SystemUserType::ADMIN ;
     }
 
+    public function viewReviews(SystemUser $user, Booth $booth): bool
+    {
+        return $user->companies()
+            ->whereKey($booth->company_id)
+            ->exists();
+    }
     public function manageInvitations(SystemUser $systemUser, Booth $booth): bool
     {
         return $systemUser->booths()->where('booths.id', $booth->id)->exists()

@@ -6,11 +6,14 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Auth\Notifications\ResetPassword as BaseResetPassword;
+use Illuminate\Queue\SerializesModels;
 
 class ResetApiPassword extends BaseResetPassword implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, SerializesModels;
 
+    public int $tries = 3;
+    public int $backoff = 60;
     protected function resetUrl($notifiable)
     {
         // Redirect to React Frontend: https://exhibition-react.com/reset-password?token=...&email=...

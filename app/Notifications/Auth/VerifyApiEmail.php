@@ -6,13 +6,17 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Auth\Notifications\VerifyEmail as BaseVerifyEmail;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
 
 class VerifyApiEmail extends BaseVerifyEmail implements ShouldQueue
 {
-    use Queueable; // Enforce Queueing (NFR 4.1)
+    use Queueable, SerializesModels; // Enforce Queueing (NFR 4.1)
+
+    public int $tries = 3;
+    public int $backoff = 60;
     public function __construct(){}
 
     protected function verificationUrl($notifiable)

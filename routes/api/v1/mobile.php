@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Mobile\AnnouncementController;
 use App\Http\Controllers\Api\V1\Mobile\AuthController;
 use App\Http\Controllers\Api\V1\Mobile\BoothController;
+use App\Http\Controllers\Api\V1\Mobile\BusCatalogController;
 use App\Http\Controllers\Api\V1\Mobile\CompanyController;
 use App\Http\Controllers\Api\V1\Mobile\EventController;
 use App\Http\Controllers\Api\V1\Mobile\LeadController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Api\V1\Mobile\SavedController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
+use App\Http\Controllers\Api\V1\Shared\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // auth routes with rate limiting
@@ -60,13 +62,13 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     Route::get('announcements', [AnnouncementController::class, 'index']);
 
     // booths
-    Route::prefix('booth/')->group(function(){
+    Route::prefix('booth/')->group(function () {
         Route::get('', [BoothController::class, 'index']);
         Route::get('{booth}', [BoothController::class, 'show']);
     });
 
-    //companies
-    Route::prefix('companies')->group(function(){
+    // companies
+    Route::prefix('companies')->group(function () {
         Route::get('/', [CompanyController::class, 'index']);
         Route::get('/{company}', [CompanyController::class, 'show']);
     });
@@ -80,6 +82,7 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     // events
     Route::prefix('events')->group(function () {
         Route::get('', [EventController::class, 'index'])->name('visitor.events.index');
+        Route::get('nearest', [EventController::class, 'nearest'])->name('visitor.events.nearest');
         Route::get('{event}', [EventController::class, 'show'])->name('visitor.events.show');
     });
 
@@ -89,8 +92,8 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::get('/{hall}', [HallController::class, 'show']);
     });
 
-    //saved
-    Route::prefix('saved')->group(function(){
+    // saved
+    Route::prefix('saved')->group(function () {
         Route::post('events/{event}', [SavedController::class, 'toggleEvent']);
         Route::post('booths/{booth}', [SavedController::class, 'toggleBooth']);
         Route::get('booths', [SavedController::class, 'savedBooths']);
@@ -100,15 +103,33 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     Route::post('report', [ReportController::class, 'store'])->middleware('throttle:report');
 
     // reviews
-    Route::prefix('reviews/')->group(function(){
+    Route::prefix('reviews/')->group(function () {
         Route::post('', [ReviewController::class, 'store']);
         Route::get('booth/{booth}', [ReviewController::class, 'boothReviews']);
         Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
         Route::delete('{review}', [ReviewController::class, 'destroy']);
     });
-
+    
+    // leads
     Route::prefix('leads')->group(function(){
         Route::post('/', [LeadController::class, 'store']);
         Route::get('/history', [LeadController::class, 'index']);
     });
+    // notifications
+    Route::prefix('notifications')->group(function () {
+         Route::get('/', [NotificationController::class, 'index'])
+            ->name('visitor.notifications.index')->defaults('guardName', 'mobile');
+        Route::get('/statistics', [NotificationController::class, 'statistics'])
+            ->name('visitor.notifications.statistics')->defaults('guardName', 'mobile');
+        Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
+            ->name('visitor.notifications.read-all')->defaults('guardName', 'mobile');
+        Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])
+            ->name('visitor.notifications.read')->defaults('guardName', 'mobile');
+        Route::delete('/{notification}', [NotificationController::class, 'destroy'])
+            ->name('visitor.notifications.destroy')->defaults('guardName', 'mobile');
+    });
+  
+    // bus catalog
+    Route::get('bus-catalog', [BusCatalogController::class, 'index'])->name('visitor.bus_catalog.index');
+
 });

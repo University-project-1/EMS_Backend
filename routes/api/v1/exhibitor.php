@@ -4,15 +4,18 @@ use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AnnouncementController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
+use App\Http\Controllers\Api\V1\Shared\NotificationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\LeadController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ReviewController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
+use App\Models\Booth;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('exhibitor')->group(function () {
@@ -95,6 +98,26 @@ Route::prefix('exhibitor')->group(function () {
             Route::get('statistics', [EventController::class, 'statistics'])->name('exhibitor.events.statistics');
             Route::get('', [EventController::class, 'index'])->name('exhibitor.events.index');
             Route::post('', [EventController::class, 'store']);
+        });
+
+        // notifications
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'index'])
+                ->name('exhibitor.notifications.index')->defaults('guardName', 'system');
+            Route::get('/statistics', [NotificationController::class, 'statistics'])
+                ->name('exhibitor.notifications.statistics')->defaults('guardName', 'system');
+            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
+                ->name('exhibitor.notifications.read-all')->defaults('guardName', 'system');
+            Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])
+                ->name('exhibitor.notifications.read')->defaults('guardName', 'system');
+            Route::delete('/{notification}', [NotificationController::class, 'destroy'])
+                ->name('exhibitor.notifications.destroy')->defaults('guardName', 'system');
+        });
+        
+        // reviews
+        Route::prefix('reviews')->group(function(){
+            Route::get('event/{event}',[ReviewController::class,'eventReviews']);
+            Route::get('booht/{booth}',[ReviewController::class,'boothReviews']);
         });
     });
 });

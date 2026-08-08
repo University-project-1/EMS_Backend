@@ -9,41 +9,68 @@ use App\Models\SystemUser;
 
 class EventPolicy
 {
+    public function viewReviews(SystemUser $user, Event $event): bool
+    {
+        return $event->query()->accessibleBy($user)
+            ->whereKey($event->getKey())
+            ->exists();
+    }
+  
     public function viewLeads(SystemUser $systemUser, Event $event): bool
     {
         return $this->isOwner($systemUser, $event) || $systemUser->type === SystemUserType::ADMIN;
     }
 
+    /**
+     * Determine whether the user can view any models.
+     */
     public function viewAny(SystemUser $systemUser): bool
-    {
-        return true;
-    }
-
-    public function view(SystemUser $systemUser, Event $event): bool
-    {
-        return true;
-    }
-
-    public function create(SystemUser $systemUser): bool
-    {
-        return $systemUser->type === SystemUserType::EXHIBITOR;
-    }
-
-    public function update(SystemUser $systemUser, Event $event): bool
-    {
-        return $this->isOwner($systemUser, $event);
-    }
-
-    public function delete(SystemUser $systemUser, Event $event): bool
-    {
-        return $this->isOwner($systemUser, $event);
-    }
-
-    public function restore(SystemUser $systemUser, Event $event): bool
     {
         return false;
     }
 
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(SystemUser $systemUser, Event $event): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(SystemUser $systemUser): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(SystemUser $systemUser, Event $event): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(SystemUser $systemUser, Event $event): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(SystemUser $systemUser, Event $event): bool
+    {
+        return false;
+    }
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
     public function forceDelete(SystemUser $systemUser, Event $event): bool
     {
         return false;

@@ -60,4 +60,11 @@ class User extends Authenticatable implements HasMedia
             'password' => 'hashed',
         ];
     }
+
+    public function routeNotificationForFcm(): array
+    {
+        return $this->deviceTokens()
+            ->pluck('fcm_token')
+            ->all();
+    }
 }
