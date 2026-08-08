@@ -25,9 +25,7 @@ class CompanyController extends Controller
         $companies = QueryBuilder::for(Company::class)
             ->allowedFilters('name', AllowedFilter::exact('business_sector'))
             ->allowedSorts('name', 'created_at')
-            ->with(['logoMedia', 'booths' => function ($query) {
-                $query->withAvg('reviews', 'rating');
-            }])
+            ->with(['logoMedia'])
             ->paginate(request()->query('per_page', 15));
 
         return successResponse(
@@ -41,7 +39,11 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        $company->loadMissing(['galleryMedia', 'booths.hall', 'events']);
+        $company->load(['galleryMedia', 'media','events' => function($query){
+            $query->withAvg('reviews', 'rating');
+        }, 'logoMedia' , 'booths' => function($query){
+            $query->withAvg('reviews', 'rating');
+        }, 'booths.hall']);
 
         return successResponse(
             data: new CompanyResource($company),

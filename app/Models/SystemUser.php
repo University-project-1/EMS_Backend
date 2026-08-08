@@ -81,4 +81,11 @@ class SystemUser extends Authenticatable implements HasMedia, MustVerifyEmail
     {
         $this->addMediaCollection('avatar')->singleFile();
     }
+
+    public function routeNotificationForFcm(): array
+    {
+        return $this->deviceTokens()
+            ->pluck('fcm_token')
+            ->all();
+    }
 }

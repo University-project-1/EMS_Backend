@@ -19,7 +19,15 @@ if (! function_exists('formatResponseData')) {
     function formatResponseData(mixed $data): mixed
     {
         if ($data instanceof AnonymousResourceCollection) {
-            return formatPaginatedResponse($data);
+        return formatPaginatedResponse($data);
+        }
+
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                if ($value instanceof AnonymousResourceCollection) {
+                    $data[$key] = formatPaginatedResponse($value);
+                }
+            }
         }
 
         return $data;

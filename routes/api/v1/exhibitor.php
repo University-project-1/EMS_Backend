@@ -4,11 +4,15 @@ use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AnnouncementController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
+use App\Http\Controllers\Api\V1\Shared\NotificationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\LeadController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\LookupController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ReviewController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
@@ -38,7 +42,7 @@ Route::prefix('exhibitor')->group(function () {
 
         Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('throttle:password_update');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-        
+
         // profile
         Route::get('profile', [ProfileController::class, 'show']);
         Route::post('profile', [ProfileController::class, 'update']);
@@ -66,6 +70,13 @@ Route::prefix('exhibitor')->group(function () {
             Route::post('/{company}/invitations', [InvitationController::class, 'storeForCompany']);
         });
 
+        //lookups
+        Route::prefix('lookup')->group(function () {
+            Route::get('/booths', [LookupController::class, 'booths'])->name('exhibitor.lookup.booths');
+            Route::get('/events', [LookupController::class, 'events'])->name('exhibitor.lookup.events');
+            Route::get('/companies', [LookupController::class, 'companies'])->name('exhibitor.lookup.companies');
+        });
+
         // invitations
         Route::prefix('invitations')->group(function () {
             Route::post('/{invitation:token}/accept', [InvitationController::class, 'approve']);
@@ -76,6 +87,11 @@ Route::prefix('exhibitor')->group(function () {
         // announcments
         Route::get('announcements', [AnnouncementController::class, 'index']);
         Route::get('services', [ServiceController::class, 'index']);
+
+        Route::prefix('leads')->group(function(){
+            Route::get('/{booth}', [LeadController::class, 'boothLeads']);
+            Route::get('/{event}', [LeadController::class, 'eventLeads']);
+        });
 
         // eventHall
         Route::prefix('eventHall/')->group(function () {
@@ -89,6 +105,26 @@ Route::prefix('exhibitor')->group(function () {
             Route::get('statistics', [EventController::class, 'statistics'])->name('exhibitor.events.statistics');
             Route::get('', [EventController::class, 'index'])->name('exhibitor.events.index');
             Route::post('', [EventController::class, 'store']);
+        });
+
+        // notifications
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'index'])
+                ->name('exhibitor.notifications.index')->defaults('guardName', 'system');
+            Route::get('/statistics', [NotificationController::class, 'statistics'])
+                ->name('exhibitor.notifications.statistics')->defaults('guardName', 'system');
+            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
+                ->name('exhibitor.notifications.read-all')->defaults('guardName', 'system');
+            Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])
+                ->name('exhibitor.notifications.read')->defaults('guardName', 'system');
+            Route::delete('/{notification}', [NotificationController::class, 'destroy'])
+                ->name('exhibitor.notifications.destroy')->defaults('guardName', 'system');
+        });
+
+        // reviews
+        Route::prefix('reviews')->group(function(){
+            Route::get('event/{event}',[ReviewController::class,'eventReviews']);
+            Route::get('booht/{booth}',[ReviewController::class,'boothReviews']);
         });
     });
 });

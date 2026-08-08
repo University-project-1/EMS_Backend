@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Mobile\BoothController;
 use App\Http\Controllers\Api\V1\Mobile\BusCatalogController;
 use App\Http\Controllers\Api\V1\Mobile\CompanyController;
 use App\Http\Controllers\Api\V1\Mobile\EventController;
+use App\Http\Controllers\Api\V1\Mobile\LeadController;
 use App\Http\Controllers\Api\V1\Mobile\PasswordController;
 use App\Http\Controllers\Api\V1\Mobile\ProfileController;
 use App\Http\Controllers\Api\V1\Mobile\ReportController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Api\V1\Mobile\SavedController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
+use App\Http\Controllers\Api\V1\Shared\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // auth routes with rate limiting
@@ -107,7 +109,26 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
         Route::delete('{review}', [ReviewController::class, 'destroy']);
     });
-
+    
+    // leads
+    Route::prefix('leads')->group(function(){
+        Route::post('/', [LeadController::class, 'store']);
+        Route::get('/history', [LeadController::class, 'index']);
+    });
+    // notifications
+    Route::prefix('notifications')->group(function () {
+         Route::get('/', [NotificationController::class, 'index'])
+            ->name('visitor.notifications.index')->defaults('guardName', 'mobile');
+        Route::get('/statistics', [NotificationController::class, 'statistics'])
+            ->name('visitor.notifications.statistics')->defaults('guardName', 'mobile');
+        Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
+            ->name('visitor.notifications.read-all')->defaults('guardName', 'mobile');
+        Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])
+            ->name('visitor.notifications.read')->defaults('guardName', 'mobile');
+        Route::delete('/{notification}', [NotificationController::class, 'destroy'])
+            ->name('visitor.notifications.destroy')->defaults('guardName', 'mobile');
+    });
+  
     // bus catalog
     Route::get('bus-catalog', [BusCatalogController::class, 'index'])->name('visitor.bus_catalog.index');
 

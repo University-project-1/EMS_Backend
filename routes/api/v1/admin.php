@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
+use App\Http\Controllers\Api\V1\Shared\NotificationController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\AnnouncementController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothController;
@@ -112,6 +113,20 @@ Route::prefix('admin')->group(function () {
             Route::get('/', [ReportController::class, 'index']);
             Route::post('/{report}/resolved', [ReportController::class, 'resolved']);
             Route::post('/{report}/rejected', [ReportController::class, 'rejected']);
+        });
+
+        // notifications
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'index'])
+                ->name('admin.notifications.index')->defaults('guardName', 'system');
+            Route::get('/statistics', [NotificationController::class, 'statistics'])
+                ->name('admin.notifications.statistics')->defaults('guardName', 'system');
+            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
+                ->name('admin.notifications.read-all')->defaults('guardName', 'system');
+            Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])
+                ->name('admin.notifications.read')->defaults('guardName', 'system');
+            Route::delete('/{notification}', [NotificationController::class, 'destroy'])
+                ->name('admin.notifications.destroy')->defaults('guardName', 'system');
         });
     });
 });
