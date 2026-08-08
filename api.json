@@ -69,6 +69,9 @@
             "name": "SystemUser/Exhibitor/Booths"
         },
         {
+            "name": "SystemUser/Exhibitor/Lookup"
+        },
+        {
             "name": "SystemUser/Exhibitor/Announcement"
         },
         {
@@ -3592,6 +3595,78 @@
                     },
                     "404": {
                         "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/lookup/booths": {
+            "get": {
+                "operationId": "exhibitor.lookup.booths",
+                "summary": "booths",
+                "tags": [
+                    "SystemUser/Exhibitor/Lookup"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/lookup/events": {
+            "get": {
+                "operationId": "exhibitor.lookup.events",
+                "summary": "events",
+                "tags": [
+                    "SystemUser/Exhibitor/Lookup"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/lookup/companies": {
+            "get": {
+                "operationId": "exhibitor.lookup.companies",
+                "summary": "companies",
+                "tags": [
+                    "SystemUser/Exhibitor/Lookup"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
