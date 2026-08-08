@@ -4,5 +4,5 @@ namespace App\Interfaces;
 
 interface FcmNotification
 {
-  public function toFcm($notifiable);
+  public function toFcm(object $notifiable);
 }
