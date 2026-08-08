@@ -9,9 +9,11 @@ use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ReviewController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
+use App\Models\Booth;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('exhibitor')->group(function () {
@@ -89,6 +91,12 @@ Route::prefix('exhibitor')->group(function () {
             Route::get('statistics', [EventController::class, 'statistics'])->name('exhibitor.events.statistics');
             Route::get('', [EventController::class, 'index'])->name('exhibitor.events.index');
             Route::post('', [EventController::class, 'store']);
+        });
+
+        // reviews
+        Route::prefix('reviews')->group(function(){
+            Route::get('event/{event}',[ReviewController::class,'eventReviews']);
+            Route::get('booht/{booth}',[ReviewController::class,'boothReviews']);
         });
     });
 });
