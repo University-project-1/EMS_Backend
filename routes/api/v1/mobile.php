@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Mobile\BoothController;
 use App\Http\Controllers\Api\V1\Mobile\BusCatalogController;
 use App\Http\Controllers\Api\V1\Mobile\CompanyController;
 use App\Http\Controllers\Api\V1\Mobile\EventController;
+use App\Http\Controllers\Api\V1\Mobile\LeadController;
 use App\Http\Controllers\Api\V1\Mobile\PasswordController;
 use App\Http\Controllers\Api\V1\Mobile\ProfileController;
 use App\Http\Controllers\Api\V1\Mobile\ReportController;
@@ -108,7 +109,12 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
         Route::delete('{review}', [ReviewController::class, 'destroy']);
     });
-
+    
+    // leads
+    Route::prefix('leads')->group(function(){
+        Route::post('/', [LeadController::class, 'store']);
+        Route::get('/history', [LeadController::class, 'index']);
+    });
     // notifications
     Route::prefix('notifications')->group(function () {
          Route::get('/', [NotificationController::class, 'index'])
