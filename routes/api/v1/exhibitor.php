@@ -106,7 +106,8 @@ Route::prefix('exhibitor')->group(function () {
                 ->name('exhibitor.notifications.read')->defaults('guardName', 'system');
             Route::delete('/{notification}', [NotificationController::class, 'destroy'])
                 ->name('exhibitor.notifications.destroy')->defaults('guardName', 'system');
-          
+        });
+        
         // reviews
         Route::prefix('reviews')->group(function(){
             Route::get('event/{event}',[ReviewController::class,'eventReviews']);
