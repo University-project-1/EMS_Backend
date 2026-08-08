@@ -1,5 +1,5 @@
 <?php
-namespace App\Filters;
+namespace App\Filter;
 
 use App\Models\SystemUser;
 use Illuminate\Database\Eloquent\Builder;
