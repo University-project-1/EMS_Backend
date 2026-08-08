@@ -11,12 +11,11 @@ use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\LeadController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\LookupController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ReviewController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
-use App\Http\Controllers\Api\V1\SystemUser\Shared\LookupController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
-use App\Models\Booth;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('exhibitor')->group(function () {
@@ -71,6 +70,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::post('/{company}/invitations', [InvitationController::class, 'storeForCompany']);
         });
 
+        //lookups
         Route::prefix('lookup')->group(function () {
             Route::get('/booths', [LookupController::class, 'booths'])->name('exhibitor.lookup.booths');
             Route::get('/events', [LookupController::class, 'events'])->name('exhibitor.lookup.events');

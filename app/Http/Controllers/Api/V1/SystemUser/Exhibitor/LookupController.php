@@ -1,5 +1,6 @@
 <?php
-namespace App\Http\Controllers\Api\V1\SystemUser\Shared;
+
+namespace App\Http\Controllers\Api\V1\SystemUser\Exhibitor;
 
 use App\Filter\AccessibleCompaniesFilter;
 use App\Filters\AccessibleBoothsFilter;
