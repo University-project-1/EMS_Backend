@@ -10,9 +10,11 @@ use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ReviewController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
+use App\Models\Booth;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('exhibitor')->group(function () {
@@ -104,6 +106,11 @@ Route::prefix('exhibitor')->group(function () {
                 ->name('exhibitor.notifications.read')->defaults('guardName', 'system');
             Route::delete('/{notification}', [NotificationController::class, 'destroy'])
                 ->name('exhibitor.notifications.destroy')->defaults('guardName', 'system');
+          
+        // reviews
+        Route::prefix('reviews')->group(function(){
+            Route::get('event/{event}',[ReviewController::class,'eventReviews']);
+            Route::get('booht/{booth}',[ReviewController::class,'boothReviews']);
         });
     });
 });

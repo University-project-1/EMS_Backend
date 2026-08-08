@@ -6,23 +6,51 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 if (! function_exists('successResponse')) {
-    function successResponse($data = null, string $message = 'Success', int $status = 200)
-    {
-        if ($data instanceof AnonymousResourceCollection && $data->resource instanceof CursorPaginator) {
-            $paginator = $data->resource;
+    function successResponse(mixed $data = null,string $message = 'Success',int $status = 200): JsonResponse {
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => formatResponseData($data),
+        ], $status);
+    }
+}
 
-            $data = [
-                'data' => $data->collection,
+if (! function_exists('formatResponseData')) {
+    function formatResponseData(mixed $data): mixed
+    {
+        if ($data instanceof AnonymousResourceCollection) {
+        return formatPaginatedResponse($data);
+        }
+
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                if ($value instanceof AnonymousResourceCollection) {
+                    $data[$key] = formatPaginatedResponse($value);
+                }
+            }
+        }
+
+        return $data;
+    }
+}
+
+if (! function_exists('formatPaginatedResponse')) {
+    function formatPaginatedResponse(AnonymousResourceCollection $resource): AnonymousResourceCollection|array {
+        $paginator = $resource->resource;
+
+        if ($paginator instanceof CursorPaginator) {
+            return [
+                'data' => $resource->collection,
                 'per_page' => $paginator->perPage(),
                 'next_cursor' => $paginator->nextCursor()?->encode(),
                 'previous_cursor' => $paginator->previousCursor()?->encode(),
                 'has_more_pages' => $paginator->hasMorePages(),
             ];
-        } elseif ($data instanceof AnonymousResourceCollection && $data->resource instanceof LengthAwarePaginator) {
-            $paginator = $data->resource;
+        }
 
-            $data = [
-                'data' => $data->collection,
+        if ($paginator instanceof LengthAwarePaginator) {
+            return [
+                'data' => $resource->collection,
                 'current_page' => $paginator->currentPage(),
                 'per_page' => $paginator->perPage(),
                 'total' => $paginator->total(),
@@ -30,17 +58,12 @@ if (! function_exists('successResponse')) {
             ];
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => $message,
-            'data' => $data,
-        ], $status);
+        return $resource;
     }
 }
 
 if (! function_exists('errorResponse')) {
-    function errorResponse(?string $message = null, mixed $errors = null, int $code = 400): JsonResponse
-    {
+    function errorResponse(?string $message = null,mixed $errors = null,int $code = 400): JsonResponse {
         return response()->json([
             'status' => false,
             'message' => $message,

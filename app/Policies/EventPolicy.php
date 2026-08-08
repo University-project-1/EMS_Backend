@@ -2,22 +2,19 @@
 
 namespace App\Policies;
 
-use App\Models\Booth;
+use App\Models\Event;
 use App\Models\SystemUser;
+use Illuminate\Auth\Access\Response;
 
-class BoothPolicy
+class EventPolicy
 {
-    public function viewReviews(SystemUser $user, Booth $booth): bool
+    public function viewReviews(SystemUser $user, Event $event): bool
     {
-        return $user->companies()
-            ->whereKey($booth->company_id)
+        return $event->query()->accessibleBy($user)
+            ->whereKey($event->getKey())
             ->exists();
     }
-    public function manageInvitations(SystemUser $systemUser, Booth $booth): bool
-    {
-        return $systemUser->booths()->where('booths.id', $booth->id)->exists()
-            || $systemUser->companies()->where('companies.id', $booth->company_id)->exists();
-    }
+
     /**
      * Determine whether the user can view any models.
      */
@@ -29,7 +26,7 @@ class BoothPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(SystemUser $systemUser, Booth $booth): bool
+    public function view(SystemUser $systemUser, Event $event): bool
     {
         return false;
     }
@@ -45,7 +42,7 @@ class BoothPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(SystemUser $systemUser, Booth $booth): bool
+    public function update(SystemUser $systemUser, Event $event): bool
     {
         return false;
     }
@@ -53,7 +50,7 @@ class BoothPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(SystemUser $systemUser, Booth $booth): bool
+    public function delete(SystemUser $systemUser, Event $event): bool
     {
         return false;
     }
@@ -61,7 +58,7 @@ class BoothPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(SystemUser $systemUser, Booth $booth): bool
+    public function restore(SystemUser $systemUser, Event $event): bool
     {
         return false;
     }
@@ -69,7 +66,7 @@ class BoothPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(SystemUser $systemUser, Booth $booth): bool
+    public function forceDelete(SystemUser $systemUser, Event $event): bool
     {
         return false;
     }
