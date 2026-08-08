@@ -75,6 +75,9 @@
             "name": "SystemUser/Exhibitor/Services"
         },
         {
+            "name": "SystemUser/Exhibitor/Leads"
+        },
+        {
             "name": "SystemUser/Exhibitor/Reviews"
         },
         {
@@ -106,6 +109,9 @@
         },
         {
             "name": "Visitor/Review"
+        },
+        {
+            "name": "Visitor/Leads"
         },
         {
             "name": "Visitor/BusCatalog"
@@ -3524,6 +3530,75 @@
                 }
             }
         },
+        "/v1/exhibitor/leads/{booth}": {
+            "get": {
+                "operationId": "lead.boothLeads",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
+                "summary": "booth Leads",
+                "tags": [
+                    "SystemUser/Exhibitor/Leads"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/leads/{event}": {
+            "get": {
+                "operationId": "lead.eventLeads",
+                "summary": "event Leads",
+                "tags": [
+                    "SystemUser/Exhibitor/Leads"
+                ],
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "required": true,
+                        "description": "The event ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/exhibitor/reviews/event/{event}": {
             "get": {
                 "operationId": "v1.systemUser.exhibitor.review.eventReviews",
@@ -4586,6 +4661,66 @@
                 "security": []
             }
         },
+        "/v1/visitor/leads": {
+            "post": {
+                "operationId": "lead.store",
+                "tags": [
+                    "Visitor/Leads"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ScanRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/visitor/leads/history": {
+            "get": {
+                "operationId": "lead.index",
+                "summary": "leads history",
+                "tags": [
+                    "Visitor/Leads"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/visitor/profile": {
             "get": {
                 "operationId": "v1.mobile.profile.show",
@@ -5459,6 +5594,18 @@
                 ],
                 "title": "ResetPasswordRequest"
             },
+            "ScanRequest": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "token"
+                ],
+                "title": "ScanRequest"
+            },
             "StoreAnnouncementRequest": {
                 "type": "object",
                 "properties": {
@@ -5959,6 +6106,25 @@
             },
             "AuthorizationException": {
                 "description": "Authorization error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
+            "ModelNotFoundException": {
+                "description": "Not found",
                 "content": {
                     "application/json": {
                         "schema": {
