@@ -5,7 +5,7 @@ namespace App\Services\SystemUser\Admin;
 use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\BoothRequest;
-use App\Notifications\SystemUser\BoothApprovedNotification;
+use App\Notifications\SystemUser\Exhibitor\BoothApprovedNotification;
 use App\Services\Shared\QrCodeService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;

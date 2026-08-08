@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AnnouncementController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
+use App\Http\Controllers\Api\V1\Shared\NotificationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
@@ -93,6 +94,19 @@ Route::prefix('exhibitor')->group(function () {
             Route::post('', [EventController::class, 'store']);
         });
 
+        // notifications
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'index'])
+                ->name('exhibitor.notifications.index')->defaults('guardName', 'system');
+            Route::get('/statistics', [NotificationController::class, 'statistics'])
+                ->name('exhibitor.notifications.statistics')->defaults('guardName', 'system');
+            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
+                ->name('exhibitor.notifications.read-all')->defaults('guardName', 'system');
+            Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])
+                ->name('exhibitor.notifications.read')->defaults('guardName', 'system');
+            Route::delete('/{notification}', [NotificationController::class, 'destroy'])
+                ->name('exhibitor.notifications.destroy')->defaults('guardName', 'system');
+          
         // reviews
         Route::prefix('reviews')->group(function(){
             Route::get('event/{event}',[ReviewController::class,'eventReviews']);

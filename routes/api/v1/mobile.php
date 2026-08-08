@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\Mobile\SavedController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
+use App\Http\Controllers\Api\V1\Shared\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // auth routes with rate limiting
@@ -108,6 +109,20 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::delete('{review}', [ReviewController::class, 'destroy']);
     });
 
+    // notifications
+    Route::prefix('notifications')->group(function () {
+         Route::get('/', [NotificationController::class, 'index'])
+            ->name('visitor.notifications.index')->defaults('guardName', 'mobile');
+        Route::get('/statistics', [NotificationController::class, 'statistics'])
+            ->name('visitor.notifications.statistics')->defaults('guardName', 'mobile');
+        Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
+            ->name('visitor.notifications.read-all')->defaults('guardName', 'mobile');
+        Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])
+            ->name('visitor.notifications.read')->defaults('guardName', 'mobile');
+        Route::delete('/{notification}', [NotificationController::class, 'destroy'])
+            ->name('visitor.notifications.destroy')->defaults('guardName', 'mobile');
+    });
+  
     // bus catalog
     Route::get('bus-catalog', [BusCatalogController::class, 'index'])->name('visitor.bus_catalog.index');
 
