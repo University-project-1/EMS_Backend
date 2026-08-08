@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+use Database\Seeders\LeadSeeder;
+
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
@@ -26,6 +28,7 @@ class DatabaseSeeder extends Seeder
             BoothSeeder::class,
             BoothRequestSeeder::class,
             EventSeeder::class,
+            LeadSeeder::class,
             NotificationSeeder::class,
             ReportSeeder::class,
             ReviewSeeder::class,

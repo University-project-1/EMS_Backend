@@ -2,13 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\Company;
 use App\Models\Hall;
 use App\Models\SystemUser;
+use App\Services\Shared\QrCodeService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use LogicException;
 
 class BoothSeeder extends Seeder
@@ -24,6 +25,11 @@ class BoothSeeder extends Seeder
         '11F-01' => ['company' => 'Dar Al feker', 'system_user' => 'Elcoach', 'assigned_by' => 'Fawzy'],
         '25B-01' => ['company' => 'GreenFoods Co.', 'system_user' => 'Fawzy', 'assigned_by' => null],
         '25B-02' => ['company' => 'Metro Tech Labs', 'system_user' => 'Elza3eem', 'assigned_by' => 'Fawzy'],
+        '26E-01' => ['company' => 'Al-Noor Publishing House', 'system_user' => 'Elcoach', 'assigned_by' => 'Fawzy'],
+        '26E-02' => ['company' => 'Cedar Build Works', 'system_user' => 'Elza3eem', 'assigned_by' => 'Fawzy'],
+        '36JD-01' => ['company' => 'Meridian Health Alliance', 'system_user' => 'Fawzy', 'assigned_by' => 'Elcoach'],
+        '36JD-02' => ['company' => 'Atlas Commerce Hub', 'system_user' => 'Elcoach', 'assigned_by' => 'Elza3eem'],
+        '8K-01' => ['company' => 'SkyPoint Tourism Ventures', 'system_user' => 'Elza3eem', 'assigned_by' => 'Fawzy'],
     ];
 
     /** @var list<float> */
@@ -160,9 +166,12 @@ class BoothSeeder extends Seeder
                     'price' => $definition['area'] * self::PRICE_PER_SQUARE_METRE,
                     'svg_id' => $definition['number'],
                 ]);
-                $booth->qr_token = $company === null ? null : ($booth->qr_token ?? (string) Str::uuid());
+                $booth->qr_token = $company?->status === Status::APPROVED
+                    ? 'B-SEED-'.$definition['number']
+                    : null;
                 $booth->deleted_at = null;
                 $booth->save();
+                $this->syncQrCodeMedia($booth, $company);
 
                 $boothsByNumber[$definition['number']] = $booth;
                 $seededBoothIds[] = $booth->id;
@@ -269,5 +278,18 @@ class BoothSeeder extends Seeder
                 'area' => $area,
             ];
         }
+    }
+
+    private function syncQrCodeMedia(Booth $booth, ?Company $company): void
+    {
+        $booth->clearMediaCollection('qr_code');
+
+        if (! $company instanceof Company || $company->status !== Status::APPROVED || $booth->qr_token === null) {
+            return;
+        }
+
+        $booth->addMediaFromString(app(QrCodeService::class)->generateSvg($booth->qr_token))
+            ->usingFileName("{$booth->qr_token}.svg")
+            ->toMediaCollection('qr_code');
     }
 }

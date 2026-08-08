@@ -8,8 +8,10 @@ use App\Models\Company;
 use App\Models\Event;
 use App\Models\EventHall;
 use App\Models\SystemUser;
+use App\Services\Shared\QrCodeService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class EventSeeder extends Seeder
 {
@@ -148,6 +150,35 @@ class EventSeeder extends Seeder
             $event->speakers()->createMany(
                 array_map(fn (string $speaker): array => ['name' => $speaker], $speakers)
             );
+
+            if ($event->status === Status::APPROVED && $event->eventable_type === Company::class) {
+                $event->loadMissing('eventable');
+
+                if ($event->eventable instanceof Company) {
+                    $event->eventable->update(['status' => Status::APPROVED]);
+                }
+            }
+
+            $this->syncQrCodeMedia($event);
         }
+    }
+
+    private function syncQrCodeMedia(Event $event): void
+    {
+        $event->clearMediaCollection('qr_code');
+
+        if ($event->status !== Status::APPROVED) {
+            return;
+        }
+
+        $token = $event->qr_token ?? 'E-SEED-'.Str::slug($event->title);
+
+        if ($event->qr_token !== $token) {
+            $event->forceFill(['qr_token' => $token])->saveQuietly();
+        }
+
+        $event->addMediaFromString(app(QrCodeService::class)->generateSvg($token))
+            ->usingFileName("{$token}.svg")
+            ->toMediaCollection('qr_code');
     }
 }

@@ -87,6 +87,66 @@ class CompanySeeder extends Seeder
             'status' => Status::APPROVED,
         ]);
 
+        $companyG = Company::create([
+            'name' => 'Al-Noor Publishing House',
+            'business_sector' => BusinessSectors::CULTURE,
+            'social_links' => ['website' => 'https://alnoor-publishing.example', 'instagram' => 'https://instagram.com/alnoorpublishing'],
+            'phone' => '+963119990011',
+            'year_founded' => 2017,
+            'description' => 'Publishing house focused on books, magazines, and literary programs.',
+            'headquarters_lat' => 33.512900,
+            'headquarters_lng' => 36.279400,
+            'status' => Status::APPROVED,
+        ]);
+
+        $companyH = Company::create([
+            'name' => 'Cedar Build Works',
+            'business_sector' => BusinessSectors::CONSTRUCTION,
+            'social_links' => ['website' => 'https://cedarbuild.example', 'linkedin' => 'https://linkedin.com/company/cedarbuildworks'],
+            'phone' => '+963120001122',
+            'year_founded' => 2011,
+            'description' => 'Construction and interior solutions provider for exhibition spaces.',
+            'headquarters_lat' => 33.507600,
+            'headquarters_lng' => 36.287300,
+            'status' => Status::APPROVED,
+        ]);
+
+        $companyI = Company::create([
+            'name' => 'Meridian Health Alliance',
+            'business_sector' => BusinessSectors::HEALTHCARE,
+            'social_links' => ['website' => 'https://meridian-health.example', 'facebook' => 'https://facebook.com/meridianhealthalliance'],
+            'phone' => '+963121112233',
+            'year_founded' => 2014,
+            'description' => 'Healthcare group presenting medical services and outreach programs.',
+            'headquarters_lat' => 33.516500,
+            'headquarters_lng' => 36.292800,
+            'status' => Status::APPROVED,
+        ]);
+
+        $companyJ = Company::create([
+            'name' => 'Atlas Commerce Hub',
+            'business_sector' => BusinessSectors::COMMERCE,
+            'social_links' => ['website' => 'https://atlas-commerce.example', 'x' => 'https://x.com/atlascommercehub'],
+            'phone' => '+963122223344',
+            'year_founded' => 2020,
+            'description' => 'Retail and wholesale hub for multi-brand exhibition participation.',
+            'headquarters_lat' => 33.520200,
+            'headquarters_lng' => 36.283900,
+            'status' => Status::APPROVED,
+        ]);
+
+        $companyK = Company::create([
+            'name' => 'SkyPoint Tourism Ventures',
+            'business_sector' => BusinessSectors::TOURISM,
+            'social_links' => ['website' => 'https://skypoint-tourism.example', 'instagram' => 'https://instagram.com/skypointtourism'],
+            'phone' => '+963123334455',
+            'year_founded' => 2018,
+            'description' => 'Tourism operator used as a non-approved company fixture for testing.',
+            'headquarters_lat' => 33.501100,
+            'headquarters_lng' => 36.298600,
+            'status' => Status::PENDING,
+        ]);
+
         $elcoach = SystemUser::where('name', 'Elcoach')->firstOrFail();
         $fawzy = SystemUser::where('name', 'Fawzy')->firstOrFail();
         $elza3eem = SystemUser::where('name', 'Elza3eem')->firstOrFail();
@@ -121,6 +181,31 @@ class CompanySeeder extends Seeder
             $elza3eem->id,
         ]);
 
+        $companyG->systemUsers()->syncWithoutDetaching([
+            $elcoach->id,
+            $fawzy->id,
+        ]);
+
+        $companyH->systemUsers()->syncWithoutDetaching([
+            $elza3eem->id,
+            $elcoach->id,
+        ]);
+
+        $companyI->systemUsers()->syncWithoutDetaching([
+            $fawzy->id,
+            $elza3eem->id,
+        ]);
+
+        $companyJ->systemUsers()->syncWithoutDetaching([
+            $elcoach->id,
+        ]);
+
+        $companyK->systemUsers()->syncWithoutDetaching([
+            $fawzy->id,
+            $elcoach->id,
+            $elza3eem->id,
+        ]);
+
         $companyALogo = database_path('assets/alawael.png');
         if (is_file($companyALogo)) {
             $companyA->copyMedia($companyALogo)->toMediaCollection('logo');
@@ -139,6 +224,31 @@ class CompanySeeder extends Seeder
         $companyDLogo = database_path('assets/RGBs.jpg');
         if (is_file($companyDLogo)) {
             $companyD->copyMedia($companyDLogo)->toMediaCollection('logo');
+        }
+
+        $companyGLogo = database_path('assets/elsaadeh.png');
+        if (is_file($companyGLogo)) {
+            $companyG->copyMedia($companyGLogo)->toMediaCollection('logo');
+        }
+
+        $companyHLogo = database_path('assets/Elba3eth.png');
+        if (is_file($companyHLogo)) {
+            $companyH->copyMedia($companyHLogo)->toMediaCollection('logo');
+        }
+
+        $companyILogo = database_path('assets/wasem.png');
+        if (is_file($companyILogo)) {
+            $companyI->copyMedia($companyILogo)->toMediaCollection('logo');
+        }
+
+        $companyJLogo = database_path('assets/RBCs.png');
+        if (is_file($companyJLogo)) {
+            $companyJ->copyMedia($companyJLogo)->toMediaCollection('logo');
+        }
+
+        $companyKLogo = database_path('assets/RGBs.jpg');
+        if (is_file($companyKLogo)) {
+            $companyK->copyMedia($companyKLogo)->toMediaCollection('logo');
         }
     }
 }
