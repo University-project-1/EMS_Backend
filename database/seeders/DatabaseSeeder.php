@@ -26,6 +26,9 @@ class DatabaseSeeder extends Seeder
             BoothSeeder::class,
             BoothRequestSeeder::class,
             EventSeeder::class,
+            NotificationSeeder::class,
+            ReportSeeder::class,
+            ReviewSeeder::class,
         ]);
     }
 }

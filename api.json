@@ -54,6 +54,9 @@
             "name": "SystemUser/Admin/Reports"
         },
         {
+            "name": "Notifications"
+        },
+        {
             "name": "SystemUser/Exhibitor/Auth"
         },
         {
@@ -66,10 +69,19 @@
             "name": "SystemUser/Exhibitor/Booths"
         },
         {
+            "name": "SystemUser/Exhibitor/Lookup"
+        },
+        {
             "name": "SystemUser/Exhibitor/Announcement"
         },
         {
             "name": "SystemUser/Exhibitor/Services"
+        },
+        {
+            "name": "SystemUser/Exhibitor/Leads"
+        },
+        {
+            "name": "SystemUser/Exhibitor/Reviews"
         },
         {
             "name": "Visitor/Auth"
@@ -100,6 +112,9 @@
         },
         {
             "name": "Visitor/Review"
+        },
+        {
+            "name": "Visitor/Leads"
         },
         {
             "name": "Visitor/BusCatalog"
@@ -806,6 +821,450 @@
                 "summary": "show hall",
                 "tags": [
                     "Halls"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/notifications": {
+            "get": {
+                "operationId": "admin.notifications.index",
+                "summary": "all notifications",
+                "tags": [
+                    "Notifications"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[type]",
+                        "in": "query",
+                        "description": "Filter notifications by exact type.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of notifications per page. Default: 15, Max: 100.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort by created_at. Use -created_at for descending.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/notifications/statistics": {
+            "get": {
+                "operationId": "admin.notifications.statistics",
+                "summary": "statistics",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/notifications/read-all": {
+            "patch": {
+                "operationId": "admin.notifications.read-all",
+                "summary": "mark all notifications as read",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/notifications/{notification}/read": {
+            "patch": {
+                "operationId": "admin.notifications.read",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'notifications' order by ordinal_position asc)",
+                "summary": "mark notification as read",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/notifications/{notification}": {
+            "delete": {
+                "operationId": "admin.notifications.destroy",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'notifications' order by ordinal_position asc)",
+                "summary": "delete notification",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/notifications": {
+            "get": {
+                "operationId": "exhibitor.notifications.index",
+                "summary": "all notifications",
+                "tags": [
+                    "Notifications"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[type]",
+                        "in": "query",
+                        "description": "Filter notifications by exact type.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of notifications per page. Default: 15, Max: 100.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort by created_at. Use -created_at for descending.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/notifications/statistics": {
+            "get": {
+                "operationId": "exhibitor.notifications.statistics",
+                "summary": "statistics",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/notifications/read-all": {
+            "patch": {
+                "operationId": "exhibitor.notifications.read-all",
+                "summary": "mark all notifications as read",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/notifications/{notification}/read": {
+            "patch": {
+                "operationId": "exhibitor.notifications.read",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'notifications' order by ordinal_position asc)",
+                "summary": "mark notification as read",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/notifications/{notification}": {
+            "delete": {
+                "operationId": "exhibitor.notifications.destroy",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'notifications' order by ordinal_position asc)",
+                "summary": "delete notification",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/visitor/notifications": {
+            "get": {
+                "operationId": "visitor.notifications.index",
+                "summary": "all notifications",
+                "tags": [
+                    "Notifications"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[type]",
+                        "in": "query",
+                        "description": "Filter notifications by exact type.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of notifications per page. Default: 15, Max: 100.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort by created_at. Use -created_at for descending.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/visitor/notifications/statistics": {
+            "get": {
+                "operationId": "visitor.notifications.statistics",
+                "summary": "statistics",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/visitor/notifications/read-all": {
+            "patch": {
+                "operationId": "visitor.notifications.read-all",
+                "summary": "mark all notifications as read",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/visitor/notifications/{notification}/read": {
+            "patch": {
+                "operationId": "visitor.notifications.read",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'notifications' order by ordinal_position asc)",
+                "summary": "mark notification as read",
+                "tags": [
+                    "Notifications"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/visitor/notifications/{notification}": {
+            "delete": {
+                "operationId": "visitor.notifications.destroy",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'notifications' order by ordinal_position asc)",
+                "summary": "delete notification",
+                "tags": [
+                    "Notifications"
                 ],
                 "responses": {
                     "200": {
@@ -3074,6 +3533,203 @@
                 }
             }
         },
+        "/v1/exhibitor/leads/{booth}": {
+            "get": {
+                "operationId": "lead.boothLeads",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
+                "summary": "booth Leads",
+                "tags": [
+                    "SystemUser/Exhibitor/Leads"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/leads/{event}": {
+            "get": {
+                "operationId": "lead.eventLeads",
+                "summary": "event Leads",
+                "tags": [
+                    "SystemUser/Exhibitor/Leads"
+                ],
+                "parameters": [
+                    {
+                        "name": "event",
+                        "in": "path",
+                        "required": true,
+                        "description": "The event ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/lookup/booths": {
+            "get": {
+                "operationId": "exhibitor.lookup.booths",
+                "summary": "booths",
+                "tags": [
+                    "SystemUser/Exhibitor/Lookup"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/lookup/events": {
+            "get": {
+                "operationId": "exhibitor.lookup.events",
+                "summary": "events",
+                "tags": [
+                    "SystemUser/Exhibitor/Lookup"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/lookup/companies": {
+            "get": {
+                "operationId": "exhibitor.lookup.companies",
+                "summary": "companies",
+                "tags": [
+                    "SystemUser/Exhibitor/Lookup"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/reviews/event/{event}": {
+            "get": {
+                "operationId": "v1.systemUser.exhibitor.review.eventReviews",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'events' order by ordinal_position asc)",
+                "summary": "event reviwes",
+                "tags": [
+                    "SystemUser/Exhibitor/Reviews"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/reviews/booht/{booth}": {
+            "get": {
+                "operationId": "v1.systemUser.exhibitor.review.boothReviews",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
+                "summary": "Booth reviews",
+                "tags": [
+                    "SystemUser/Exhibitor/Reviews"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/exhibitor/services": {
             "get": {
                 "operationId": "v1.systemUser.exhibitor.service.index",
@@ -4080,6 +4736,66 @@
                 "security": []
             }
         },
+        "/v1/visitor/leads": {
+            "post": {
+                "operationId": "lead.store",
+                "tags": [
+                    "Visitor/Leads"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ScanRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/visitor/leads/history": {
+            "get": {
+                "operationId": "lead.index",
+                "summary": "leads history",
+                "tags": [
+                    "Visitor/Leads"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/visitor/profile": {
             "get": {
                 "operationId": "v1.mobile.profile.show",
@@ -4327,7 +5043,7 @@
         },
         "/v1/visitor/reviews/booth/{booth}": {
             "get": {
-                "operationId": "review.boothReviews",
+                "operationId": "v1.mobile.review.boothReviews",
                 "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
                 "summary": "reviews on booth",
                 "tags": [
@@ -4352,7 +5068,7 @@
         },
         "/v1/visitor/reviews/event/{event}": {
             "get": {
-                "operationId": "review.eventReviews",
+                "operationId": "v1.mobile.review.eventReviews",
                 "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'events' order by ordinal_position asc)",
                 "summary": "reviews on event",
                 "tags": [
@@ -4953,6 +5669,18 @@
                 ],
                 "title": "ResetPasswordRequest"
             },
+            "ScanRequest": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "token"
+                ],
+                "title": "ScanRequest"
+            },
             "StoreAnnouncementRequest": {
                 "type": "object",
                 "properties": {
@@ -5453,6 +6181,25 @@
             },
             "AuthorizationException": {
                 "description": "Authorization error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
+            "ModelNotFoundException": {
+                "description": "Not found",
                 "content": {
                     "application/json": {
                         "schema": {

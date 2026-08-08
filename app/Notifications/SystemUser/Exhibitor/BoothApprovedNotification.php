@@ -1,24 +1,29 @@
 <?php
 
-namespace App\Notifications\SystemUser;
+namespace App\Notifications\SystemUser\Exhibitor;
 
+use App\Channels\FcmChannel;
+use App\Interfaces\FcmNotification;
 use App\Models\BoothRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Queue\SerializesModels;
 
-class BoothApprovedNotification extends Notification implements ShouldQueue
+class BoothApprovedNotification extends Notification implements ShouldQueue, FcmNotification
 {
-    use Queueable;
+    use Queueable, SerializesModels;
 
+    public int $tries = 3;
+    public int $backoff = 60;
     public function __construct(
         public readonly BoothRequest $boothRequest
     ) {}
 
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return ['database', 'mail', FcmChannel::class];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -47,5 +52,18 @@ class BoothApprovedNotification extends Notification implements ShouldQueue
             'body' => 'notifications.booth_approved_body',
             'target_id' => $this->boothRequest->id,
         ];
+    }
+
+    public function toFcm(object $notifiable): array { 
+        return [ 
+            'notification' => [ 
+                'title' => __('notifications.booth_approved_title'), 
+                'body' => __('notifications.booth_approved_body'), 
+                ], 
+                'data' => [ 
+                    'type' => 'booth_approved', 
+                    'target_id' => (string) $this->boothRequest->id, 
+                ], 
+            ]; 
     }
 }
