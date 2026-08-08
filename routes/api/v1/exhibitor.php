@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\LeadController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ReviewController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\ServiceController;
+use App\Http\Controllers\Api\V1\SystemUser\Shared\LookupController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
 use App\Models\Booth;
@@ -70,6 +71,12 @@ Route::prefix('exhibitor')->group(function () {
             Route::post('/{company}/invitations', [InvitationController::class, 'storeForCompany']);
         });
 
+        Route::prefix('lookup')->group(function () {
+            Route::get('/booths', [LookupController::class, 'booths'])->name('exhibitor.lookup.booths');
+            Route::get('/events', [LookupController::class, 'events'])->name('exhibitor.lookup.events');
+            Route::get('/companies', [LookupController::class, 'companies'])->name('exhibitor.lookup.companies');
+        });
+
         // invitations
         Route::prefix('invitations')->group(function () {
             Route::post('/{invitation:token}/accept', [InvitationController::class, 'approve']);
@@ -113,7 +120,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::delete('/{notification}', [NotificationController::class, 'destroy'])
                 ->name('exhibitor.notifications.destroy')->defaults('guardName', 'system');
         });
-        
+
         // reviews
         Route::prefix('reviews')->group(function(){
             Route::get('event/{event}',[ReviewController::class,'eventReviews']);

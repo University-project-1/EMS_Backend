@@ -48,11 +48,7 @@ class EventHallController extends Controller
                         ->with('media'),
                 ),
             )
-            ->allowedSorts(
-                'number',
-                'area',
-                'price_per_hour'
-            )
+            ->allowedSorts('number', 'area','price_per_hour')
             ->get();
 
         return successResponse(EventHallResource::collection($eventHalls));
