@@ -22,11 +22,12 @@ class LeadController extends Controller
      */
     public function boothLeads(Booth $booth){
         Gate::authorize('viewLeads', $booth);
-        $result = $this->leadService->getLeadStatistics($booth);
-        return successResponse([
-            'latest_visitors' => LeadResource::collection($result['latest_visitors']),
-            'weekly_stats' => $result['weekly_stats']
-        ]);
+
+        $statistics = $this->leadService->getLeadStatistics($booth);
+        $statistics['visitors'] = LeadResource::collection($statistics['visitors'])
+            ->response()
+            ->getData(true);
+        return successResponse($statistics);
     }
 
     /**

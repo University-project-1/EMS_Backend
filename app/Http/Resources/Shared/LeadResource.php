@@ -23,13 +23,15 @@ class LeadResource extends JsonResource
             'leadable' => MorphResourceResolver::resourceFor($this->leadable),
             'created_at' => $this->created_at,
 
-            'visitor' => UserResource::collection($this->whenLoaded('user', function(){
+            'visitor' => $this->whenLoaded('user', function ($loadedUser) {
                 return [
-                    'name' => $this->user->first_name . ' ' . $this->user->last_name,
-                    'phone' => $this->user->phone,
-                    'job' => $this->user->job
+                    'id' => $loadedUser->id,
+                    'full_name' => trim($loadedUser->first_name . ' ' . $loadedUser->last_name),
+                    'email' => $loadedUser->email,
+                    'phone' => $loadedUser->phone,
+                    'avatar' => $loadedUser->getFirstMediaUrl('user-avatars') ?: null,
                 ];
-            })),
+            }),
         ];
     }
 }
