@@ -85,6 +85,7 @@ Route::prefix('admin')->group(function () {
             Route::delete('/{announcement}', [AnnouncementController::class, 'destroy']);
         });
 
+        //busCatalog
         Route::prefix('buses')->group(function(){
             Route::get('', [BusController::class, 'index']);
             Route::get('/{busCatalog}', [BusController::class, 'show']);

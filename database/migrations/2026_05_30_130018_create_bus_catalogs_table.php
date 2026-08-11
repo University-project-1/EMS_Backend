@@ -20,7 +20,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('bus_catalog');
         Schema::dropIfExists('bus_catalogs');
     }
 };
