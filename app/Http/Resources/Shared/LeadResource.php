@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Shared;
 
-use App\Http\Resources\Mobile\UserResource;
 use App\Support\MorphResourceResolver;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;

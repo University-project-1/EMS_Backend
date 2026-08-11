@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Admin\AnnouncementController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothRequestController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\BusController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\CompanyDirectoryController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController as AdminEventHallController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventRequestController;
@@ -83,7 +84,14 @@ Route::prefix('admin')->group(function () {
             Route::patch('/{announcement}', [AnnouncementController::class, 'update']);
             Route::delete('/{announcement}', [AnnouncementController::class, 'destroy']);
         });
-        // Route::resource('announcement', AnnouncementController::class);
+
+        Route::prefix('buses')->group(function(){
+            Route::get('', [BusController::class, 'index']);
+            Route::get('/{busCatalog}', [BusController::class, 'show']);
+            Route::post('/{busCatalog}', [BusController::class, 'create']);
+            Route::patch('/{busCatalog}', [BusController::class, 'update']);
+            Route::delete('/{busCatalog}', [BusController::class, 'destroy']);
+        });
 
         // eventHall
         Route::prefix('eventHall/')->group(function () {
