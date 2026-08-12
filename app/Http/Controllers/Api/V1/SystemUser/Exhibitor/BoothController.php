@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\SystemUser\Exhibitor;
 use App\DTOs\SystemUser\BoothRequestDTO;
 use App\DTOs\SystemUser\CompanyDTO;
 use App\Filter\BookedBoothFilter;
+use App\Filter\BoothStatusFilter;
 use App\Filter\MaxFilter;
 use App\Filter\MinFilter;
 use App\Http\Controllers\Controller;
@@ -88,11 +89,16 @@ class BoothController extends Controller
     /**
      * My booths
      */
+    #[QueryParameter('filter[status]', 'Filter booths by exact booth status', required: false, type: 'string')]
     public function ownedBooths(Request $request)
     {
         $userId = $request->user('system')->id;
 
-        $booths = Booth::with([
+        $booths = QueryBuilder::for(Booth::class)
+            ->allowedFilters(
+                AllowedFilter::custom('status', new BoothStatusFilter()),
+            )
+            ->with([
             'company',
             'hall',
             'latestBoothRequest',
