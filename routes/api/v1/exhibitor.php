@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AnnouncementController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
+use App\Http\Controllers\Api\V1\Shared\FaciltyController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\Shared\NotificationController;
@@ -97,6 +98,12 @@ Route::prefix('exhibitor')->group(function () {
         Route::prefix('eventHall/')->group(function () {
             Route::get('', [EventHallController::class, 'index'])->name('exhibitor.event_halls.index');
             Route::get('{eventHall}', [EventHallController::class, 'show'])->name('exhibitor.event_halls.show');
+        });
+
+        // facilities
+        Route::prefix('facilities')->group(function(){
+            Route::get('', [FaciltyController::class, 'index']);
+            Route::get('/{facility}', [FaciltyController::class, 'show']);
         });
 
         // events
