@@ -16,6 +16,9 @@ class FaciltyController extends Controller
     #[QueryParameter('filter[number]', 'Filter facilities by exact number', required: false, type: 'string')]
     #[QueryParameter('filter[type]', 'Filter facilities by exact type', required: false, type: 'string')]
     #[QueryParameter('per_page', 'Number of items per page. Default: 10', required: false, type: 'integer')]
+    /**
+     * all
+     */
     public function index(){
         $facilities = QueryBuilder::for(Facility::class)
             ->allowedFilters('number',
@@ -25,6 +28,9 @@ class FaciltyController extends Controller
         return successResponse(FaciltyResource::collection($facilities));
     }
 
+    /**
+     * show
+     */
     public function show(Facility $facility){
         return successResponse(new FaciltyResource($facility));
     }

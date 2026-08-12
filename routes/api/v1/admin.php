@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
+use App\Http\Controllers\Api\V1\Shared\FaciltyController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\Shared\NotificationController;
@@ -92,6 +93,12 @@ Route::prefix('admin')->group(function () {
             Route::post('/', [BusController::class, 'create']);
             Route::patch('/{busCatalog}', [BusController::class, 'update']);
             Route::delete('/{busCatalog}', [BusController::class, 'destroy']);
+        });
+
+        //facilities
+        Route::prefix('facilities')->group(function(){
+            Route::get('', [FaciltyController::class, 'index']);
+            Route::get('/{facility}', [FaciltyController::class, 'show']);
         });
 
         // eventHall
