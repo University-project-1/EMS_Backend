@@ -20,7 +20,6 @@ class FacilitySeeder extends Seeder
         ['number' => 'WC-SOUTH-EAST-M', 'gender' => 'male', 'svg_id' => 'facility-wc-south-east-m', 'type' => 'bathroom'],
         ['number' => 'WC-SOUTH-EAST-F', 'gender' => 'female', 'svg_id' => 'facility-wc-south-east-f', 'type' => 'bathroom'],
         ['number' => 'MOSQUE-01', 'gender' => 'unisex', 'svg_id' => 'facility-mosque-01', 'type' => 'mosque'],
-        ['number' => 'RESTAURANT-01', 'gender' => 'unisex', 'svg_id' => 'facility-restaurant-01', 'type' => 'restaurant'],
         ['number' => 'PARKING-NORTH-EAST', 'gender' => 'unisex', 'svg_id' => 'facility-parking-north-east', 'type' => 'parking'],
         ['number' => 'PARKING-MIDDLE-EAST', 'gender' => 'unisex', 'svg_id' => 'facility-parking-middle-east', 'type' => 'parking'],
         ['number' => 'PARKING-SOUTH-WEST', 'gender' => 'unisex', 'svg_id' => 'facility-parking-south-west', 'type' => 'parking'],
