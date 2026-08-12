@@ -7,6 +7,7 @@ use App\Filter\DateFilter;
 use App\Filter\ReportSearchFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Admin\ActionReportRequest;
+use App\Http\Resources\SystemUser\Admin\ReportDetailsResource;
 use App\Http\Resources\SystemUser\Admin\ReportResource;
 use App\Models\Report;
 use App\Services\SystemUser\Admin\ReportService;
@@ -47,7 +48,6 @@ class ReportController extends Controller
     #[QueryParameter('filter[status]', type: 'string', description: 'Filter by report status (exact match).')]
     #[QueryParameter('filter[created_date]', type: 'string', description: 'Filter by created date (mapped to created_at).')]
     #[QueryParameter('sort', type: 'string', description: 'Sort by created_at. Use -created_at for descending.')]
-    #[QueryParameter('include', 'Include related resources (reportable, reporter, resolvedBy)', required: false, type: 'string')]
     public function index(){
         $perPage = min(max(request()->integer('per_page', 15), 1), 100);
 
@@ -57,11 +57,19 @@ class ReportController extends Controller
                 AllowedFilter::custom('created_date', new DateFilter(), 'created_at'),
                 AllowedFilter::custom('search', new ReportSearchFilter())
             )
-            ->allowedIncludes('reportable', 'reporter', 'resolvedBy')
             ->allowedSorts('created_at')
             ->paginate($perPage);
 
         return successResponse(ReportResource::collection($reports));
+    }
+
+    /**
+     * show
+     */
+    public function show(Report $report){
+        $report->load('reportable', 'reporter', 'resolvedBy');
+
+        return successResponse(ReportDetailsResource::make($report));
     }
 
     /**
