@@ -95,9 +95,7 @@ class BoothController extends Controller
         $booths = Booth::with([
             'company',
             'hall',
-            'boothRequests' => function ($query) {
-                $query->where('status', 'APPROVED');
-            },
+            'latestBoothRequest',
             'boothRequests.attachedServices'
         ])
         ->where(function ($query) use ($userId) {

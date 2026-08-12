@@ -19,10 +19,7 @@ class CompanySummaryResource extends JsonResource
             'name' => $this->name,
             'business_sector' => $this->business_sector,
 
-            'logo' => $this->whenLoaded(
-                'logoMedia',
-                fn () => $this->getFirstMediaUrl('logo')
-            ),
+            'logo' => $this->getFirstMediaUrl('logo')
         ];
     }
 }
