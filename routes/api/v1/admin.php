@@ -89,7 +89,7 @@ Route::prefix('admin')->group(function () {
         Route::prefix('buses')->group(function(){
             Route::get('', [BusController::class, 'index']);
             Route::get('/{busCatalog}', [BusController::class, 'show']);
-            Route::post('/{busCatalog}', [BusController::class, 'create']);
+            Route::post('/', [BusController::class, 'create']);
             Route::patch('/{busCatalog}', [BusController::class, 'update']);
             Route::delete('/{busCatalog}', [BusController::class, 'destroy']);
         });

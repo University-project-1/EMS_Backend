@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\SystemUser\Admin;
 use Illuminate\Foundation\Http\FormRequest;
+use Log;
 
 class StoreBusCatalogRequest extends FormRequest
 {
@@ -10,6 +11,7 @@ class StoreBusCatalogRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        Log::info(00);
         return true;
     }
 
@@ -19,6 +21,7 @@ class StoreBusCatalogRequest extends FormRequest
      */
     public function rules(): array
     {
+        Log::info(3);
         return [
             'location'   => ['required', 'string', 'max:255'],
             'start_time' => ['required', 'date_format:H:i'],

@@ -13,6 +13,7 @@ use App\Http\Resources\Shared\BusCatalogResource;
 use App\Models\BusCatalog;
 use App\Services\SystemUser\Admin\BusCatalogService;
 use Dedoc\Scramble\Attributes\Group;
+use Dedoc\Scramble\Attributes\QueryParameter;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -23,6 +24,10 @@ class BusController extends Controller
         protected readonly BusCatalogService $busCatalogService
     ){}
 
+    #[QueryParameter('filter[location]', 'Filter catalogs partially by location', required: false, type: 'string')]
+    #[QueryParameter('filter[start_time]', 'Filter by start time (From) e.g., 14:00', required: false, type: 'string')]
+    #[QueryParameter('filter[end_time]', 'Filter by end time (To) e.g., 18:00', required: false, type: 'string')]
+    #[QueryParameter('per_page', 'Number of items per page. Default: 5', required: false, type: 'integer')]
     /**
      * all
      */
@@ -49,7 +54,7 @@ class BusController extends Controller
     public function create(StoreBusCatalogRequest $request){
         $dto = BusCatalogDTO::fromRequest($request->validated());
         $bus = $this->busCatalogService->create($dto);
-        return successResponse(new BusCatalog($bus));
+        return successResponse(new BusCatalogResource($bus));
     }
     /**
      * update
@@ -57,7 +62,7 @@ class BusController extends Controller
     public function update(BusCatalog $busCatalog, UpdateBusCatalogRequest $request){
         $dto = UpdateBusCatalogDTO::fromRequest($request->validated());
         $bus = $this->busCatalogService->update($busCatalog, $dto);
-        return successResponse(new BusCatalog($bus));
+        return successResponse(new BusCatalogResource($bus));
     }
     /**
      * delete
