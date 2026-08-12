@@ -6,9 +6,11 @@ use App\Enum\Status;
 use App\Models\Company;
 use App\Models\Event;
 use App\Models\EventHall;
+use App\Notifications\SystemUser\Exhibitor\EventApprovedNotification;
 use App\Services\Shared\QrCodeService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -16,7 +18,8 @@ class EventRequestService
 {
     public function __construct(
         private QrCodeService $qrCodeService
-    ){}
+    ) {}
+
     public function getConflictingRequests(Event $event): LengthAwarePaginator
     {
         return Event::query()
@@ -68,6 +71,19 @@ class EventRequestService
                 ->where('start_at', '<', $event->end_at)
                 ->where('end_at', '>', $event->start_at)
                 ->update(['status' => Status::REJECTED]);
+
+            DB::afterCommit(function () use ($event): void {
+                $event->loadMissing('eventable');
+
+                $recipients = $event->eventable instanceof Company
+                    ? $event->eventable->systemUsers
+                    : collect([$event->eventable]);
+
+                Notification::send(
+                    $recipients->filter()->unique('id'),
+                    new EventApprovedNotification($event)
+                );
+            });
         });
     }
 

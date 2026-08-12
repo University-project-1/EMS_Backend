@@ -119,6 +119,7 @@ Route::prefix('admin')->group(function () {
         //reports
         Route::prefix('reports')->group(function(){
             Route::get('/statistics', [ReportController::class, 'statistics']);
+            Route::get('{report}', [ReportController::class, 'show']);
             Route::get('/', [ReportController::class, 'index']);
             Route::post('/{report}/resolved', [ReportController::class, 'resolved']);
             Route::post('/{report}/rejected', [ReportController::class, 'rejected']);
