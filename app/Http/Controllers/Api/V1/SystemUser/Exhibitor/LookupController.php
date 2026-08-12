@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\SystemUser\Exhibitor;
 
+use App\Enum\Status;
 use App\Filter\AccessibleBoothsFilter;
 use App\Filter\AccessibleCompaniesFilter;
 use App\Filter\LookupSearchFilter;
@@ -30,7 +31,7 @@ class LookupController extends Controller
         $user = Auth::guard('system')->user();
 
         $companies = Cache::remember("lookup_companies_user_{$user->id}", now()->addMinutes(15), function () use ($user) {
-            $baseQuery = Company::query();
+            $baseQuery = Company::query()->where('status', '=!', Status::REJECTED);
             (new AccessibleCompaniesFilter($user))($baseQuery, null, '');
 
             $models = QueryBuilder::for($baseQuery)
