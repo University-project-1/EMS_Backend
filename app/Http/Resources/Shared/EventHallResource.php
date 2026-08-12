@@ -17,6 +17,7 @@ class EventHallResource extends JsonResource
         return [
             'id' => $this->id,
             'number' => $this->number,
+            'svg_id' => $this->svg_id,
             'area' => $this->area,
             'price_per_hour' => $this->price_per_hour,
             'events' => EventResource::collection($this->whenLoaded('events')),
