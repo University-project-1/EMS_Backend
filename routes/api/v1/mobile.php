@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Mobile\ReportController;
 use App\Http\Controllers\Api\V1\Mobile\ReviewController;
 use App\Http\Controllers\Api\V1\Mobile\SavedController;
 use App\Http\Controllers\Api\V1\Shared\EventHallController;
+use App\Http\Controllers\Api\V1\Shared\FaciltyController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\Shared\NotificationController;
@@ -92,6 +93,12 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::get('/{hall}', [HallController::class, 'show']);
     });
 
+    // facilities
+    Route::prefix('facilities')->group(function(){
+        Route::get('', [FaciltyController::class, 'index']);
+        Route::get('/{facility}', [FaciltyController::class, 'show']);
+    });
+
     // saved
     Route::prefix('saved')->group(function () {
         Route::post('events/{event}', [SavedController::class, 'toggleEvent']);
@@ -109,7 +116,7 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
         Route::delete('{review}', [ReviewController::class, 'destroy']);
     });
-    
+
     // leads
     Route::prefix('leads')->group(function(){
         Route::post('/', [LeadController::class, 'store']);
@@ -128,7 +135,7 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::delete('/{notification}', [NotificationController::class, 'destroy'])
             ->name('visitor.notifications.destroy')->defaults('guardName', 'mobile');
     });
-  
+
     // bus catalog
     Route::get('bus-catalog', [BusCatalogController::class, 'index'])->name('visitor.bus_catalog.index');
 
