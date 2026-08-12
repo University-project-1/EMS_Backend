@@ -57,7 +57,7 @@ class EventApprovedNotification extends Notification implements FcmNotification,
         return [
             'notification' => [
                 'title' => __('notifications.event_approved_title'),
-                'body' => __('notifications.event_approved_body'),
+                'body' => __('notifications.event_approved_body', ['title' => $this->event->title]),
             ],
             'data' => [
                 'type' => 'event_approved',

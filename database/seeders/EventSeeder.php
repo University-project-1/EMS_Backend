@@ -125,7 +125,9 @@ class EventSeeder extends Seeder
             ],
         ];
 
-        foreach ($events as $eventData) {
+        $eventAssets = ['alawael.png', 'Elba3eth.png', 'RBCs.png', 'RGBs.jpg', 'wasem.png'];
+
+        foreach ($events as $index => $eventData) {
             $startAt = $eventData['start_at'];
             $eventable = $eventData['eventable'];
             $speakers = $eventData['speakers'];
@@ -160,7 +162,23 @@ class EventSeeder extends Seeder
             }
 
             $this->syncQrCodeMedia($event);
+            $this->syncEventImage(
+                $event,
+                $eventAssets[$index % count($eventAssets)]
+            );
         }
+    }
+
+    private function syncEventImage(Event $event, string $asset): void
+    {
+        $assetPath = database_path('assets/'.$asset);
+
+        if (! is_file($assetPath)) {
+            throw new \RuntimeException("Missing event image asset: {$asset}");
+        }
+
+        $event->clearMediaCollection('event-logo');
+        $event->copyMedia($assetPath)->toMediaCollection('event-logo');
     }
 
     private function syncQrCodeMedia(Event $event): void

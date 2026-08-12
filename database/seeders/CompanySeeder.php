@@ -250,5 +250,34 @@ class CompanySeeder extends Seeder
         if (is_file($companyKLogo)) {
             $companyK->copyMedia($companyKLogo)->toMediaCollection('logo');
         }
+
+        $galleryAssets = ['alawael.png', 'Elba3eth.png', 'elsaadeh.png', 'fawzy.jpg', 'RBCs.png', 'RGBs.jpg', 'wasem.png'];
+        $companies = [$companyA, $companyB, $companyC, $companyD, $companyE, $companyF, $companyG, $companyH, $companyI, $companyJ, $companyK];
+
+        foreach ($companies as $index => $company) {
+            $assetCount = count($galleryAssets);
+            $this->syncGallery($company, [
+                $galleryAssets[$index % $assetCount],
+                $galleryAssets[($index + 1) % $assetCount],
+            ]);
+        }
+    }
+
+    /**
+     * @param  array<int, string>  $assets
+     */
+    private function syncGallery(Company $company, array $assets): void
+    {
+        $company->clearMediaCollection('gallery');
+
+        foreach ($assets as $asset) {
+            $assetPath = database_path('assets/'.$asset);
+
+            if (! is_file($assetPath)) {
+                throw new \RuntimeException("Missing company gallery asset: {$asset}");
+            }
+
+            $company->copyMedia($assetPath)->toMediaCollection('gallery');
+        }
     }
 }
