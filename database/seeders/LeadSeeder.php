@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\Event;
 use App\Models\Lead;
@@ -28,12 +29,12 @@ class LeadSeeder extends Seeder
         $booths = Booth::query()
             ->whereNotNull('company_id')
             ->whereNotNull('qr_token')
-            ->whereHas('company', fn ($query) => $query->where('status', 'approved'))
+            ->whereHas('company', fn ($query) => $query->where('status', Status::APPROVED))
             ->get()
             ->keyBy('number');
 
         $events = Event::query()
-            ->where('status', 'approved')
+            ->where('status', Status::APPROVED)
             ->whereNotNull('qr_token')
             ->get()
             ->keyBy('title');
