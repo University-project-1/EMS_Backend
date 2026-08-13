@@ -4986,6 +4986,14 @@
                         }
                     },
                     {
+                        "name": "filter[title]",
+                        "in": "query",
+                        "description": "Search by partial title",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "filter[date]",
                         "in": "query",
                         "description": "Filter events overlapping the selected day (Y-m-d)",
