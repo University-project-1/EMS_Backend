@@ -26,7 +26,6 @@ return new class extends Migration
 
             $table->index([
                 'event_hall_id',
-                'type',
                 'status',
                 'start_at',
                 'end_at',

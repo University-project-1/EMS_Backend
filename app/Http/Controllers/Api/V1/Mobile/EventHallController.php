@@ -15,7 +15,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedInclude;
 use Spatie\QueryBuilder\QueryBuilder;
 
-#[Group('EventHall')]
+#[Group('Visitor/EventHall')]
 class EventHallController extends Controller
 {
     /**

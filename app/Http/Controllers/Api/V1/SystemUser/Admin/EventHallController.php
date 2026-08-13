@@ -17,7 +17,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedInclude;
 use Spatie\QueryBuilder\QueryBuilder;
 
-#[Group('SystemUser/Admi/EventHall')]
+#[Group('SystemUser/Admin/EventHall')]
 class EventHallController extends Controller
 {
     public function __construct(protected EventHallService $eventHallService){}
