@@ -23,6 +23,7 @@ class EventController extends Controller
      * all
      */
     #[QueryParameter('filter[type]', 'Filter events by exact type', required: false, type: 'string')]
+    #[QueryParameter('filter[title]', 'Search by partial title', required: false, type: 'string')]
     #[QueryParameter('filter[date]', 'Filter events overlapping the selected day (Y-m-d)', required: false, type: 'string')]
     #[QueryParameter('filter[saved]', 'Filter by the authenticated visitor schedule', required: false, type: 'boolean')]
     #[QueryParameter('per_page', 'Number of events per page (maximum 100)', required: false, type: 'integer')]
@@ -36,6 +37,7 @@ class EventController extends Controller
         )
             ->allowedFilters(
                 AllowedFilter::exact('type'),
+                AllowedFilter::partial('title'),
                 AllowedFilter::custom('date', new EventDateFilter),
                 AllowedFilter::callback('saved', function (Builder $query, mixed $value) use ($user): void {
                     $savedByUser = fn (Builder $savedItems): Builder => $savedItems->where('user_id', $user->getKey());
