@@ -10,19 +10,21 @@ use App\Models\BoothRequest;
 use App\Models\Company;
 use App\Models\Service;
 use App\Models\SystemUser;
+use App\Notifications\SystemUser\Admin\NewBookingRequestNotification;
+use App\Services\Shared\NotificationRecipientResolver;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class BoothRequestService
 {
-    /**
-     * Create a new class instance.
-     */
     public function __construct(
         public readonly CompanyService $companyService,
-    ){}
+        private readonly NotificationRecipientResolver $notificationRecipients,
+    ) {}
 
-    public function confirmBoothBooking(SystemUser $user, BoothRequestDTO $bookingDTO, ?CompanyDTO $companyDTO){
-        return DB::transaction(function() use ($user, $bookingDTO, $companyDTO){
+    public function confirmBoothBooking(SystemUser $user, BoothRequestDTO $bookingDTO, ?CompanyDTO $companyDTO)
+    {
+        return DB::transaction(function () use ($user, $bookingDTO, $companyDTO) {
             Service::lockForUpdate();
             $booth = Booth::findOrFail($bookingDTO->boothId);
             $company = $bookingDTO->companyId ? Company::findOrFail($bookingDTO->companyId)
@@ -32,15 +34,22 @@ class BoothRequestService
                 'system_user_id' => $user->id,
                 'booth_id' => $booth->id,
                 'company_id' => $company->id,
-                'reason_for_booking' =>$bookingDTO->reasonForBooking,
+                'reason_for_booking' => $bookingDTO->reasonForBooking,
                 'status' => Status::PENDING,
                 'final_price' => 0,
             ]);
-            $servicesCost = $bookingDTO->services ? $this->attachServices($boothRequest, $bookingDTO->services) : 0 ;
+            $servicesCost = $bookingDTO->services ? $this->attachServices($boothRequest, $bookingDTO->services) : 0;
 
             $boothRequest->update(['final_price' => $booth->price + $servicesCost]);
 
-            return $boothRequest->load(['services', 'company.logoMedia', 'company.galleryMedia']);;
+            DB::afterCommit(function () use ($boothRequest): void {
+                Notification::send(
+                    $this->notificationRecipients->admins(),
+                    new NewBookingRequestNotification($boothRequest),
+                );
+            });
+
+            return $boothRequest->load(['services', 'company.logoMedia', 'company.galleryMedia']);
         });
     }
 

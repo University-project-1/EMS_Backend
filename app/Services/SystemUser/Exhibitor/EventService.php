@@ -8,15 +8,18 @@ use App\Enum\Status;
 use App\Models\Company;
 use App\Models\Event;
 use App\Models\SystemUser;
+use App\Notifications\SystemUser\Admin\NewBookingRequestNotification;
+use App\Services\Shared\NotificationRecipientResolver;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class EventService
 {
-    /**
-     * Create a new class instance.
-     */
-    public function __construct(public readonly CompanyService $companyService) {}
+    public function __construct(
+        public readonly CompanyService $companyService,
+        private readonly NotificationRecipientResolver $notificationRecipients,
+    ) {}
 
     public function store(SystemUser $user, EventDTO $dto, ?CompanyDTO $companyDto): Event
     {
@@ -56,6 +59,13 @@ class EventService
             if ($dto->logo !== null) {
                 $event->addMedia($dto->logo)->toMediaCollection('event-logo');
             }
+
+            DB::afterCommit(function () use ($event): void {
+                Notification::send(
+                    $this->notificationRecipients->admins(),
+                    new NewBookingRequestNotification($event),
+                );
+            });
 
             return $event->load('media', 'speakers', 'eventable');
         });
