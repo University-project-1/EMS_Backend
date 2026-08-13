@@ -25,7 +25,7 @@ class VisitorResource extends JsonResource
             'birthday' => $this->birthday,
             'gender' => $this->gender,
             'created_at' => $this->created_at,
-            'avatar' => $this->getFirstMediaUrl('avatar') ?: null,
+            'avatar' => $this->getFirstMediaUrl('user-avatars') ?: null,
         ];
     }
 }
