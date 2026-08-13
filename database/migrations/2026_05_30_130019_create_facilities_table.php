@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('number')->unique();
             $table->string('gender');
             $table->string('svg_id')->nullable();
-            $table->string('type'); // mosque bathroom ...
+            $table->string('type');
         });
     }
 

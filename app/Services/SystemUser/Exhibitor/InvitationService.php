@@ -51,7 +51,12 @@ class InvitationService
                 throw new HttpException(404, __('errors.user_not_found'));
             }
 
-            $lockedInvitation->inviteable->systemUsers()->syncWithoutDetaching([$user->id]);
+            $lockedInvitation->inviteable->systemUsers()->syncWithoutDetaching([
+                $user->id => [
+                    'assigned_by' => $lockedInvitation->sender_id,
+                    'created_at' => now()
+                ],
+            ]);
             $lockedInvitation->update(['status' => Status::APPROVED]);
         });
     }
@@ -61,6 +66,7 @@ class InvitationService
         $this->check($invitation);
         $invitation->update(['status' => Status::REJECTED]);
     }
+
     public function delete(Invitation $invitation): void
     {
         DB::transaction(function () use ($invitation) {
@@ -87,6 +93,7 @@ class InvitationService
 
         return $invitation;
     }
+
     public function check(Invitation $invitation): bool
     {
         if (! $invitation->isValid()) {

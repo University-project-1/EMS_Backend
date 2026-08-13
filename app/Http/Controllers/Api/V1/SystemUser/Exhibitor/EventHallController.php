@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Shared;
+namespace App\Http\Controllers\Api\V1\SystemUser\Exhibitor;
 
 use App\Enum\Status;
 use App\Filter\MaxFilter;
@@ -8,16 +8,19 @@ use App\Filter\MinFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Shared\EventHallResource;
 use App\Models\EventHall;
+use App\Services\SystemUser\Admin\EventHallService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedInclude;
 use Spatie\QueryBuilder\QueryBuilder;
 
-#[Group('EventHall')]
+#[Group('SystemUser/Exhibitor/EventHall')]
 class EventHallController extends Controller
 {
-    /**
+    public function __construct(protected EventHallService $eventHallService){}
+
+        /**
      * all event halls
      */
     #[QueryParameter('filter[number]', 'Filter by hall number', required: false, type: 'string')]
@@ -38,9 +41,7 @@ class EventHallController extends Controller
                 AllowedFilter::custom('max_price', new MaxFilter, 'price_per_hour'),
             )
             ->allowedIncludes(
-                AllowedInclude::callback(
-                    'events',
-                    fn ($events) => $events
+                    AllowedInclude::callback('events', fn ($events) => $events
                         ->where('status', Status::APPROVED->value)
                         ->with('media'),
                 ),

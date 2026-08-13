@@ -152,58 +152,58 @@ class CompanySeeder extends Seeder
         $elza3eem = SystemUser::where('name', 'Elza3eem')->firstOrFail();
 
         $companyA->systemUsers()->syncWithoutDetaching([
-            $elcoach->id,
-            $fawzy->id,
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
         ]);
 
         $companyB->systemUsers()->syncWithoutDetaching([
-            $elza3eem->id,
-            $elcoach->id,
+            $elza3eem->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $elcoach->id, 'created_at' => now()],
         ]);
 
         $companyC->systemUsers()->syncWithoutDetaching([
-            $fawzy->id,
-            $elcoach->id,
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
         ]);
 
         $companyD->systemUsers()->syncWithoutDetaching([
-            $elcoach->id,
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
         ]);
 
         $companyE->systemUsers()->syncWithoutDetaching([
-            $elza3eem->id,
-            $elcoach->id,
+            $elza3eem->id => ['assigned_by' => $elcoach->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
         ]);
 
         $companyF->systemUsers()->syncWithoutDetaching([
-            $fawzy->id,
-            $elcoach->id,
-            $elza3eem->id,
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elza3eem->id => ['assigned_by' => $elcoach->id, 'created_at' => now()],
         ]);
 
         $companyG->systemUsers()->syncWithoutDetaching([
-            $elcoach->id,
-            $fawzy->id,
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
         ]);
 
         $companyH->systemUsers()->syncWithoutDetaching([
-            $elza3eem->id,
-            $elcoach->id,
+            $elza3eem->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $elcoach->id, 'created_at' => now()],
         ]);
 
         $companyI->systemUsers()->syncWithoutDetaching([
-            $fawzy->id,
-            $elza3eem->id,
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elza3eem->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
         ]);
 
         $companyJ->systemUsers()->syncWithoutDetaching([
-            $elcoach->id,
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
         ]);
 
         $companyK->systemUsers()->syncWithoutDetaching([
-            $fawzy->id,
-            $elcoach->id,
-            $elza3eem->id,
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elza3eem->id => ['assigned_by' => $elcoach->id, 'created_at' => now()],
         ]);
 
         $companyALogo = database_path('assets/alawael.png');

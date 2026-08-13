@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Api\V1\SystemUser\Admin;
 
 use App\DTOs\SystemUser\BusCatalogDTO;
 use App\DTOs\SystemUser\UpdateBusCatalogDTO;
-use App\Filter\FromDateFilter;
-use App\Filter\ToDateFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Admin\StoreBusCatalogRequest;
 use App\Http\Requests\SystemUser\Admin\UpdateBusCatalogRequest;
@@ -14,7 +12,6 @@ use App\Models\BusCatalog;
 use App\Services\SystemUser\Admin\BusCatalogService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 #[Group('SystemUser/Admin/Buses')]
@@ -25,18 +22,13 @@ class BusController extends Controller
     ){}
 
     #[QueryParameter('filter[location]', 'Filter catalogs partially by location', required: false, type: 'string')]
-    #[QueryParameter('filter[start_time]', 'Filter by start time (From) e.g., 14:00', required: false, type: 'string')]
-    #[QueryParameter('filter[end_time]', 'Filter by end time (To) e.g., 18:00', required: false, type: 'string')]
     #[QueryParameter('per_page', 'Number of items per page. Default: 5', required: false, type: 'integer')]
     /**
      * all
      */
     public function index(){
         $catalog = QueryBuilder::for(BusCatalog::class)
-            ->allowedFilters('location',
-                AllowedFilter::custom('start_time', new FromDateFilter(),'start_time'),
-                AllowedFilter::custom('end_time', new ToDateFilter(), 'end_time')
-            )
+            ->allowedFilters('location')
             ->defaultSort('location')
             ->paginate(Request()->query('per_page', 5));
 

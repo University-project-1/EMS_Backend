@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AnnouncementController;
-use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FaciltyController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
@@ -10,6 +9,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventHallController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\InvitationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\LeadController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\LookupController;
@@ -39,7 +39,7 @@ Route::prefix('exhibitor')->group(function () {
     Route::middleware(['auth:system', 'verified'])->group(function () {
         // store fcm token
         Route::post('fcm/register-token', [FCMController::class, 'store'])
-            ->defaults('guardName', 'web')->name('exhibitor.fcm.store');
+            ->defaults('guardName', 'system')->name('exhibitor.fcm.store');
 
         Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('throttle:password_update');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');

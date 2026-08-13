@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\V1\Shared\EventHallController;
 use App\Http\Controllers\Api\V1\Shared\FaciltyController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
@@ -11,7 +10,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BusController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\CompanyDirectoryController;
-use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController as AdminEventHallController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ManagerDirectoryController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ReportController;
@@ -29,7 +28,7 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth:system', 'type.admin'])->group(function () {
         // store fcm token
         Route::post('fcm/register-token', [FCMController::class, 'store'])
-            ->defaults('guardName', 'web')->name('admin.fcm.store');
+            ->defaults('guardName', 'system')->name('admin.fcm.store');
 
         Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('throttle:password_update');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -105,7 +104,7 @@ Route::prefix('admin')->group(function () {
         Route::prefix('eventHall/')->group(function () {
             Route::get('', [EventHallController::class, 'index'])->name('admin.event_halls.index');
             Route::get('{eventHall}', [EventHallController::class, 'show'])->name('admin.event_halls.show');
-            Route::patch('{eventHall}', [AdminEventHallController::class, 'update']);
+            Route::patch('{eventHall}', [EventHallController::class, 'update']);
         });
 
         // event request
