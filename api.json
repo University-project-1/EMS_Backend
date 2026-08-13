@@ -152,14 +152,6 @@
                         }
                     },
                     {
-                        "name": "filter[booked]",
-                        "in": "query",
-                        "description": "Filter booths by booking status",
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    },
-                    {
                         "name": "include",
                         "in": "query",
                         "description": "Include events relationship",
@@ -297,14 +289,6 @@
                         }
                     },
                     {
-                        "name": "filter[booked]",
-                        "in": "query",
-                        "description": "Filter booths by booking status",
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    },
-                    {
                         "name": "include",
                         "in": "query",
                         "description": "Include events relationship",
@@ -413,14 +397,6 @@
                         "description": "Filter by hall number",
                         "schema": {
                             "type": "string"
-                        }
-                    },
-                    {
-                        "name": "filter[booked]",
-                        "in": "query",
-                        "description": "Filter booths by booking status",
-                        "schema": {
-                            "type": "boolean"
                         }
                     },
                     {

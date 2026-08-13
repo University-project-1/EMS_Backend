@@ -5,26 +5,37 @@ namespace App\Services\Mobile;
 use App\DTOs\Mobile\ReportDTO;
 use App\Models\Booth;
 use App\Models\Event;
+use App\Notifications\SystemUser\Admin\NewReportNotification;
+use App\Services\Shared\NotificationRecipientResolver;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class ReportService
 {
-    public function store(ReportDTO $dto, Authenticatable $user){
-        $reportable_type = null;
-        $reportable_id = null;
-        if($dto->event_id){
-            $reportable_type = Event::class;
-            $reportable_id = $dto->event_id;
-        }elseif($dto->booth_id){
-            $reportable_type = Booth::class;
-            $reportable_id = $dto->booth_id;
-        }
+    public function __construct(private readonly NotificationRecipientResolver $notificationRecipients) {}
 
-        $user->reports()->create([
-            'reportable_type' => $reportable_type,
-            'reportable_id' => $reportable_id,
-            'title' => $dto->title,
-            'description' => $dto->description,
-        ]);
+    public function store(ReportDTO $dto, Authenticatable $user)
+    {
+        $reportableType = $dto->event_id ? Event::class : Booth::class;
+        $reportableId = $dto->event_id ?: $dto->booth_id;
+
+        return DB::transaction(function () use ($dto, $user, $reportableType, $reportableId) {
+            $report = $user->reports()->create([
+                'reportable_type' => $reportableType,
+                'reportable_id' => $reportableId,
+                'title' => $dto->title,
+                'description' => $dto->description,
+            ]);
+
+            DB::afterCommit(function () use ($report): void {
+                Notification::send(
+                    $this->notificationRecipients->admins(),
+                    new NewReportNotification($report)
+                );
+            });
+
+            return $report;
+        });
     }
 }
