@@ -48,7 +48,7 @@
             "name": "Facilities"
         },
         {
-            "name": "SystemUser/Admi/EventHall"
+            "name": "SystemUser/Admin/EventHall"
         },
         {
             "name": "SystemUser/Admin/EventRequests"
@@ -111,7 +111,7 @@
             "name": "Visitor/Companies"
         },
         {
-            "name": "EventHall"
+            "name": "Visitor/EventHall"
         },
         {
             "name": "Visitor/Events"
@@ -141,81 +141,6 @@
         }
     ],
     "paths": {
-        "/v1/visitor/eventHall": {
-            "get": {
-                "operationId": "visitor.event_halls.index",
-                "summary": "all event halls",
-                "tags": [
-                    "EventHall"
-                ],
-                "parameters": [
-                    {
-                        "name": "filter[number]",
-                        "in": "query",
-                        "description": "Filter by hall number",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include events relationship",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "sort",
-                        "in": "query",
-                        "description": "Sort by number, area or price_per_hour",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            }
-        },
-        "/v1/visitor/eventHall/{eventHall}": {
-            "get": {
-                "operationId": "visitor.event_halls.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'event_halls' order by ordinal_position asc)",
-                "summary": "show",
-                "tags": [
-                    "EventHall"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            }
-        },
         "/v1/admin/facilities": {
             "get": {
                 "operationId": "v1.shared.facilty.index_0",
@@ -1212,143 +1137,6 @@
                 }
             }
         },
-        "/v1/admin/eventHall": {
-            "get": {
-                "operationId": "admin.event_halls.index",
-                "summary": "all event halls",
-                "tags": [
-                    "SystemUser/Admi/EventHall"
-                ],
-                "parameters": [
-                    {
-                        "name": "filter[number]",
-                        "in": "query",
-                        "description": "Filter by hall number",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "include",
-                        "in": "query",
-                        "description": "Include events relationship",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "sort",
-                        "in": "query",
-                        "description": "Sort by number, area or price_per_hour",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "filter[min_area]",
-                        "in": "query",
-                        "description": "Minimum area",
-                        "schema": {
-                            "type": "object"
-                        },
-                        "x-deepObject-style": "qs"
-                    },
-                    {
-                        "name": "filter[max_area]",
-                        "in": "query",
-                        "description": "Maximum area",
-                        "schema": {
-                            "type": "object"
-                        },
-                        "x-deepObject-style": "qs"
-                    },
-                    {
-                        "name": "filter[min_price]",
-                        "in": "query",
-                        "description": "Minimum price per hour",
-                        "schema": {
-                            "type": "object"
-                        },
-                        "x-deepObject-style": "qs"
-                    },
-                    {
-                        "name": "filter[max_price]",
-                        "in": "query",
-                        "description": "Maximum price per hour",
-                        "schema": {
-                            "type": "object"
-                        },
-                        "x-deepObject-style": "qs"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            }
-        },
-        "/v1/admin/eventHall/{eventHall}": {
-            "get": {
-                "operationId": "admin.event_halls.show",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'event_halls' order by ordinal_position asc)",
-                "summary": "show",
-                "tags": [
-                    "SystemUser/Admi/EventHall"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            },
-            "patch": {
-                "operationId": "eventHall.update",
-                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'event_halls' order by ordinal_position asc)",
-                "summary": "update",
-                "tags": [
-                    "SystemUser/Admi/EventHall"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    }
-                }
-            }
-        },
         "/v1/admin/announcements": {
             "get": {
                 "operationId": "v1.systemUser.admin.announcement.index",
@@ -1660,6 +1448,7 @@
         "/v1/admin/booths/requests/stats": {
             "get": {
                 "operationId": "boothRequest.statistics",
+                "summary": "statistics",
                 "tags": [
                     "SystemUser/Admin/BoothRequests"
                 ],
@@ -2154,6 +1943,143 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/eventHall": {
+            "get": {
+                "operationId": "admin.event_halls.index",
+                "summary": "all event halls",
+                "tags": [
+                    "SystemUser/Admin/EventHall"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[number]",
+                        "in": "query",
+                        "description": "Filter by hall number",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include events relationship",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort by number, area or price_per_hour",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "filter[min_area]",
+                        "in": "query",
+                        "description": "Minimum area",
+                        "schema": {
+                            "type": "object"
+                        },
+                        "x-deepObject-style": "qs"
+                    },
+                    {
+                        "name": "filter[max_area]",
+                        "in": "query",
+                        "description": "Maximum area",
+                        "schema": {
+                            "type": "object"
+                        },
+                        "x-deepObject-style": "qs"
+                    },
+                    {
+                        "name": "filter[min_price]",
+                        "in": "query",
+                        "description": "Minimum price per hour",
+                        "schema": {
+                            "type": "object"
+                        },
+                        "x-deepObject-style": "qs"
+                    },
+                    {
+                        "name": "filter[max_price]",
+                        "in": "query",
+                        "description": "Maximum price per hour",
+                        "schema": {
+                            "type": "object"
+                        },
+                        "x-deepObject-style": "qs"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/eventHall/{eventHall}": {
+            "get": {
+                "operationId": "admin.event_halls.show",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'event_halls' order by ordinal_position asc)",
+                "summary": "show",
+                "tags": [
+                    "SystemUser/Admin/EventHall"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "eventHall.update",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'event_halls' order by ordinal_position asc)",
+                "summary": "update",
+                "tags": [
+                    "SystemUser/Admin/EventHall"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             }
@@ -4896,6 +4822,81 @@
                 "summary": "show",
                 "tags": [
                     "Visitor/Companies"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/visitor/eventHall": {
+            "get": {
+                "operationId": "visitor.event_halls.index",
+                "summary": "all event halls",
+                "tags": [
+                    "Visitor/EventHall"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[number]",
+                        "in": "query",
+                        "description": "Filter by hall number",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Include events relationship",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort by number, area or price_per_hour",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/visitor/eventHall/{eventHall}": {
+            "get": {
+                "operationId": "visitor.event_halls.show",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'event_halls' order by ordinal_position asc)",
+                "summary": "show",
+                "tags": [
+                    "Visitor/EventHall"
                 ],
                 "responses": {
                     "200": {
