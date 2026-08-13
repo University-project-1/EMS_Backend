@@ -5,7 +5,8 @@ namespace App\Services\SystemUser\Admin;
 use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\BoothRequest;
-use App\Notifications\SystemUser\Exhibitor\BoothApprovedNotification;
+use App\Notifications\SystemUser\Exhibitor\BoothRequestStatusNotification;
+use App\Services\Shared\NotificationRecipientResolver;
 use App\Services\Shared\QrCodeService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -18,7 +19,8 @@ class BoothRequestService
      * Create a new class instance.
      */
     public function __construct(
-        private readonly QrCodeService $qrCodeService
+        private readonly QrCodeService $qrCodeService,
+        private readonly NotificationRecipientResolver $notificationRecipients,
     ) {}
 
     public function getConflictingRequests(BoothRequest $request)
@@ -32,7 +34,7 @@ class BoothRequestService
 
     public function approve(BoothRequest $boothRequest)
     {
-        if ($boothRequest->status !== Status::PENDING) {
+        if ($boothRequest->status !== Status::PENDING->value) {
             throw new HttpException(400, __('validation.invalid_status'));
         }
 
@@ -62,23 +64,28 @@ class BoothRequestService
                 ->toMediaCollection('qr_code');
         });
 
-        $usersToNotify = $boothRequest->company->systemUsers;
-
-        if (! $usersToNotify->contains('id', $boothRequest->system_user_id)) {
-            $usersToNotify->push($boothRequest->systemUser);
-        }
-
-        Notification::send($usersToNotify->unique('id'), new BoothApprovedNotification($boothRequest));
+        Notification::send($this->notificationRecipients->boothRequestRecipients($boothRequest), new BoothRequestStatusNotification($boothRequest, Status::APPROVED));
 
         return $boothRequest;
     }
 
     public function reject(BoothRequest $boothRequest)
     {
-        if ($boothRequest->status !== Status::PENDING) {
+        if ($boothRequest->status !== Status::PENDING->value) {
             throw new HttpException(400, __('validation.invalid_status'));
         }
 
-        return $boothRequest->update(['status' => Status::REJECTED]);
+        return DB::transaction(function () use ($boothRequest) {
+            $updated = $boothRequest->update(['status' => Status::REJECTED]);
+
+            DB::afterCommit(function () use ($boothRequest): void {
+                Notification::send(
+                    $this->notificationRecipients->boothRequestRecipients($boothRequest),
+                    new BoothRequestStatusNotification($boothRequest, Status::REJECTED)
+                );
+            });
+
+            return $updated;
+        });
     }
 }
