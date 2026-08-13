@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('booths', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('hall_id')->constrained('halls');
-            $table->foreignId('company_id')->nullable()->constrained('companies')->nullOnDelete();
+            $table->foreignId('company_id')->index()->nullable()->constrained('companies')->nullOnDelete();
             $table->string('qr_token')->nullable()->unique();
             $table->string('number');
             $table->float('area');

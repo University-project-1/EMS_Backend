@@ -25,10 +25,18 @@ class BoothRequestController extends Controller
     public function statistics()
     {
         $stats = Cache::remember('admin_bootRequests_stat', 600, function () {
+            $stats = BoothRequest::query()
+                ->selectRaw('COUNT(*) AS total_requests')
+                ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS pending_requests', [Status::PENDING->value])
+                ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS approved_requests', [Status::APPROVED->value])
+                ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS rejected_requests', [Status::REJECTED->value])
+                ->first();
+
             return [
-                'total_requests' => BoothRequest::count(),
-                'pending_requests' => BoothRequest::where('status', Status::PENDING->value)->count(),
-                'approved_requests' => BoothRequest::where('status', Status::APPROVED->value)->count(),
+                'total_requests' => (int) $stats->total_requests,
+                'pending_requests' => (int) $stats->pending_requests,
+                'approved_requests' => (int) $stats->approved_requests,
+                'rejected_requests' => (int) $stats->rejected_requests,
             ];
         });
 

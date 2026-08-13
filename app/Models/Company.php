@@ -33,7 +33,7 @@ class Company extends Model implements HasMedia
 
     public function systemUsers(): BelongsToMany
     {
-        return $this->belongsToMany(SystemUser::class, 'company_system_users');
+        return $this->belongsToMany(SystemUser::class, 'company_system_users')->withPivot('assigned_by');
     }
 
     public function booths(): HasMany
@@ -51,7 +51,8 @@ class Company extends Model implements HasMedia
         return $this->morphMany(Event::class, 'eventable');
     }
 
-    public function invitations() : MorphMany{
+    public function invitations(): MorphMany
+    {
         return $this->morphMany(Invitation::class, 'inviteable');
     }
 

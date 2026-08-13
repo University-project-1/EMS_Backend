@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('bus_catalogs', function (Blueprint $table): void {
             $table->id();
-            $table->string('location');
+            $table->string('location')->index();
             $table->time('start_time');
             $table->time('end_time');
             $table->integer('duration');

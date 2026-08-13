@@ -12,6 +12,8 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('system_user_id')->constrained('system_users')->cascadeOnDelete();
             $table->primary(['company_id', 'system_user_id']);
+            $table->foreignId('assigned_by')->nullable()->constrained('system_users')->nullOnDelete();
+            $table->timestamp('created_at');
         });
     }
     public function down(): void
