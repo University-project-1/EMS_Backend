@@ -24,8 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->alias(['type.admin' => EnsureUserIsAdmin::class]);
-        $middleware->alias(['type.exhibitor' => EnsureUserIsExhibitor::class]);
+        $middleware->alias([
+            'type.admin' => EnsureUserIsAdmin::class, 
+            'type.exhibitor' => EnsureUserIsExhibitor::class
+        ]);
         $middleware->api([
             'ApiLocalization' => ApiLocalization::class,
         ]);
