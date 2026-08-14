@@ -12,7 +12,7 @@ class BoothRequestServiceResource extends JsonResource
         return [
             'id' => $this->id,
             'service_id' => $this->service_id,
-            'service_name' => $this->whenLoaded('service', fn() => $this->service->name),
+            'service_name' => $this->service->name,
             'quantity' => $this->quantity,
             'unit_price' => (float) $this->unit_price,
             'total_price' => (float) ($this->quantity * $this->unit_price),
