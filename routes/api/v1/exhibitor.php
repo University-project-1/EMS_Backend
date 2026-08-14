@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AnnouncementController;
 use App\Http\Controllers\Api\V1\Shared\FaciltyController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\Shared\NotificationController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AnnouncementController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
@@ -25,10 +25,11 @@ Route::prefix('exhibitor')->group(function () {
     Route::get('invitations/{invitation:token}', [InvitationController::class, 'show']);
     Route::post('register/{invitation:token}', [AuthController::class, 'registerViaInvite']);
     Route::post('/email/resend-verification', [AuthController::class, 'resendVerificationEmail'])
-        ->middleware(['auth:system', 'throttle:verify_otp']);
+        ->middleware(['auth:system', 'type.exhibitor', 'throttle:verify_otp']);
     Route::post('/auth/system/google', [AuthController::class, 'googleAuth']);
     Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
-    Route::get('/auth/status', [AuthController::class, 'checkStatus'])->middleware('auth:system');
+    Route::get('/auth/status', [AuthController::class, 'checkStatus'])
+        ->middleware(['auth:system', 'type.exhibitor']);
 
     Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->middleware('throttle:forgot_password');
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
@@ -36,7 +37,7 @@ Route::prefix('exhibitor')->group(function () {
     // nearest events
     Route::get('events/nearest', [EventController::class, 'nearest'])->name('exhibitor.events.nearest');
 
-    Route::middleware(['auth:system', 'verified'])->group(function () {
+    Route::middleware(['auth:system', 'type.exhibitor', 'verified'])->group(function () {
         // store fcm token
         Route::post('fcm/register-token', [FCMController::class, 'store'])
             ->defaults('guardName', 'system')->name('exhibitor.fcm.store');
@@ -71,7 +72,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::post('/{company}/invitations', [InvitationController::class, 'storeForCompany']);
         });
 
-        //lookups
+        // lookups
         Route::prefix('lookup')->group(function () {
             Route::get('/booths', [LookupController::class, 'booths'])->name('exhibitor.lookup.booths');
             Route::get('/events', [LookupController::class, 'events'])->name('exhibitor.lookup.events');
@@ -89,7 +90,7 @@ Route::prefix('exhibitor')->group(function () {
         Route::get('announcements', [AnnouncementController::class, 'index']);
         Route::get('services', [ServiceController::class, 'index']);
 
-        Route::prefix('leads')->group(function(){
+        Route::prefix('leads')->group(function () {
             Route::get('/booths/{booth}', [LeadController::class, 'boothLeads']);
             Route::get('/events/{event}', [LeadController::class, 'eventLeads']);
         });
@@ -101,7 +102,7 @@ Route::prefix('exhibitor')->group(function () {
         });
 
         // facilities
-        Route::prefix('facilities')->group(function(){
+        Route::prefix('facilities')->group(function () {
             Route::get('', [FaciltyController::class, 'index']);
             Route::get('/{facility}', [FaciltyController::class, 'show']);
         });
@@ -129,10 +130,9 @@ Route::prefix('exhibitor')->group(function () {
         });
 
         // reviews
-        Route::prefix('reviews')->group(function(){
-            Route::get('event/{event}',[ReviewController::class,'eventReviews']);
-            Route::get('booht/{booth}',[ReviewController::class,'boothReviews']);
+        Route::prefix('reviews')->group(function () {
+            Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
+            Route::get('booht/{booth}', [ReviewController::class, 'boothReviews']);
         });
     });
 });
-

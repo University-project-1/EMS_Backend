@@ -4643,7 +4643,7 @@
                         "required": true,
                         "description": "The event ID",
                         "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     }
                 ],

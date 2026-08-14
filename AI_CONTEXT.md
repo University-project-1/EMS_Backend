@@ -1,1305 +1,696 @@
-# EMS Backend: Comprehensive AI Handover Document
-
-**Last Updated:** 2026-07-11
-**Status:** Functional Implementation (Auth/Profile, Admin Booths/BoothRequests/Services CRUD, Exhibitor Booth Booking, Team Invitations & Cancellation, Admin Companies & Managers Directories, and Visitor Booth/Hall lists are live. Event management pending).
-**Laravel Version:** 13.7  
-**PHP Version:** 8.3+  
-
----
-
-## 1. Project Overview
-
-**Exhibition Management System (EMS) Backend** is a Laravel REST API for managing events, exhibitions, booths, and visitor interactions.
-
-**Three user types:**
-- **Visitor (`User` model):** Mobile app users viewing exhibitions and events
-- **Admin (`SystemUser` type=`admin`):** System administrators
-- **Exhibitor (`SystemUser` type=`exhibitor`):** Companies managing booths and events
-
-**Current Maturity:**
-- ✅ Complete: Authentication (OTP, email verification, Google OAuth2), registration, profile management, FCM push tokens, rate limiting.
-- ✅ Complete: Admin Booths, Booth Requests (booking approvals & rejections, conflict detection, stats), and Services CRUD endpoints.
-- ✅ Complete: Exhibitor Booth booking & request workflow, and Team Invitations system (inviting system users to booths/companies, canceling invitations).
-- ✅ Complete: Admin Companies & Managers Directories (paginated list, show details, directory/request stats).
-- ✅ Complete: Visitor/Visitor profile list & show endpoints for Booths & Halls with Spatie QueryBuilder filtering.
-- ✅ Complete: Model authorization policies (`BoothPolicy`, `CompanyPolicy`, `InvitationPolicy`, `SystemUserPolicy`) and `type.admin` middleware.
-- ❌ Missing: Event creation & attendance tracking, Company write CRUD (outside of booth request flow), Report/complaint resolutions, Reviews, and Visitor engagement tracking (leads/saved items).
-
-**API Documentation:** Available at `/docs/api` (Scramble-generated OpenAPI spec)
-
----
-
-## 2. Architecture Overview
-
-### 2.1 Core Design Patterns
-
-**Triple-Guard Authentication (Passport OAuth2):**
-- `mobile` guard: `User` model (mobile visitors)
-- `system` guard: `SystemUser` model (admins/exhibitors)
-- Both guards use **Passport** for token-based API authentication
-- Token lifetimes configurable in [AppServiceProvider](app/Providers/AppServiceProvider.php)
-
-**Service-Oriented Business Logic:**
-- No repositories; services query models directly
-- Services handle **transactions, caching, OTP generation, media uploads, email verification**
-- DTOs carry validated request payloads; `HasUpdatePayload` trait tracks PATCH field changes
-
-**Request→Service→Model Flow:**
-1. **Form Request:** Validates payload, applies array notation or custom rules
-2. **Controller:** Injects service, calls method with request data
-3. **Service:** Manages transactions, state, notifications, error handling
-4. **Model:** Persists data; handles relationships and casts
-
-**API Routing & Consumers (BFF Pattern):**
-- Strict separation of Controllers, Routes, and Resources based on the consumer (Admin, Exhibitor, Visitor).
-- Example: Visitors have `VisitorBoothResource` which hides sensitive data like `price`.
-
-**Filtering & Querying (Spatie QueryBuilder):**
-- Strictly using `spatie/laravel-query-builder` for all GET list endpoints.
-- Complex filtering logic must be extracted to Dedicated Custom Filters in `app/Filter/` (e.g., MinFilter, MaxFilter, BookedBoothFilter, DateFilter, CompanyNameFilter).
-- Avoid inline closures or Local Scopes for Spatie filters.
-
-**Exception Handling:**
-- `ModelNotFoundException` is handled globally in `bootstrap/app.php` to return a standardized JSON response matching global helpers. No need for `if(!$model)` when Route Model Binding is used.
-
-### 2.2 Passport Configuration
-
-Located in [config/passport.php](config/passport.php):
-- Default guard: `web` (for Laravel command execution only)
-- API guards: `mobile`, `system` (defined in [config/auth.php](config/auth.php))
-- Tokens expire in 15 days; refresh tokens in 30 days; personal access tokens in 6 months
-- Scopes: Not yet implemented (all endpoints are scope-agnostic)
-
-**OAuth Clients:**
-- Two personal access clients created on first `php artisan migrate` (see [DatabaseSeeder](database/seeders/DatabaseSeeder.php))
-- Device authorization flow available but not yet used
-
-### 2.3 Rate Limiting (AppServiceProvider)
-
-Custom rate limiters active on all auth routes:
-- `login_register`: 10 req/min per IP
-- `verify_otp`: 5 req/min per IP
-- `forgot_password`: 3 req/hour per phone
-- `profile_update`: 20 req/min per user
-- `password_update`: 3 req/min per user
-- `phone_update_request`: 2 req/hour per user
-
-Rate limit violations return `429` with custom error message via global helper.
-
----
-
-## 3. Folder Structure
-
-```
-app/
-├── Console/Commands/
-│   ├── CleanUnverifiedAccounts.php  [Scheduled daily: deletes expired/used OTPs]
-│   └── AutoDeploy.php               [Scheduled every minute: git pull + cache clear]
-├── DTOs/
-│   ├── PatchDTO.php                 [Base class for PATCH operations with field tracking]
-│   ├── Mobile/UpdateProfileDTO.php
-│   ├── Shared/UpdatePasswordDTO.php
-│   └── SystemUser/LoginDTO.php, RegisterDTO.php, ProfileUpdateDTO.php, BoothRequestDTO.php, UpdateBoothDTO.php, CompanyDTO.php, ServiceDTO.php, UpdateServiceDTO.php
-├── Enum/                            [8 backing enums for domain validation]
-│   ├── Status.php                   [pending, approved, rejected]
-│   ├── SystemUserType.php           [admin, exhibitor]
-│   ├── EventType.php                [conference, workshop, lecture, other]
-│   ├── ReportStatus.php             [pending, resolved, rejected]
-│   ├── Gender.php, AnnouncementReceiverType.php, DeviceType.php, HallType.php
-├── Exceptions/ApiException.php      [Custom app exception handler]
-├── Filter/                          [Custom Spatie QueryBuilder filters]
-│   ├── BookedBoothFilter.php        [Filters booths by booking status]
-│   ├── CompanyNameFilter.php        [Filters booths by associated company name]
-│   ├── DateFilter.php               [Filters records by created_at date]
-│   ├── MaxFilter.php                [Filters values less than or equal to max]
-│   └── MinFilter.php                [Filters values greater than or equal to min]
-├── Helper/ApiResponse.php           [Global successResponse(), errorResponse() helpers]
-├── Http/
-│   ├── Controllers/Api/V1/
-│   │   ├── Mobile/
-│   │   │   ├── AuthController        [register, verifyRegister, login, logout, resendOtp]
-│   │   │   ├── ProfileController     [show, updateProfile, updatePassword, requestPhoneUpdate, verifyPhoneUpdate]
-│   │   │   ├── PasswordController    [forgotPassword, verifyForgotPasswordOtp, resetPassword]
-│   │   │   └── BoothController       [index, show]
-│   │   ├── SystemUser/
-│   │   │   ├── Admin/
-│   │   │   │   ├── AuthController    [login, logout]
-│   │   │   │   ├── BoothController   [index, show, update]
-│   │   │   │   ├── BoothRequestController [index, show, approve, reject, statistics]
-│   │   │   │   ├── CompanyDirectoryController [index, show]
-│   │   │   │   ├── ManagerDirectoryController [directory, index, show]
-│   │   │   │   └── ServiceController [resource CRUD]
-│   │   │   ├── Exhibitor/
-│   │   │   │   ├── AuthController    [register, verify email, login, logout, googleAuth, checkStatus]
-│   │   │   │   ├── BoothController   [index, show, book, ownedBooths]
-│   │   │   │   ├── ServiceController [index]
-│   │   │   │   └── InvitationController [companyInvitations, boothInvitations, show, storeForCompany, storeForBooth, approve, reject, delete]
-│   │   │   └── Shared/
-│   │   │       ├── ProfileController [show, update]
-│   │   │       └── ResetPasswordController [changePassword, sendResetLink, resetPassword]
-│   │   └── Shared/FCMController      [store: updateOrCreate FCM token]
-│   ├── Middleware/
-│   │   ├── ApiLocalization.php       [Sets locale based on request header]
-│   │   └── EnsureUserIsAdmin.php     [Middleware alias type.admin; restricts to admins]
-│   ├── Requests/                    [25 form request classes; validation active]
-│   └── Resources/                   [12 API resources; comprehensive coverage]
-│       ├── Mobile/
-│       │   ├── UserResource.php
-│       │   └── BoothResource.php
-│       ├── SystemUser/
-│       │   ├── Admin/
-│       │   │   ├── CompanyDirectoryResource.php
-│       │   │   └── ManagerResource.php
-│       │   ├── Exhibitor/
-│       │   │   └── InvitaionResource.php
-│       │   └── Shared/
-│       │       ├── BoothRequestResource.php, BoothRequestServiceResource.php, BoothResource.php, CompanyResource.php, ProfileResource.php, ServiceResource.php, SystemUserResource.php
-├── Jobs/
-│   └── SendOtpWhatsappJob.php       [Queued; calls UltraMsg API with OTP code]
-├── Models/                          [23 eloquent models with soft deletes and polymorphic relations]
-│   ├── User.php                     [Mobile visitor; HasApiTokens, media avatars]
-│   ├── SystemUser.php               [Admin/Exhibitor; MustVerifyEmail, media avatars]
-│   ├── Company.php                  [Company/exhibitor entity; coordinates stored as float; status]
-│   ├── Booth.php                    [Exhibition booth; unique qr_token, composite (hall_id, number)]
-│   ├── BoothRequest.php             [Request to book booth; final_price snapshot]
-│   ├── Hall.php                     [Physical exhibition hall; type, area]
-│   ├── Event.php                    [Polymorphic; avg_rating, unique qr_token]
-│   ├── EventHall.php                [Event venue; hourly pricing for billing]
-│   ├── Lead.php                     [User view/scan of Booth/Event; no timestamps]
-│   ├── Saved.php                    [User bookmark of Company/Event; composite unique index]
-│   ├── Review.php                   [1-5 rating; composite unique index]
-│   ├── Report.php                   [Complaint; polymorphic reporter/reportable]
-│   ├── Invitation.php               [Team invitation model; token unique]
-│   ├── Announcement.php, Facility.php, BusCatalog.php, Service.php, EventSpeaker.php [skeletal]
-│   └── DeviceToken.php, OtpCode.php [Support models]
-├── Notifications/Auth/
-│   ├── VerifyApiEmail.php           [Sends verification link with id/{hash} to frontend URL]
-│   └── ResetApiPassword.php         [Sends password reset link to frontend]
-├── Policies/                        [Authorization policies]
-│   ├── BoothPolicy.php              [Enforces invitation rules for Booths]
-│   ├── CompanyPolicy.php            [Enforces invitation rules for Companies]
-│   └── InvitationPolicy.php         [Enforces user validation for accepting/rejecting invitations]
-├── Providers/
-│   ├── AppServiceProvider.php       [Rate limiters, Scramble config, HTTPS enforcement, Passport key configurations]
-│   └── TelescopeServiceProvider.php [Dev debugging dashboard]
-├── Services/
-│   ├── Mobile/
-│   │   ├── AuthService.php          [register, verifyRegister, login, logout, forgotPassword, resetPassword, resendOtp]
-│   │   ├── OtpService.php           [generateOtp, verifyOtp; rate limits, locks, cache cleanup]
-│   │   └── ProfileService.php       [updateProfile, verifyPhoneUpdate with media library]
-│   ├── SystemUser/
-│   │   ├── Admin/
-│   │   │   ├── AuthService.php      [login]
-│   │   │   ├── BoothRequestService.php [approve, reject, conflict checking]
-│   │   │   ├── ServiceService.php   [services CRUD logic]
-│   │   │   └── UpdateBoothService.php [booth properties updates]
-│   │   ├── Exhibitor/
-│   │   │   ├── AuthService.php      [register, login, verifyEmail]
-│   │   │   ├── GoogleAuthService.php [Socialite OAuth2 token validation; auto-creates SystemUser]
-│   │   │   ├── BoothRequestService.php [request booth booking, attach services]
-│   │   │   ├── CompanyService.php   [creates and updates companies]
-│   │   │   └── InvitationService.php [creates, accepts, rejects team/booth invitations]
-│   │   └── Shared/ProfileService.php [update with media library]
-│   └── Shared/
-│       ├── PasswordService.php      [updatePassword; revokes other tokens + device tokens]
-│       ├── FCMService.php           [updateOrCreate device token; maps oauth_access_token_id]
-│       └── ResetSystemUserPasswordService.php [sendResetLink, resetPassword via Laravel Password broker]
-├── Trait/HasUpdatePayload.php       [updatePayload() method for PATCH DTO field extraction]
-└── README.md, AGENTS.md, database_architecture.dbml
-
-config/
-├── auth.php                         [Dual guard config; default guard = "system"; password brokers for both models]
-├── passport.php                     [Private/public key env vars; default guard = "web" (unused in API)]
-├── app.php, database.php, queue.php, cache.php [Standard Laravel; queue driver = database]
-├── services.php                     [Google OAuth, UltraMsg WhatsApp config via env]
-├── scramble.php                     [OpenAPI spec generation; auto security via MiddlewareAuthSecurityStrategy]
-└── filesystems.php, mail.php, logging.php [Default configs]
-
-database/
-├── migrations/                      [32 migrations; ordered by timestamp]
-│   ├── Core Auth: users, system_users, oauth_* (Passport), otp_codes, device_tokens, media
-│   ├── Exhibition: companies, halls, booths, booth_requests, booth_request_services
-│   ├── Events: event_halls, events, event_speakers
-│   ├── User Interactions: leads, saved, reviews, reports
-│   ├── Infrastructure: announcements, facilities, bus_catalog, notifications, jobs, cache
-│   └── Tools: telescope_entries (Telescope dev debugging)
-├── factories/
-│   └── UserFactory.php              [Minimal factory for testing]
-└── seeders/DatabaseSeeder.php       [Creates 2 Passport clients, demo User, demo SystemUser]
-
-routes/
-├── api.php                          [Mounts /v1 prefix with nested route groups]
-└── api/v1/
-    ├── admin.php                    [Admin login, password reset, profile, FCM]
-    ├── exhibitor.php                [Exhibitor register, Google auth, email verify, profile, password, FCM]
-    └── mobile.php                   [Visitor auth, password reset, profile, FCM with per-route rate limiting]
-
-resources/
-├── css/, js/                        [Vite-bundled; Tailwind v4]
-└── views/welcome.blade.php          [Default Laravel landing page]
-
-tests/
-├── Pest.php                         [Test configuration; RefreshDatabase disabled by default]
-├── Feature/ExampleTest.php          [Boilerplate test]
-└── Unit/ExampleTest.php             [Boilerplate test]
-
-bootstrap/app.php, providers.php     [Laravel 13 skeleton; no custom middleware wired yet]
-
-vite.config.js                       [Vue/React/Tailwind ready; not configured]
-phpunit.xml, phpstan.neon, .github/skills/, AGENTS.md
-```
-
----
-
-## 4. Implemented Modules
-
-### 4.1 Completed Routes (26 endpoints)
-
-#### Mobile Visitor Routes (`/v1/auth`, `/v1/visitor`)
-
-**Authentication:**
-- `POST /auth/register` → Generate OTP, cache user data for 10 min, return `registration_id`
-- `POST /auth/register/verify` → Verify OTP, create User, issue Passport token, clear cache
-- `POST /auth/login` → Phone + password auth, issue token
-- `DELETE /auth/logout` → Revoke token, delete device tokens for this token
-- `POST /auth/otp/resend` → Regenerate OTP for same session
-- `POST /auth/password/forgot` → Send reset OTP via WhatsApp (return UUID if user not found for security)
-- `POST /auth/password/otp/verify` → Verify reset OTP, cache temp token for 10 min
-- `POST /auth/password/reset` → Reset password with temp token, revoke all other tokens
-
-**Profile & Security:**
-- `GET /visitor/profile` → Return authenticated user with media avatar URL
-- `POST /visitor/profile/update` → PATCH user fields + optional avatar upload (clears old)
-- `PUT /visitor/profile/password/update` → Change password (current + new); revokes other tokens
-- `POST /visitor/profile/phone/request` → OTP for phone change
-- `POST /visitor/profile/phone/verify` → Verify new phone, update record
-
-**Device & Notifications:**
-- `POST /visitor/fcm/register-token` → UpdateOrCreate FCM token with device type
-
-#### Admin Routes (`/v1/admin`)
-
-- `POST /login` → Email + password auth, issue token
-- `POST /change-password` → Change password with current password validation
-- `POST /logout` → Revoke token
-- `GET /profile` → Retrieve admin profile with media
-- `POST /profile` → Update name + optional avatar
-- `POST /forgot-password`, `POST /reset-password` → Via Laravel Password broker
-- `GET /booths`, `GET /booths/{id}`, `PATCH /booths/{id}` → Paginated Booth management with Spatie QueryBuilder filtering.
-- `GET /booths/requests` → Paginated listing of booking requests with filters.
-- `GET /booths/requests/stats` → Retrieve statistics for booking requests (total, pending, approved).
-- `GET /booths/requests/{id}` → Retrieve details of a booking request.
-- `POST /booths/requests/approve/{id}` → Approve booth request (auto-assigns booth to company, sets price, and detects conflicts).
-- `PATCH /booths/requests/reject/{id}` → Reject booth request.
-- `GET /companies` → Retrieve paginated list of companies with name, business sector, and status filtering.
-- `GET /companies/{company}` → Retrieve detailed company profile.
-- `GET /managers/directory` → Retrieve statistics for companies, booths, and managers.
-- `GET /managers` → Retrieve paginated list of managers/exhibitors.
-- `GET /managers/{manager}` → Retrieve detailed manager profile with portfolio.
-- `GET /service`, `POST /service`, `GET /service/{id}`, `PATCH /service/{id}`, `DELETE /service/{id}` → Service CRUD resource.
-
-#### Exhibitor Routes (`/v1/exhibitor`)
-
-- `POST /register` → Create SystemUser, fire `Registered` event (queues email verification), issue token
-- `POST /login` → Email + password, issue token
-- `GET /email/verify/{id}/{hash}` → Verify email hash, mark `email_verified_at`, fire `Verified` event
-- `POST /auth/system/google` → Validate Google token via Socialite, create/link SystemUser, download avatar
-- `GET /auth/status` → Retrieve exhibitor authentication/verification status.
-- `GET /booth` → List booths with filtering (min_price, max_price, area, hall_id, hall_type, number).
-- `GET /booth/my` → List booths owned by current exhibitor.
-- `POST /booth/request-booth` → Create booking request (optionally auto-creating a Company or using existing).
-- `GET /booth/{id}` → Retrieve details of a booth.
-- `GET /booth/{booth}/invitations`, `POST /booth/{booth}/invitations` → List and send invitations to join a booth.
-- `GET /companies/{company}/invitations`, `POST /companies/{company}/invitations` → List and send invitations to join a company.
-- `GET /invitation/{token}` → Retrieve invitation details.
-- `POST /invitation/{token}/accept` → Accept team/booth invitation and join.
-- `POST /invitation/{token}/reject` → Reject invitation.
-- `DELETE /invitation/{invitation}` → Cancel/delete a sent team or booth invitation.
-- `GET /services` → Retrieve available add-on services list.
-- Same password/profile routes as admin
-
----
-
-### 4.2 Not Yet Implemented
-
-**No endpoints for:**
-- Event management (create, list, update, attend)
-- Company CRUD (except auto-creation/lookup via booth requests)
-- Report/complaint workflow
-- Review/rating management
-- Announcement management
-- Saved items (wishlist) retrieval
-- Lead tracking queries
-- Facility location search
-- Bus schedule retrieval
-
----
-
-## 5. Database Schema Summary
-
-### 5.1 Core Tables (33 migrations total)
-
-| Table | Purpose | Key Traits | Notes |
-|-------|---------|-----------|-------|
-| `users` | Mobile visitors | soft deletes, unique (email, phone) | Avatar via media library |
-| `system_users` | Admins/Exhibitors | soft deletes, unique email, `email_verified_at` | type: admin/exhibitor; Avatar via media; google_id |
-| `companies` | Exhibitor organizations | soft deletes, unique phone | Geo: headquarters_lat/lng; social_links JSON; status |
-| `company_system_users` | Many-to-many | Composite PK (company_id, system_user_id) | Cascade delete on both sides |
-| `halls` | Physical exhibition spaces | soft deletes, unique number | type: exhibition/event; area float; full timestamps |
-| `booths` | Exhibition booths | soft deletes, unique qr_token, composite (hall_id, number) | svg_id for interactive map; company_id nullable; price decimal(10,2); full timestamps |
-| `booth_system_users` | Staff assignment to booths | Composite PK (booth_id, system_user_id) | assigned_by FK; created_at only |
-| `booth_requests` | Booth booking applications | soft deletes | status: pending/approved/rejected; final_price snapshot; full timestamps |
-| `booth_request_services` | Line items for requests | — | quantity int; unit_price decimal(10,2); no timestamps |
-| `services` | Booth add-on services | — | price decimal(10,2); is_active boolean; unique name; full timestamps |
-| `event_halls` | Dedicated event venues | — | unique number; price_per_hour decimal(10,2); no timestamps |
-| `events` | Exhibition events | soft deletes, unique qr_token | Polymorphic eventable (Company/SystemUser); status, type, avg_rating; date datetime |
-| `event_speakers` | Event presenters | — | name; no timestamps; cascade on event delete |
-| `leads` | User/Exhibitor views | Composite unique (user_id, leadable_type, leadable_id) | created_at only; no updated_at |
-| `saved` | User bookmarks | Composite unique (user_id, savedable_type, savedable_id) | created_at only; polymorphic savedable |
-| `reviews` | 1-5 ratings + comments | Composite unique (user_id, reviewable_type, reviewable_id) | Polymorphic reviewable; soft deletes on related entities |
-| `reports` | Complaints/Issues | — | Polymorphic reporter/reportable; resolved_by FK (nullable) |
-| `announcements` | Push notifications | — | receiver: visitor/exhibitor/all; is_active boolean; full timestamps |
-| `facilities` | Toilets, mosques, etc. | — | gender, type, svg_id; no timestamps |
-| `bus_catalog` | Transportation schedules | — | duration int; start_time/end_time time; full timestamps |
-| `device_tokens` | FCM push tokens | Polymorphic tokenable | fcm_token unique; oauth_access_token_id char(80); full timestamps |
-| `otp_codes` | OTP verification | Unique session_id | type: registration/password_reset/phone_update; attempts counter; full timestamps |
-| `media` | Spatie MediaLibrary | — | Polymorphic model; centralized file storage (uuid, conversions_disk, manipulations, custom_properties, responsive_images, order_column) |
-| `invitations` | Team invitations to join companies/booths | sender_id FK, status default 'pending' | Polymorphic inviteable (Company/Booth); unique token; expires_at |
-
-**Passport OAuth Tables:** `oauth_clients`, `oauth_access_tokens`, `oauth_refresh_tokens`, `oauth_auth_codes`, `oauth_device_codes`
-
-**Infrastructure:** `jobs`, `job_batches`, `failed_jobs`, `cache`, `cache_locks`, `notifications`, `telescope_entries`, `telescope_entries_tags`, `telescope_monitoring`
-
-### 5.2 Key Constraints
-
-- **Composite Unique Indexes:**
-  - `(hall_id, number)` on booths → Prevent duplicate booth numbers per hall
-  - `(user_id, leadable_type, leadable_id)` on leads → Prevent duplicate lead records
-  - `(user_id, savedable_type, savedable_id)` on saved → Prevent duplicate saves
-  - `(user_id, reviewable_type, reviewable_id)` on reviews → Prevent duplicate reviews (1 per user per item)
-
-- **Cascade Behavior:** Most FKs cascade on delete (exceptions: company_id on booths is nullable with null-on-delete)
-
-- **Soft Deletes:** Active on most domain tables; allows recovery and relationship integrity
-
----
-
-## 6. Model Relationships
-
-**User (Mobile Visitor):**
-```php
-hasMany(Lead::class)              // Views/scans they've recorded
-hasMany(Saved::class)             // Bookmarks
-hasMany(Review::class)            // Ratings given
-morphMany(Report::class, 'reporter')    // Complaints filed
-morphMany(DeviceToken::class, 'tokenable') // FCM tokens
-```
-
-**SystemUser (Admin/Exhibitor):**
-```php
-belongsToMany(Company::class, 'company_system_users')
-belongsToMany(Booth::class, 'booth_system_users')->withPivot('assigned_by')
-hasMany(BoothRequest::class)
-morphMany(Event::class, 'eventable')
-morphMany(DeviceToken::class, 'tokenable')
-hasMany(Report::class, 'resolved_by')  // Reports they've resolved
-```
-
-**Company:**
-```php
-belongsToMany(SystemUser::class, 'company_system_users')
-hasMany(Booth::class)
-hasMany(BoothRequest::class)
-morphMany(Event::class, 'eventable')  // Conferences, etc.
-```
-
-**Booth:**
-```php
-belongsTo(Hall::class)
-belongsTo(Company::class)->nullable()
-belongsToMany(SystemUser::class, 'booth_system_users')->withPivot('assigned_by')
-hasMany(BoothRequest::class)
-morphMany(Lead::class, 'leadable')
-morphMany(Review::class, 'reviewable')
-morphMany(Report::class, 'reportable')
-morphMany(Saved::class, 'savedable')
-```
-
-**Event:**
-```php
-morphTo('eventable')  // Company or SystemUser
-belongsTo(EventHall::class)
-hasMany(EventSpeaker::class)
-morphMany(Lead::class, 'leadable')
-morphMany(Saved::class, 'savedable')
-morphMany(Review::class, 'reviewable')
-morphMany(Report::class, 'reportable')
-```
-
-**BoothRequest:**
-```php
-belongsTo(Booth::class)
-belongsTo(Company::class)
-belongsTo(SystemUser::class)
-hasMany(BoothRequestService::class, 'request_id')
-```
-
-**Invitation:**
-```php
-belongsTo(SystemUser::class, 'sender_id')
-morphTo('inviteable') // Company or Booth
-```
-
-All relationships include **soft deletes** on the model side, allowing safe data recovery.
-
----
-
-## 7. Authentication & Authorization Flow
-
-### 7.1 Mobile Visitor Registration
-
-1. `POST /auth/register` (phone, email, password, profile fields)
-   - Validate uniqueness of phone/email
-   - Generate 6-digit OTP, hash it
-   - Store OTP in `otp_codes` table with 5-min expiry and UUID session ID
-   - Dispatch `SendOtpWhatsappJob` (asynchronous via database queue)
-   - Cache user payload for 10 min under `reg_data_{registration_id}`
-   - Return `registration_id` (UUID)
-
-2. `POST /auth/register/verify` (phone, otp, registration_id)
-   - Verify OTP: Hash check, expiry check, attempt counter (max 3)
-   - Retrieve cached user data; confirm no race-condition re-registration
-   - **Transaction:** Create User, issue Passport token, clear cache
-   - Return User + token
-
-### 7.2 Admin/Exhibitor Registration & Verification
-
-**Exhibitor Manual Registration:**
-1. `POST /exhibitor/register` (name, email, password)
-   - Create SystemUser
-   - Fire `Registered` event → Queue `VerifyApiEmail` notification
-   - Issue Passport token
-   - Return User + token (email not yet verified)
-
-2. `GET /exhibitor/email/verify/{id}/{hash}` (signed URL from email)
-   - Verify SHA1 hash against user's email
-   - Set `email_verified_at`
-   - Fire `Verified` event
-
-**Exhibitor Google OAuth:**
-1. `POST /exhibitor/auth/system/google` (token from frontend Google SDK)
-   - Validate token with Google servers via Socialite
-   - Find or create SystemUser with matching email
-   - Download and attach Google avatar to media library
-   - Mark `email_verified_at` (auto-verified via Google)
-   - Issue Passport token
-
-**Admin Login:**
-- No registration endpoint; created manually or via database
-- `POST /admin/login` (email, password)
-
-### 7.3 Token Management
-
-**Passport Configuration ([AppServiceProvider](app/Providers/AppServiceProvider.php)):**
-- Access token expiry: 15 days
-- Refresh token expiry: 30 days
-- Personal access token expiry: 6 months
-- Scopes: Not yet implemented (all endpoints are scope-agnostic)
-
-**Token Revocation on Logout:**
-- Revoke current token via `$token->revoke()`
-- Delete device tokens associated with this token
-- Other active tokens remain valid
-
-**Multi-Device Sessions:**
-- Each device stores a separate `DeviceToken` record with unique `fcm_token`
-- Logout only revokes the current token; other devices remain authenticated
-- Password change revokes all OTHER tokens (current session survives)
-
-### 7.4 Authorization
-
-**Authorization & Policies:**
-- Model authorization policies exist in `app/Policies/` to enforce access controls:
-  - `BoothPolicy`: Enforces invitation and access rules for Booths.
-  - `CompanyPolicy`: Restricts listing/viewing of companies to admins, approved company staff, or general viewing if the company is approved.
-  - `InvitationPolicy`: Restricts accepting/rejecting invitations to target users, and deleting/canceling invitations to the original sender.
-  - `SystemUserPolicy`: Restricts listing and viewing system users/managers to admin users only.
-- Admin routes (`/v1/admin/*`) are protected using the `type.admin` middleware which aliases `EnsureUserIsAdmin::class`. This verifies that the authenticated `system` user has the `SystemUserType::ADMIN` enum value, preventing exhibitors from executing admin functions.
-- Other controller actions currently assume authorization based on authentication guards (`auth:mobile` and `auth:system`).
-
-**Security Recommendation:** Extend policies to other entities (e.g. `Event`, `Service`, `BoothRequest`) and continue integrating `Gate::authorize()` checks in controllers.
-
----
-
-## 8. API Design Conventions
-
-### 8.1 Response Format (Global Helpers)
-
-**Success:**
-```json
-{
-  "status": true,
-  "message": "success",
-  "data": { ... }
-}
-```
-HTTP: `200`, `201`, or `204`
-
-**Error:**
-```json
-{
-  "status": false,
-  "message": "Invalid credentials",
-  "data": null
-}
-```
-HTTP: `400`, `401`, `403`, `404`, `429`, etc.
-
-**Rate Limit Exceeded:**
-```json
-{
-  "status": false,
-  "message": "Too many login or register attempts. Please try again later.",
-  "data": null
-}
-```
-HTTP: `429`
-
-### 8.2 Status Codes
-
-- `200` OK → Successful request, data returned
-- `201` Created → Resource created (not currently used; routes return 200)
-- `204` No Content → Success, no response body (not currently used)
-- `400` Bad Request → Validation failed
-- `401` Unauthorized → Authentication required or failed
-- `403` Forbidden → Permission denied
-- `404` Not Found → Resource not found
-- `429` Too Many Requests → Rate limit exceeded
-- `500` Internal Server Error → Uncaught exception
-
-### 8.3 Authentication Header
-
-```
-Authorization: Bearer {oauth_access_token}
-```
-
-Bearer token issued by Passport on login or registration.
-
-### 8.4 Validation & Error Messages
-
-**Form Requests** ([app/Http/Requests](app/Http/Requests)):
-- Enum validation: `new Enum(Gender::class)`
-- Existence checks: `exists:users,phone`
-- Unique constraints: `unique:users,phone,{id}` (ignores soft-deleted rows by default)
-- Custom messages via `messages()` method
-- Array notation: `['required', 'string', 'min:8']`
-
-**Validation Error Response:**
-```json
-{
-  "status": false,
-  "message": "The given data was invalid.",
-  "data": {
-    "phone": ["The phone field is required."],
-    "password": ["The password must be at least 8 characters."]
-  }
-}
-```
-
-### 8.5 Documentation
-
-**OpenAPI/Swagger UI:**
-- URL: `/docs/api` (Stoplight Elements UI)
-- Spec endpoint: `/api.json`
-- Configured via [config/scramble.php](config/scramble.php)
-- Auto-discovers routes with `#[Group('...')]` attributes on controllers
-- Security scheme: HTTP Bearer (auto-applied to `auth:*` routes)
-
-**Route Groups (Scramble):**
-- `Visitor/Auth`, `Visitor/Profile`, `Visitor/ForgotPassword`
-- `SystemUser/Admin/Auth`, `SystemUser/Exhibitor/Auth`, `SystemUser/Profile`
-- `SystemUser/reset_password`
-
----
-
-## 9. Business Rules Implemented
-
-### 9.1 OTP System
-
-- **Type:** Numeric, 6 digits
-- **Delivery:** WhatsApp via UltraMsg API (async job)
-- **Expiry:** 5 minutes (configurable in `OtpService::generateOtp()`)
-- **Attempts:** Max 3 before session locks
-- **Cooldown:** 60 seconds between requests (per phone/type)
-- **Daily Limit:** 10 OTPs per phone per type
-- **Types:** `registration`, `password_reset`, `phone_update`
-- **Session Management:** UUID-based; idempotent within window; auto-mark as used on verification
-- **Storage:** `otp_codes` table with indexes on `phone` and `session_id`
-
-### 9.2 Booth Model
-
-- **QR Token:** Unique, secure random string for QR generation
-- **Number:** Unique per hall (composite unique index `(hall_id, number)`)
-- **Pricing:** Decimal(10,2) in primary currency
-- **Company Association:** Nullable until booth request is approved
-- **Staff Assignment:** Managed via `booth_system_users` pivot with `assigned_by` tracking
-- **Availability:** `is_booked` flag tracks whether booth is available (column exists; logic not yet implemented)
-
-### 9.3 Booth Request Workflow
-
-- **Status Enum:** `pending`, `approved`, `rejected`
-- **Final Price:** Decimal snapshot at request time (allows pricing to change over time)
-- **Services:** Line items with quantity + unit_price snapshots (prevents retroactive price changes)
-- **Approval Logic:** Not yet implemented in endpoints; should auto-assign booth to company
-
-### 9.4 Event Management
-
-- **Polymorphic Ownership:** Company or SystemUser (via `eventable_type` + `eventable_id`)
-- **Status:** `pending`, `approved`, `rejected`
-- **Type:** `conference`, `workshop`, `lecture`, `other` (Enum)
-- **Duration:** Stored in minutes (not hours)
-- **QR Token:** Unique; used for attendance tracking (endpoint not yet implemented)
-- **Average Rating:** Decimal(3,2); updated on review changes (logic not yet implemented)
-- **Pricing:** Associated hall has `price_per_hour`; billing calculation not yet implemented
-
-### 9.5 Lead Tracking
-
-- **Trigger:** When user scans Booth QR or views Event
-- **Deduplication:** Composite unique index `(user_id, leadable_type, leadable_id)` prevents duplicates
-- **No Update Tracking:** `created_at` only; visits to same item reuse record without updating timestamp
-
-### 9.6 User Bookmarks (Saved Items)
-
-- **Polymorphic Target:** Company or Event
-- **Deduplication:** Composite unique index `(user_id, savedable_type, savedable_id)`
-- **No Timestamps:** `created_at` only
-
-### 9.7 Reviews & Ratings
-
-- **Scale:** 1–5 integer
-- **Deduplication:** Composite unique index `(user_id, reviewable_type, reviewable_id)` (one review per user per item)
-- **Polymorphic Target:** Booth or Event
-- **Comment:** Optional text field
-- **Relationship:** Can be reported via Report model (allows meta-complaints about reviews)
-
-### 9.8 Reporting & Complaints
-
-- **Polymorphic Reporter:** User or SystemUser (who filed complaint)
-- **Polymorphic Reportable:** Booth, Event, Review, or null (flexible for future extensions)
-- **Status:** `pending`, `resolved`, `rejected`
-- **Resolution:** `resolved_by` FK points to SystemUser admin who resolved it
-- **Admin Notes:** Text field for internal tracking
-- **Workflow:** Not yet implemented; should have approval/rejection logic
-
-### 9.9 Announcements
-
-- **Receiver Type:** `visitor`, `exhibitor`, `all` (Enum)
-- **Active Flag:** Controls visibility
-- **Media:** Can attach images via Media Library
-- **No Timestamps:** `created_at` only; static announcements
-
-### 9.10 Facilities
-
-- **Gender:** Distinguishes facilities (separate toilets, etc.)
-- **Type:** Mosque, toilet, etc.
-- **SVG ID:** Maps to floor plan graphic
-- **No Timestamps:** Static reference data
-
----
-
-## 10. Services & Repositories
-
-### 10.1 Service Architecture (No Repositories)
-
-**All business logic is in [app/Services](app/Services). No repository pattern is used.**
-
-Services query models directly and handle:
-- State management (caching, temp tokens)
-- Transactions
-- External API calls (WhatsApp OTP, Google OAuth, file uploads)
-- Notifications
-- Error handling
-
-### 10.2 Service Breakdown
-
-| Service | Location | Responsibility |
-|---------|----------|---|
-| `AuthService` (Mobile) | [app/Services/Mobile/AuthService.php](app/Services/Mobile/AuthService.php) | register, verifyRegister, login, logout, forgotPassword, verifyForgotPasswordOtp, resetPassword, resendOtp |
-| `OtpService` | [app/Services/Mobile/OtpService.php](app/Services/Mobile/OtpService.php) | generateOtp, verifyOtp; rate limiting, locking, cleanup |
-| `ProfileService` (Mobile) | [app/Services/Mobile/ProfileService.php](app/Services/Mobile/ProfileService.php) | updateProfile (PATCH), verifyPhoneUpdate; media library integration |
-| `AuthService` (Admin) | [app/Services/SystemUser/Admin/AuthService.php](app/Services/SystemUser/Admin/AuthService.php) | login |
-| `AuthService` (Exhibitor) | [app/Services/SystemUser/Exhibitor/AuthService.php](app/Services/SystemUser/Exhibitor/AuthService.php) | register, login, verifyEmail |
-| `GoogleAuthService` | [app/Services/SystemUser/Exhibitor/GoogleAuthService.php](app/Services/SystemUser/Exhibitor/GoogleAuthService.php) | handleGoogleProviderToken; Socialite token validation, auto-create/link user |
-| `ProfileService` (SystemUser) | [app/Services/SystemUser/Shared/ProfileService.php](app/Services/SystemUser/Shared/ProfileService.php) | update (PATCH) with media library |
-| `PasswordService` | [app/Services/Shared/PasswordService.php](app/Services/Shared/PasswordService.php) | updatePassword; current password validation, token revocation |
-| `FCMService` | [app/Services/Shared/FCMService.php](app/Services/Shared/FCMService.php) | store; updateOrCreate device token |
-| `ResetSystemUserPasswordService` | [app/Services/SystemUser/Shared/ResetSystemUserPasswordService.php](app/Services/SystemUser/Shared/ResetSystemUserPasswordService.php) | sendResetLink, resetPassword via Laravel Password broker |
-
-### 10.3 Dependency Injection Pattern
-
-All services use constructor injection; no `app()` calls.
-
-```php
-public function __construct(
-    protected OtpService $otp,
-    protected PasswordService $password
-) {}
-```
-
----
-
-## 11. Validation Strategy
-
-### 11.1 Form Request Pattern
-
-All routes type-hint Form Request classes in controller methods. Laravel auto-validates and returns 422 on failure.
-
-**Example:**
-```php
-public function register(RegisterRequest $request) {
-    $validated = $request->validated();  // Always use validated(), never all()
-}
-```
-
-### 11.2 Validation Rules by Route
-
-| Route | Key Rules |
-|-------|-----------|
-| `/auth/register` | first_name/last_name max:255; email unique; phone unique max:20; password min:8; birthday before:today; gender Enum |
-| `/auth/login` | phone required; password required |
-| `/auth/register/verify` | phone required; otp digits:6; registration_id uuid |
-| `/visitor/profile/update` | first_name/last_name/email/job/location sometimes max:255; avatar image mimes:jpeg,png,jpg,webp max:4096 |
-| `/visitor/profile/password/update` | current_password required; new_password min:8 confirmed different:current_password |
-| `/visitor/profile/phone/request` | phone unique:users,phone,{id} |
-| `/exhibitor/register` | name max:255; email unique (where email_verified_at is not null); password min:8 |
-| `/admin/login` | email max:255; password required |
-| `POST /fcm/register-token` | token required; device_type Enum(DeviceType::class) |
-
-### 11.3 Common Patterns
-
-- **Existence Checks:** `exists:table_name,column` (e.g., `exists:users,phone` in forgot-password)
-- **Uniqueness:** `unique:table_name,column,{id}` (ignores soft deletes by default in Laravel 13)
-- **Enums:** `new Enum(GenderClass::class)` (strict backing value validation)
-- **PATCH Semantics:** Use `sometimes` for optional fields; DTOs track which fields were provided
-- **Confirmed:** Password confirmation (`password_confirmation` field required)
-
----
-
-## 12. Response Format Standards
-
-### 12.1 API Resources
-
-**Comprehensive resource coverage is implemented to transform API outputs:**
-
-| Resource | Location | Transforms |
-|----------|----------|-----------|
-| `UserResource` | [app/Http/Resources/Mobile/UserResource.php](app/Http/Resources/Mobile/UserResource.php) | id, first_name, last_name, email, job, location, birthday (Y-m-d), gender, phone, avatar (media URL) |
-| `BoothResource` (Mobile) | [app/Http/Resources/Mobile/BoothResource.php](app/Http/Resources/Mobile/BoothResource.php) | id, number, area, type, is_booked, company, hall |
-| `ProfileResource` | [app/Http/Resources/SystemUser/Shared/ProfileResource.php](app/Http/Resources/SystemUser/Shared/ProfileResource.php) | id, name, email, type (Enum value), avatar (media URL or null) |
-| `BoothResource` (System) | [app/Http/Resources/SystemUser/Shared/BoothResource.php](app/Http/Resources/SystemUser/Shared/BoothResource.php) | id, hall_id, company_id, qr_token, svg_id, number, area, price, created_at, updated_at, is_booked, hall, company |
-| `BoothRequestResource` | [app/Http/Resources/SystemUser/Shared/BoothRequestResource.php](app/Http/Resources/SystemUser/Shared/BoothRequestResource.php) | id, booth_id, company_id, system_user_id, final_price, status, reason_for_booking, created_at, updated_at, services, company, booth, system_user |
-| `BoothRequestServiceResource` | [app/Http/Resources/SystemUser/Shared/BoothRequestServiceResource.php](app/Http/Resources/SystemUser/Shared/BoothRequestServiceResource.php) | id, request_id, service_id, quantity, unit_price, name |
-| `CompanyResource` | [app/Http/Resources/SystemUser/Shared/CompanyResource.php](app/Http/Resources/SystemUser/Shared/CompanyResource.php) | id, name, business_sector, social_links, phone, year_founded, description, headquarters_lat, headquarters_lng, status, logo, gallery |
-| `ServiceResource` | [app/Http/Resources/SystemUser/Shared/ServiceResource.php](app/Http/Resources/SystemUser/Shared/ServiceResource.php) | id, name, price, is_active |
-| `SystemUserResource` | [app/Http/Resources/SystemUser/Shared/SystemUserResource.php](app/Http/Resources/SystemUser/Shared/SystemUserResource.php) | id, name, email, type |
-| `InvitaionResource` | [app/Http/Resources/SystemUser/Exhibitor/InvitaionResource.php](app/Http/Resources/SystemUser/Exhibitor/InvitaionResource.php) | id, sender_id, email, token, status, expires_at, created_at, updated_at, sender, inviteable |
-| `CompanyDirectoryResource` | [app/Http/Resources/SystemUser/Admin/CompanyDirectoryResource.php](app/Http/Resources/SystemUser/Admin/CompanyDirectoryResource.php) | id, name, business_sector, phone, status, logo, managers_count, booths_count, loaded managers, loaded booths |
-| `ManagerResource` | [app/Http/Resources/SystemUser/Admin/ManagerResource.php](app/Http/Resources/SystemUser/Admin/ManagerResource.php) | id, name, email, avatar, companies_count, booths_count, loaded portfolios |
-
-### 12.2 Missing Resources
-
-No resources for: Event, Review, Report, Announcement, Lead, Saved, Facility, BusCatalog.
-
-**Impact:** Standardized resources ensure API contracts remain clean. Future endpoints should map models to their respective resources.
-
-### 12.3 Media Library Integration
-
-**Avatar Collections:**
-- `User` → `user-avatars` collection
-- `SystemUser` → `avatar` collection (single file)
-- `Company` → (not yet used)
-
-**Retrieval in Resources:**
-```php
-'avatar' => $this->getFirstMediaUrl('user-avatars') ?? null
-```
-
-**URL Format:** `/storage/{disk}/{media-uuid}/{file-name}` (when media disk is `public`)
-
----
-
-## 13. External Packages Used
-
-| Package | Version | Purpose | Status |
-|---------|---------|---------|--------|
-| `laravel/framework` | 13.7 | Core framework | Active |
-| `laravel/passport` | 13.0 | OAuth2 token auth | Configured; scopes not used |
-| `laravel/socialite` | 5.27 | Google OAuth provider | Integrated; Exhibitor Google login working |
-| `spatie/laravel-medialibrary` | 11.22 | File uploads, avatars | Integrated; collections on User/SystemUser |
-| `spatie/laravel-query-builder` | * | Query filtering (generic) | Installed; not used in code yet |
-| `dedoc/scramble` | 0.13.24 | OpenAPI spec generation | Configured; `/docs/api` live |
-| `laravel/tinker` | 3.0 | Interactive shell | Dev only |
-| `barryvdh/laravel-ide-helper` | * | IDE auto-completion | Dev only |
-| `larastan/larastan` | 3.10 | Static analysis | Dev only |
-| `laravel/pint` | 1.27 | Code formatting | Dev only |
-| `laravel/telescope` | 5.20 | Dev debugging dashboard | Dev only; configured |
-| `pestphp/pest` | 4.7 | Testing framework | Dev only; Pest.php configured; tests minimal |
-| `mockery/mockery` | 1.6 | Mocking library | Dev only |
-
-### 13.1 External Services
-
-| Service | Library | Configuration | Status |
-|---------|---------|---------------|--------|
-| WhatsApp OTP | UltraMsg API | `config/services.php` (env vars) | Integrated; queued job active |
-| Google OAuth | Socialite | `config/services.php` + .env | Integrated; token validation working |
-| Email | Laravel Mail | `config/mail.php` (default: log) | Not production-ready (log driver) |
-| Queue | Database | `config/queue.php` | Active; WhatsApp job uses this |
-| Cache | Database | `config/cache.php` | Active; OTP caching uses this |
-| File Storage | Local disk | `config/filesystems.php` | Local only; no S3/cloud integration |
-
----
-
-## 14. Environment Requirements
-
-### 14.1 Minimum Software Versions
-
-- **PHP:** 8.3+
-- **MySQL:** 8.0+ OR SQLite (default in .env.example)
-- **Node.js:** 18+ (for npm)
-- **Composer:** 2.0+
-
-### 14.2 Key Environment Variables
-
-```env
-APP_NAME=EMS
-APP_ENV=local|production
-APP_DEBUG=true|false
-APP_URL=http://localhost:8000
-APP_FRONTEND_URL=http://localhost:3000  # Custom: for email verification links
-
-DB_CONNECTION=sqlite|mysql|pgsql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=laravel
-DB_USERNAME=root
-DB_PASSWORD=
-
-QUEUE_CONNECTION=database  # OTP/email jobs queued here
-CACHE_STORE=database
-
-MAIL_MAILER=log  # ⚠️ Not production-ready; configure SMTP
-MAIL_FROM_ADDRESS=hello@example.com
-
-# OAuth providers
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
-GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback  # (Not used in API flow)
-
-# WhatsApp OTP
-ULTRAMSG_INSTANCE_ID=...
-ULTRAMSG_TOKEN=...
-
-# Passport encryption keys (auto-generated on first migrate)
-PASSPORT_PRIVATE_KEY=...
-PASSPORT_PUBLIC_KEY=...
-
-# Socialite session (for storing intermediate OAuth state)
-SESSION_DRIVER=database
-```
-
-### 14.3 Recommended Tooling
-
-- **Postman/Insomnia:** API testing
-- **TablePlus/Sequel Pro:** Database management
-- **VS Code + Laravel extensions:** PHP IntelliSense, Blade syntax
-- **Ray:** Debug helper package (not installed; optional)
-
----
-
-## 15. Current Progress Status
-
-### 15.1 Completed
-
-✅ **Authentication & Authorization (Surface Level)**
-- OTP-based mobile registration (WhatsApp delivery)
-- Email verification for System Users
-- Google OAuth login (Exhibitor)
-- Password reset flows (both User types)
-- Passport OAuth2 token lifecycle
-- Rate limiting on auth endpoints
-- FCM device token management
-- Enforced granular access controls via `BoothPolicy`, `CompanyPolicy`, `InvitationPolicy`, and `SystemUserPolicy`
-
-✅ **Profile Management**
-- View own profile (all user types)
-- Update profile fields + avatar (all user types)
-- Password change with token revocation
-- Phone number change with OTP verification
-
-✅ **Data Model Foundation**
-- 22 Eloquent models with relationships defined
-- 32 migrations with proper schema design
-- Soft deletes on domain entities
-- Polymorphic relations (Lead, Saved, Review, Report)
-- Media library integration (avatars)
-
-✅ **API Infrastructure**
-- Dual-guard Passport setup (mobile, system)
-- OpenAPI documentation generation (Scramble)
-- Global response helpers (successResponse, errorResponse)
-- Rate limiting middleware
-- Form request validation
-
-✅ **Admin Booths & Booking Requests**
-- CRUD endpoints for Services & Booth management
-- Approve/reject booking requests with conflict detection
-- Statistics for booking requests (total, pending, approved)
-
-✅ **Exhibitor Team Management**
-- Sent invitation list and invitation creation for Companies & Booths
-- Accepting or rejecting invitations
-- Canceling/deleting pending invitations
-
-✅ **Admin Directories**
-- Company Directory (paginated list, show details, filters for name, sector, status, sorts)
-- Manager/Exhibitor Directory (paginated list, show details with portfolio, directory statistics)
-
-✅ **External Integrations**
-- WhatsApp OTP delivery (UltraMsg API)
-- Google OAuth token validation (Socialite)
-- FCM push token storage
-- Email notifications (VerifyApiEmail, ResetApiPassword)
-
-### 15.2 Partial/In-Progress
-
-⚠️ **Authorization:** Standard policies exist for Booths, Companies, Invitations, and SystemUsers. Policies for other models (e.g. `Event`, `Service`, `BoothRequest`) are not yet written.
-
-⚠️ **API Resources:** Resources are created for Booths, BoothRequests, Companies, Services, Invitations, and Directories. Others (Events, Reports, etc.) still need them.
-
-⚠️ **Queue System:** Active with database driver; WhatsApp jobs are queued. Email notifications not yet queued.
-
-### 15.3 Not Started
-
-❌ **Event Management:** No endpoints for creation, attendance, speaker management.
-
-❌ **Company Write Management:** Create, update, or delete endpoints for Companies (other than auto-creation/lookup via booth requests) do not exist (only read-only directory exists for Admin).
-
-❌ **Reporting & Complaints:** Models exist; no workflow endpoints.
-
-❌ **Lead/Analytics:** No endpoints to query user viewing history or engagement.
-
-❌ **Announcement Management:** Models exist; no delivery/targeting logic.
-
-❌ **Testing:** Pest setup is configured, but only basic tests exist (need to expand feature tests).
-
-❌ **Frontend Client:** React/Vue setup exists (Vite); no UI code.
-
----
-
-## 16. Pending Features
-
-### 16.1 High Priority (Blocking MVP)
-
-1. **Event Management**
-   - Create/update/list events (Company or SystemUser can host)
-   - Event hall booking and conflict detection
-   - Attendee tracking via Lead model
-   - Speaker management
-
-2. **Extend Authorization Policies**
-   - Create remaining policies for Event, BoothRequest, etc.
-   - Enforce policy checks across all controllers
-
-3. **Remaining Read/List Endpoints**
-   - `GET /events` with date range, type, organizer filters
-   - `GET /companies` for visitors/exhibitors with search
-   - `GET /announcements` for visitor/exhibitor
-
-### 16.2 Medium Priority
-
-4. **Review & Rating System**
-   - `POST /reviews` (rate booth/event)
-   - `GET /reviews/{id}` (retrieve single review)
-   - Auto-calculate `avg_rating` on Event/Booth
-   - Report review (already modeled; endpoints missing)
-
-5. **Reporting & Resolution Workflow**
-   - `POST /reports` (file complaint)
-   - `GET /reports` (admin list)
-   - `PATCH /reports/{id}/resolve` (admin resolves with notes)
-
-6. **Lead & Analytics**
-   - `POST /leads` (implicit on booth/event view; or explicit endpoint)
-   - `GET /my-activity` (return user's lead history)
-   - Admin analytics dashboard endpoints
-
-7. **Spatie QueryBuilder Pagination & Filtering**
-   - Implement query pagination and sorting on future models.
-
-### 16.3 Lower Priority
-
-9. **Advanced Features**
-   - Booth availability calendar
-   - Dynamic pricing (surge pricing during peak hours)
-   - Discount codes
-   - Refund/cancellation policies
-   - Multi-language support
-   - Push notifications via FCM (endpoints exist; UI integration missing)
-   - Search by location/distance (requires geo-indexing)
-
-10. **Production Hardening**
-    - Comprehensive test suite (Pest feature/unit tests)
-    - API rate limiting tweaks per endpoint
-    - Logging & monitoring (Telescope for dev; ELK or similar for prod)
-    - Error tracking (Sentry/Rollbar)
-    - Database indexing audit
-    - Cache strategy for expensive queries
-
----
-
-## 17. Technical Debt / Known Issues
-
-### 17.1 Security Issues
-
-🔴 **CRITICAL:**
-- **Rate limiting on password reset is weak.** 3 per hour per phone allows brute force by changing IP.
-  - **Fix:** Implement account lockout or exponential backoff; log attempts
-  - **File:** [AppServiceProvider](app/Providers/AppServiceProvider.php)
-
-🟡 **HIGH:**
-- **Notification URLs hardcoded.** Password reset & verification links use `config('app.frontend_url')` which is not standard.
-  - **Fix:** Use signed URLs or frontend-generated links; verify domain before sending
-  - **Files:** [VerifyApiEmail](app/Notifications/Auth/VerifyApiEmail.php), [ResetApiPassword](app/Notifications/Auth/ResetApiPassword.php)
-
-- **WhatsApp OTP sent asynchronously without delivery confirmation.** No webhook to track failed deliveries.
-  - **Fix:** Add UltraMsg webhook listener; retry logic
-  - **File:** [SendOtpWhatsappJob](app/Jobs/SendOtpWhatsappJob.php)
-
-- **No CSRF protection on API endpoints.** Not necessary for stateless API, but ensure frontend CORS is locked down.
-  - **Fix:** Verify `APP_URL` in production matches frontend domain
-  - **File:** [config/app.php](config/app.php)
-
-### 17.2 Architectural Issues
-
-🟡 **MEDIUM:**
-- **No repositories.** Services query models directly; tight coupling makes testing harder.
-  - **Fix:** Create repository layer for data access; inject into services
-  - **Impact:** Affects all service classes in [app/Services](app/Services)
-
-- **Soft deletes not scoped by default.** Queries will return deleted records unless explicitly excluded.
-  - **Fix:** Use `withoutTrashed()` or `onlyTrashed()` where needed; add global scopes if appropriate
-  - **Files:** All model queries in services
-
-- **No database transaction error handling.** Caught exceptions might leave partial updates.
-  - **Fix:** Add explicit rollback and error logging in try/catch blocks
-  - **Files:** [AuthService](app/Services/Mobile/AuthService.php), [GoogleAuthService](app/Services/SystemUser/Exhibitor/GoogleAuthService.php)
-
-### 17.3 Code Quality Issues
-
-🟡 **MEDIUM:**
-- **Duplicate code across Admin/Exhibitor AuthService.** Both have nearly identical login logic.
-  - **Fix:** Extract shared logic to trait or base class
-  - **Files:** [Admin/AuthService](app/Services/SystemUser/Admin/AuthService.php), [Exhibitor/AuthService](app/Services/SystemUser/Exhibitor/AuthService.php)
-
-- **No logging in services.** Errors are silently thrown; hard to debug production issues.
-  - **Fix:** Add `Log::info()`, `Log::error()` throughout
-  - **Files:** All service classes
-
-- **Inconsistent null handling.** Some services use `?? throw Exception()` others use if/throw.
-  - **Fix:** Standardize on one pattern
-  - **Files:** Services, controllers
-
-### 17.4 Database Issues
-
-🟡 **MEDIUM:**
-- **No database indexes on frequently-queried columns.** Scans on phone, email, session_id could be slow.
-  - **Fix:** Add indexes: `phone` (otp_codes), `email` (users, system_users), `session_id` (otp_codes, already exists), `eventable_type` (events)
-  - **Files:** Create new migration
-
-- **Soft delete queries inefficient.** No index on `deleted_at` for soft-delete scoping.
-  - **Fix:** Add indexes on `deleted_at` columns
-  - **Files:** Create new migration
-
-- **No foreign key indexes by default.** Laravel migrations create FKs but MySQL doesn't auto-index them.
-  - **Fix:** Verify `constrained()` includes implicit indexing or add explicit indexes
-  - **Files:** Verify migrations
-
-### 17.5 Feature Gaps
-
-🟡 **MEDIUM:**
-- **No test coverage.** Only boilerplate tests exist.
-  - **Fix:** Write Pest feature tests for auth flows, CRUD endpoints, validation
-  - **Files:** [tests/Feature](tests/Feature), [tests/Unit](tests/Unit)
-
-- **No API versioning beyond URL prefix.** Future v2 changes will break v1 clients.
-  - **Fix:** Use header-based versioning or parallel route groups; document deprecation policy
-  - **Files:** Routes, controllers
-
-- **Mail driver set to log.** Won't send real emails in production.
-  - **Fix:** Configure SMTP in `.env.production`
-  - **Files:** [config/mail.php](config/mail.php)
-
-- **No request logging.** Can't audit who called what.
-  - **Fix:** Add middleware to log HTTP requests/responses (Telescope does this in dev)
-  - **Files:** Create new middleware
-
-### 17.6 Configuration Issues
-
-🟡 **MEDIUM:**
-- **Timezone hardcoded to UTC.** Events/announcements may be confusing for local users.
-  - **Fix:** Add timezone to User/SystemUser model; use in notification times
-  - **Files:** Migrations, models
-
-- **No multi-database support.** All queries hit single DB; no read replicas.
-  - **Fix:** Configure read/write connections in `config/database.php`
-  - **Files:** [config/database.php](config/database.php)
-
----
-
-## 18. Recommended Next Steps
-
-### Immediate (Next Sprint)
-
-1. **Add Authorization Policies** (blocking security issue)
-   - Create [app/Policies/](app/Policies) directory
-   - Policies: `BoothPolicy`, `CompanyPolicy`, `EventPolicy`, `BoothRequestPolicy`
-   - Add checks in all admin/exhibitor endpoints
-
-2. **Implement Booth CRUD + Request Workflow**
-   - Routes: `POST /booths`, `GET /booths/{id}`, `PATCH /booths/{id}`, etc.
-   - Request workflow: `POST /booth-requests/{id}/approve`, `/reject`
-   - Validation: Ensure booth number unique per hall, price > 0
-   - Tests: Feature tests for happy path + error cases
-
-3. **Add Event Management Endpoints**
-   - Create/update/list events
-   - Integrate EventHall booking validation (prevent double-booking)
-   - Speaker management
-
-4. **Create API Resources for All Entities**
-   - Booth, Company, Event, BoothRequest, Review, Report, Announcement, etc.
-   - Add pagination support; use `spatie/laravel-query-builder`
-
-### Short-term (Next 2-3 Sprints)
-
-5. **Add Read/List Endpoints**
-   - `/booths` with filters (hall, company, availability, price range)
-   - `/events` with date range, type, organizer filters
-   - `/companies` with search by name, sector
-   - `/announcements` filtered by receiver type
-
-6. **Reporting & Analytics**
-   - File complaints: `POST /reports`
-   - Admin resolve: `PATCH /reports/{id}/resolve`
-   - Analytics: Lead tracking, popular booths, engagement metrics
-
-7. **Database Optimization**
-   - Add missing indexes (phone, email, deleted_at, foreign keys)
-   - Review query performance with database profiler
-
-8. **Test Suite**
-   - Write Pest feature tests for all auth flows
-   - Unit tests for services (OtpService, AuthService, etc.)
-   - Achieve 70%+ coverage
-
-### Medium-term (1-2 Months)
-
-9. **Production Hardening**
-   - Error tracking (Sentry)
-   - Structured logging (ELK or Papertrail)
-   - Performance monitoring (New Relic, Datadog)
-   - Database read replicas if traffic warrants
-
-10. **Advanced Features**
-    - Push notifications via FCM
-    - Booth availability calendar with pricing
-    - Search by location (geo-indexing)
-    - Discount codes and promotions
-    - Multi-language support
-
-11. **Frontend Integration**
-    - React/Vue SPA consuming API
-    - Admin dashboard
-    - Mobile app (React Native or Flutter)
-
----
-
-## Architectural Decisions to Preserve
-
-**For any future AI session working on this project:**
-
-1. **Service-oriented design** (no repositories): Services handle all business logic; direct model queries. Keep this pattern for consistency.
-
-2. **Passport OAuth2 with dual guards:** Two separate user models (`User`, `SystemUser`) with two guards (`mobile`, `system`). Don't merge into single User model without major refactoring.
-
-3. **OTP caching + transactions:** Registration uses 10-min cache for atomicity. Don't move to database sessions without understanding race condition implications.
-
-4. **Soft deletes everywhere:** Most domain models include `deleted_at`. Queries must use `withoutTrashed()` or risk returning soft-deleted data. Add global scopes if intended as default behavior.
-
-5. **Polymorphic relations:** Lead, Saved, Review, Report use polymorphic patterns. Maintain for flexibility to track user interactions across different entity types.
-
-6. **Rate limiting per endpoint:** Custom rate limiters in AppServiceProvider, not global middleware. Keep granular control for different auth flows.
-
-7. **No authorization policies yet:** Security gap exists. Don't proceed with CRUD endpoints without adding policies first.
-
-8. **Media library for avatars:** Spatie MediaLibrary on User/SystemUser. Don't add custom file upload logic; extend Media Library instead.
-
-9. **Form requests for validation:** Always validate via Form Requests; never call `$request->all()`. Enforce `$request->validated()`.
-
-10. **DTOs for service inputs:** Use readonly DTOs for type safety; `fromRequest()` factory for conversion from Form Requests.
-
-11. **Backend-For-Frontend (BFF) Pattern:** Separate controllers and resources by user type (`Admin`, `Exhibitor`, `Visitor`) to maintain clean API contracts and Swagger docs. Do not use shared controllers with complex `if/else` guard checks.
-12. **Spatie QueryBuilder Custom Filters:** Always use dedicated classes implementing `Filter` interface in `app/Filters` for complex queries. Re-use generic filters like `MinFilter` dynamically passing the column name.
-13. **Scramble Documentation:** Document query parameters using PHP Attributes like `#[QueryParameter]` directly on controller methods instead of raw PHPDoc.
-14. **Global Exception Handling:** Rely on `bootstrap/app.php` to catch `NotFoundHttpException` and format it as a standard JSON API response.
-
----
-
-## File Locations Quick Reference
-
-**Critical Files:**
-- Config: [config/auth.php](config/auth.php), [config/passport.php](config/passport.php), [config/services.php](config/services.php)
-- Auth: [app/Services/Mobile/AuthService.php](app/Services/Mobile/AuthService.php), [app/Services/Mobile/OtpService.php](app/Services/Mobile/OtpService.php)
-- Models: [app/Models/User.php](app/Models/User.php), [app/Models/SystemUser.php](app/Models/SystemUser.php)
-- Routes: [routes/api.php](routes/api.php), [routes/api/v1/mobile.php](routes/api/v1/mobile.php), [routes/api/v1/admin.php](routes/api/v1/admin.php), [routes/api/v1/exhibitor.php](routes/api/v1/exhibitor.php)
-- Controllers: [app/Http/Controllers/Api/V1/Mobile/AuthController.php](app/Http/Controllers/Api/V1/Mobile/AuthController.php)
-- Jobs: [app/Jobs/SendOtpWhatsappJob.php](app/Jobs/SendOtpWhatsappJob.php)
-- Notifications: [app/Notifications/Auth/VerifyApiEmail.php](app/Notifications/Auth/VerifyApiEmail.php), [app/Notifications/Auth/ResetApiPassword.php](app/Notifications/Auth/ResetApiPassword.php)
-- Migrations: [database/migrations/](database/migrations/) (32 total)
-- Tests: [tests/](tests/) (minimal coverage)
-
-**Scaffolding & Support:**
-- Helpers: [app/Helper/ApiResponse.php](app/Helper/ApiResponse.php)
-- DTOs: [app/DTOs/](app/DTOs/)
-- Enums: [app/Enum/](app/Enum/)
-- Requests: [app/Http/Requests/](app/Http/Requests/)
-- Resources: [app/Http/Resources/](app/Http/Resources/)
-- Database: [database/seeders/DatabaseSeeder.php](database/seeders/DatabaseSeeder.php)
-- Console: [routes/console.php](routes/console.php) (scheduled commands)
-
----
-
-## Final Notes
-
-This document is a comprehensive snapshot of the EMS backend as of June 2026. It reflects the actual, verified state of the codebase through direct inspection of migrations, models, services, controllers, and configuration.
-
-**Use this as:**
-1. **Onboarding guide** for new developers
-2. **Handoff document** between AI sessions
-3. **Architecture reference** when making design decisions
-4. **Security audit checklist** (many items marked as debt)
-5. **Feature prioritization** based on implementation status
-
-**Update this document when:**
-- Adding/removing major features
-- Changing authentication or authorization schemes
-- Refactoring service layer
-- Adding new external integrations
-- Resolving security issues
-- Implementing policies or repositories
-
----
-
-**Document Version:** 1.1  
-**Generated:** 2026-07-11  
-**Status:** Accurate as of last codebase scan
+# EMS Backend - AI Project Context
+
+Last audited: 2026-08-14
+Document version: 2.1
+Audit status: Source, routes, live schema, tests, and static analysis reviewed after the Priority 0 repair pass
+Authoritative product source: Current routes and code behavior
+Historical requirements reference: C:\Users\LAPTOP KING\Desktop\EMS\SRS.pdf (8 pages; known to be incomplete/inaccurate and not authoritative)
+
+This document is the current handover for the EMS backend. It replaces older progress claims that no longer matched the repository.
+
+## 1. How to Read Feature Status
+
+- Implemented: The backend route and supporting code exist for the core requirement.
+- Partial: Useful implementation exists, but its code-defined workflow is incomplete or has a known defect.
+- Missing: No usable implementation was found.
+- Frontend/external: The backend exposes supporting data, but the actual client, interactive UI, or third-party workflow is outside this repository.
+- Code implementation is the source of truth for current features. The SRS traceability section is retained only as historical context until the SRS is rewritten from the code.
+- Source-complete is not the same as production-ready. The verification and known-issues sections below determine current engineering priority.
+
+## 2. Current Technical Snapshot
+
+Laravel Boost application-info reported:
+
+| Component | Current version/state |
+|---|---|
+| PHP | 8.3 |
+| Laravel | 13.13.0 |
+| Database | MySQL |
+| Passport | 13.7.5 |
+| Socialite | 5.27.0 |
+| Boost | 2.4.8 |
+| Pest | 4.7.2 |
+| PHPUnit | 12.5.28 |
+| Larastan | 3.10.0 |
+| Pint | 1.29.1 |
+| Telescope | 5.20.0 |
+| Tailwind CSS | 4.3.0 |
+
+Repository inventory:
+
+| Area | Count |
+|---|---:|
+| Non-vendor routes | 158 |
+| API routes | 156 |
+| Admin API routes | 60 |
+| Exhibitor API routes | 52 |
+| Visitor API routes | 37 |
+| Visitor auth routes | 7 |
+| Controllers | 45 |
+| Form Requests | 35 |
+| API Resources | 30 |
+| Services | 34 |
+| Eloquent models | 23 |
+| Policies | 6 |
+| Migrations | 33 |
+| Seeders | 17 |
+| Test files ending in Test.php | 10 |
+
+OpenAPI:
+
+- Scramble is installed and secures the generated specification with bearer authentication.
+- api.json currently contains 140 documented path templates.
+- Interactive API documentation is expected at /docs/api.
+- api.json is generated output and should be refreshed after route or contract changes.
+
+## 3. Product and Actors
+
+EMS is an Exhibition Management System with three backend actors:
+
+1. Visitor
+   - Model: App\Models\User
+   - Guard: mobile
+   - Intended consumer: mobile application
+
+2. Exhibitor
+   - Model: App\Models\SystemUser with type exhibitor
+   - Guard: system
+   - Intended consumer: exhibitor web dashboard
+
+3. Administrator
+   - Model: App\Models\SystemUser with type admin
+   - Guard: system
+   - Intended consumer: admin web panel
+
+The repository is primarily an API backend. It contains only minimal web views:
+
+- resources/views/welcome.blade.php
+- resources/views/scan-landing.blade.php
+
+The mobile app, admin panel, exhibitor dashboard, and interactive exhibition map are not implemented here.
+
+## 4. Architecture to Preserve
+
+The established project pattern is:
+
+Request -> Form Request -> DTO -> Service -> Eloquent Model -> API Resource
+
+Important conventions:
+
+- Separate BFF-style controllers and resources for Admin, Exhibitor, Visitor, and Shared concerns.
+- Use Passport bearer tokens with mobile and system guards.
+- Use SystemUserType to distinguish admin and exhibitor accounts.
+- Keep business workflows in services; controllers should stay thin.
+- Use Form Requests and validated data. Avoid request all-data mass assignment.
+- Use DTOs for structured service input, including PatchDTO and HasUpdatePayload for partial updates.
+- Use Spatie QueryBuilder for list filters, includes, sorting, and pagination.
+- Put non-trivial filters in app/Filter classes.
+- Return API responses through successResponse and errorResponse.
+- Use Eloquent API Resources to keep actor-specific response contracts.
+- Use policies and Gate checks for object ownership and team operations.
+- Use transactions, row locks, cache locks, and post-commit notifications for multi-record workflows.
+- Use Spatie Media Library for avatars, company media, event logos, and generated QR codes.
+- Use backed enums for domain statuses and types.
+- Preserve URL versioning under /api/v1.
+- Treat existing migrations as immutable after deployment; create new migrations for changes.
+- Before Laravel code changes, use Laravel Boost search-docs for installed-version documentation.
+- After PHP changes, run vendor/bin/pint --dirty --format agent.
+
+## 5. Authentication, Authorization, and Shared Infrastructure
+
+### Implemented
+
+- Visitor registration by phone with a six-digit OTP sent through the queued UltraMsg WhatsApp job.
+- OTP hashes, expiration, attempt limits, cooldown, daily generation limit, database row locks, and cache locks.
+- Visitor phone/password login, logout, password reset, profile update, avatar, password change, and phone-change OTP flow.
+- Exhibitor registration, email verification, email/password login, logout, password reset, and profile/avatar update.
+- Google token login through Socialite userFromToken.
+- Admin email/password login, logout, password reset, profile, and password change.
+- Passport access tokens for User and SystemUser.
+- FCM device-token registration endpoints for all actors.
+- Admin routes enforce type.admin; every authenticated exhibitor route now enforces type.exhibitor.
+- Shared FCM registration resolves both the device-token relation and OAuth access-token id from the guard selected by the route.
+- Database notifications with list, statistics, mark one read, mark all read, and delete operations.
+- Queued email/database/FCM notifications for booking requests, booking decisions, reports, reviews, invitations, and announcements.
+- Central JSON exception envelope in bootstrap/app.php when the request expects JSON.
+- English and Arabic localization files.
+
+### Partial or risky
+
+- User and SystemUser use Passport HasApiTokens but do not implement the OAuthenticatable contract described by current Passport guidance. Validate this integration before treating authentication as fully hardened.
+- config/passport.php names web as the Passport guard even though only mobile and system guards are defined.
+- Admin login and exhibitor login/register/Google auth are not route-throttled.
+- phone_update_request is defined but not attached to the visitor phone-request route.
+- The email verification route is not protected by Laravel signed middleware; it relies on the user id plus the email SHA-1 hash.
+- FcmChannel catches and logs all send failures without rethrowing, preventing queue retries for those failures.
+- Queue after_commit is false globally, so each transactional dispatch must explicitly use afterCommit or DB::afterCommit.
+
+## 6. Historical SRS Functional Traceability (Non-authoritative)
+
+This section records how the old SRS compares with the current backend. It must not be used to classify an implemented behavior as defective merely because the documents differ. Product scope and the next SRS revision should be derived from verified code behavior first.
+
+### 6.1 Admin Module
+
+| Requirement | Status | Current evidence and remaining gap |
+|---|---|---|
+| FR-ADM-01 - Admin login to the web system | Implemented | POST /api/v1/admin/login, Passport token, admin-only protected group. The actual web panel is external. |
+| FR-ADM-02 - Accept or reject booth booking requests | Implemented | Request index/show/stats, conflict preview, approve/reject, company/booth assignment, competing-request rejection, QR creation, and notifications. |
+| FR-ADM-03 - Accept or reject event requests | Implemented | Request index/show/stats, overlap checks, row locking, approve/reject, competing-request rejection, QR creation, and notifications. |
+| FR-ADM-04 - Review volunteers imported from Google Forms | Missing | No volunteer model, import, connector, route, or review workflow exists. |
+| FR-ADM-05 - Email communication portal with exhibitors | Missing | Automated verification, invitation, password, and status emails exist, but there is no admin-to-exhibitor communication portal or message workflow. |
+| FR-ADM-06 - Dashboard and general booking/exhibition statistics | Implemented | Cached admin dashboard includes summaries, daily trends, and breakdowns. Separate booth, event, report, visitor, and directory statistics also exist. |
+| FR-ADM-07 - Manage booth information and status | Partial | Admin can list, show, filter, and update number, area, price, svg_id, and qr_token. Booth allocation is managed by approval. No admin create/delete endpoint or explicit booth status field exists. |
+| FR-ADM-08 - Manage booth-service data, prices, and availability | Implemented | The code-defined API supports list/show/create/update and is_active. Routes are restricted to those four implemented API actions; no delete feature is claimed. |
+
+### 6.2 Exhibitor Module
+
+| Requirement | Status | Current evidence and remaining gap |
+|---|---|---|
+| FR-EXH-01 - Secure account creation and login | Implemented | Email registration/verification, email/password login, Google login, invite registration, logout, reset password, Passport tokens, and authenticated exhibitor-role enforcement. |
+| FR-EXH-02 - View and manage personal profile | Implemented | Shared profile show/update, avatar media, password change, and reset flow. |
+| FR-EXH-03 - View exhibition and contact information | Partial | Authenticated halls, booths, facilities, event halls, announcements, services, and nearest-event data exist. No dedicated exhibition-information or contact-details endpoint exists. |
+| FR-EXH-04 - Interactive map, available booth selection, and booking request | Backend implemented / frontend external | Booth/hall/svg data, availability filters, company creation/selection, service selection, price snapshot, and booking request exist. The interactive map UI is not in this repo. |
+| FR-EXH-05 - Manage approved booth and company data | Partial | Exhibitors can list owned booths and view company profiles. They cannot update company or booth details. |
+| FR-EXH-06 - Create events inside the exhibition | Implemented | Event creation with organizer/company, hall, time, duration, speakers, logo, pending approval, calendar, list, nearest, and statistics. No exhibitor edit/cancel flow exists. |
+| FR-EXH-07 - View interested visitors/leads | Implemented | Booth/event lead counts, visitor lists, and weekly series are implemented; event route binding uses App\Models\Event. |
+| FR-EXH-08 - General booth and event statistics | Partial | Event request statistics and per-booth/per-event lead analytics exist. There is no unified exhibitor dashboard covering all booths and events. |
+| FR-EXH-09 - Email communication with admin | Missing | No interactive contact-admin or message workflow exists. Automated system email is not a replacement. |
+| FR-EXH-10 - Manage companies/booths and invite team members | Partial | Company and booth invitations can be sent, viewed, accepted, rejected, canceled, and used for registration. Direct company/booth editing is missing. |
+
+### 6.3 Visitor Module
+
+| Requirement | Status | Current evidence and remaining gap |
+|---|---|---|
+| FR-VIS-01 - Static buses catalog | Implemented | Authenticated visitor bus catalog list; admin buses CRUD is implemented. |
+| FR-VIS-02 - Secure visitor registration and login | Implemented | OTP registration, phone/password login, logout, reset password, token issuance, and throttling. |
+| FR-VIS-03 - View and edit profile | Implemented | Profile show/update, avatar, password update, and phone update verification. |
+| FR-VIS-04 - Save companies or events | Partial | Events and booths can be toggled as saved. Companies cannot be saved. Only a saved-booths list exists; there is no saved-events list. |
+| FR-VIS-05 - View map and booth locations | Backend implemented / frontend external | Hall, booth, facility, event-hall, and svg_id data are exposed. The interactive mobile map is outside this backend. |
+| FR-VIS-06 - Receive announcements and exhibition notifications | Implemented | Audience-targeted announcements, database notifications, FCM delivery, token registration, read state, statistics, and delete. |
+| FR-VIS-07 - Review companies and events | Partial | Visitors can create/update one review per booth or event, list reviews, and delete their own review. Company reviews are not implemented; the backend models the reviewed exhibition presence as a booth. |
+| FR-VIS-08 - View scan history | Partial | QR resolution, lead registration, and scan-history resource exist. The history controller passes an unexecuted relationship builder and does not eager-load polymorphic targets; endpoint behavior and N+1 performance need correction. |
+| FR-VIS-09 - Submit a report about a booth or event | Partial | Visitor report creation and admin list/show/stats/resolve/reject are implemented with notifications. Validation does not require exactly one of event_id or booth_id, so an empty target can reach persistence and fail. |
+
+## 7. SRS Non-Functional Requirements
+
+| Requirement | Status | Assessment |
+|---|---|---|
+| NFR 4.1 - Performance | Partial | Resources, pagination, cursor pagination, eager loading, aggregates, query filters, and selected caching are used. Several unpaginated lists, N+1 paths, and no measured performance target remain. |
+| NFR 4.2 - Security | Partial | Bearer tokens, hashed passwords/OTPs, validation, admin/exhibitor role middleware, policies, and throttling exist. Incomplete throttling, unsigned verification, and remaining object/visibility review prevent production-hardening completion. |
+| NFR 4.3 - Android/iOS compatibility | Frontend/external | No mobile client is in this repository, so compatibility cannot be verified here. |
+| NFR 4.4 - Transaction integrity | Partial | Core OTP, auth, booth request, event request, invitation, review, report, announcement, and Google-login workflows use transactions and some row locks. Not every multi-step path is equally protected. |
+| NFR 4.5 - Resource optimization | Partial | with, withCount, withAvg, withExists, cursor pagination, chunkById, dashboard caching, lookup caching, and locks are used. Lazy-loading prevention is not enabled; known N+1 paths and cache-invalidation gaps remain. |
+| NFR 4.6 - API documentation | Partial | Scramble and api.json exist. The generated file has 140 path templates while the repo currently has 156 API routes; it should be regenerated after the route repair. No Postman collection exists. |
+| NFR 4.7 - Rate limiting | Partial | Named limiters cover visitor auth, OTP, password/profile updates, and reports. They do not cover every API user or all system-user auth operations. |
+| NFR 4.8 - Scalability and maintainability | Partial | Layered services, DTOs, requests, resources, filters, enums, and actor-separated controllers are established. Two failing/erroring tests, 281 static-analysis errors, inconsistent controller patterns, and deployment risks remain. |
+
+## 8. Implemented Feature Inventory
+
+### 8.1 Admin
+
+- Authentication, password reset/change, logout, profile, and FCM registration.
+- Cached dashboard:
+  - Visitors and companies totals/period counts
+  - Booth allocation
+  - Pending booth requests
+  - Upcoming events
+  - Open reports
+  - Lead totals
+  - Daily visitor/company/request/lead/event trends
+  - Gender, booth allocation, and request-status breakdowns
+- Booth inventory list/show/update with filters, includes, sorting, and pagination.
+- Booth request list/show/statistics/approve/reject/conflict response.
+- Company directory list/show.
+- Manager directory list/show/statistics.
+- Visitor directory list/statistics.
+- Event hall list/show/update.
+- Event request list/show/statistics/approve/reject/conflict handling.
+- Announcement list/show/create/update/delete with audience notifications.
+- Bus catalog list/show/create/update/delete.
+- Report list/show/statistics/resolve/reject.
+- Service list/show/create/update. These are the four intentional API actions currently implemented.
+- Hall and facility read endpoints.
+- Shared notification inbox operations.
+
+### 8.2 Exhibitor
+
+- Registration, email verification/resend, invite registration, Google login, password reset/change, profile, logout, and FCM registration.
+- Booth browse/show, booking request, selected services, new/existing company, and owned-booth list.
+- Company profile read.
+- Company/booth invitation lists and full invite lifecycle.
+- Accessible company/booth/event lookup endpoints.
+- Announcement and active-service lists.
+- Booth/event lead analytics.
+- Event hall and facility reads.
+- Event create, list, calendar, nearest, and request statistics.
+- Booth/event review analytics.
+- Shared notification inbox operations.
+
+### 8.3 Visitor
+
+- OTP registration and login/password/profile flows.
+- Company list/show.
+- Booth list/show.
+- Event list/show/nearest with saved state and filters.
+- Hall, event hall, facility, and bus-catalog reads.
+- Announcement list.
+- Save toggle for booths/events and saved-booth list.
+- Review create/update, list, and own-review delete.
+- Report creation.
+- QR lead registration and scan-history endpoint.
+- Notification inbox operations.
+- FCM token registration.
+
+### 8.4 Notifications
+
+The application has queued notification classes for:
+
+- Email verification
+- Password reset
+- Team invitations
+- New booth/event booking requests to admins
+- Booth request approved/rejected
+- Event request approved/rejected
+- New visitor reports to admins
+- New visitor reviews to exhibitors
+- Announcement created/updated
+
+Channels include database, mail where appropriate, and a custom FCM channel.
+
+## 9. Data Model and Persistence
+
+The live Boost schema confirms the domain tables are migrated in MySQL.
+
+Core auth:
+
+- users
+- system_users
+- oauth_access_tokens, oauth_refresh_tokens, oauth_clients, oauth_auth_codes, oauth_device_codes
+- otp_codes
+- device_tokens
+- password_reset_tokens
+- sessions
+
+Exhibition and booking:
+
+- companies
+- company_system_users
+- halls
+- booths
+- booth_system_users
+- booth_requests
+- services
+- booth_request_services
+
+Events and venue:
+
+- event_halls
+- events
+- event_speakers
+
+Visitor engagement and support:
+
+- announcements
+- bus_catalogs
+- facilities
+- leads
+- saved
+- reviews
+- reports
+- invitations
+- notifications
+- media
+
+Infrastructure:
+
+- jobs
+- failed_jobs
+- job_batches
+- cache and cache_locks
+- Telescope tables
+
+Important domain behavior:
+
+- Booth numbers are unique per hall.
+- Booth and event QR tokens are unique and are generated on approval.
+- Event organizers are polymorphic: SystemUser or Company.
+- Leads are polymorphic: Booth or Event.
+- Saved items are polymorphic: currently Booth or Event.
+- Reviews are polymorphic: currently Booth or Event.
+- Reports use polymorphic reporter and reportable relations.
+- Invitations target Company or Booth.
+- Company and booth team membership use pivot tables with assigned_by.
+- Most core domain models use soft deletes.
+
+## 10. External Services and Runtime Dependencies
+
+| Integration | State |
+|---|---|
+| Passport OAuth2 | Integrated with mobile and system guards; configuration concerns remain |
+| Google Socialite | Token-to-user login implemented |
+| UltraMsg WhatsApp | OTP job implemented and queued |
+| Firebase Cloud Messaging | Custom channel and guard-correct device-token storage implemented; delivery retry/failure handling still needs hardening |
+| Laravel Mail | Verification, reset, invitations, and request-status email notifications |
+| Spatie Media Library | Avatars, company logo/gallery, event logo, and QR SVG storage |
+| Spatie QueryBuilder | Filtering, includes, sorting, and pagination |
+| Endroid QR Code | QR SVG generation |
+| Scramble | OpenAPI generation and interactive docs |
+| Telescope | Development diagnostics |
+
+Production configuration remains environment-dependent:
+
+- The default mailer fallback is log.
+- The default queue connection fallback is database.
+- The default cache fallback is database.
+- Firebase credentials must be supplied.
+- UltraMsg credentials must be supplied.
+- Passport keys/clients must be provisioned.
+- A long-running queue worker is required for queued notifications and OTP delivery.
+
+## 11. Verification Baseline
+
+These results were collected on 2026-08-14 after the Priority 0 repair pass.
+
+### Routes
+
+Command:
+
+    php artisan route:list --json --except-vendor
+
+Result:
+
+- 158 non-vendor routes
+- 156 API routes
+- 60 admin routes
+- 52 exhibitor routes
+- 37 visitor routes
+- 7 visitor auth routes
+- Admin services now expose exactly index, store, show, and update.
+
+### Tests
+
+Command:
+
+    php artisan test --compact
+
+Result:
+
+- 22 tests discovered
+- 20 passed
+- 1 failed
+- 1 errored
+- 283 assertions
+
+Focused Priority 0 regression run:
+
+- 8 tests passed
+- 215 assertions
+- Covers authenticated exhibitor middleware, admin rejection, legitimate exhibitor access, system-guard FCM registration, successful system-user password change, event model binding, the admin service action set, and every registered controller action.
+
+Current failures:
+
+1. MapDataSeederTest expected 3 booth requests after repeated seeders but found 9.
+2. MapDataSeederTest errored because EventSeeder could not find a SystemUser in one seed order.
+
+Coverage is narrow:
+
+- Seeders and map fixture data
+- Notification payloads
+- Announcement notification recipient behavior
+- Default application smoke test
+
+Missing test coverage includes:
+
+- Visitor, exhibitor, and admin authentication
+- Broader guard and object-level role boundaries beyond the new exhibitor regression cases
+- OTP behavior and job failure paths
+- Booth booking and approval races
+- Event scheduling and approval races
+- Invitations and ownership
+- Saved/review/report validation
+- Visitor/exhibitor FCM token registration beyond the new system-guard regression case
+- Most API filters and pagination
+- Policies and forbidden access
+- Scheduled commands and deployment
+
+### Static Analysis
+
+Command:
+
+    vendor/bin/phpstan analyse --no-progress --error-format=table
+
+Result:
+
+- Failed with 281 reported errors.
+- Some are missing type metadata or generic QueryBuilder/Resource inference issues.
+- No PHPStan error is currently reported in the files changed for the Priority 0 fixes.
+
+### Formatting
+
+Command:
+
+    vendor/bin/pint --dirty --format agent
+
+Result:
+
+- Passed and formatted the dirty PHP files.
+
+## 12. Regenerated Problem Priorities
+
+Priorities below are based on verified code behavior and operational impact, not on differences from the old SRS.
+
+### Priority 0 - No known open blocker after this pass
+
+The previous Priority 0 findings are resolved:
+
+1. Every authenticated exhibitor route now includes type.exhibitor; an admin receives 403 and a verified exhibitor succeeds.
+2. Shared FCM registration now reads both the user and OAuth access-token id from the selected guard.
+3. Exhibitor event-lead binding uses App\Models\Event.
+4. Admin service routing exposes only the four controller actions actually implemented: index, store, show, and update.
+5. System-user password change no longer calls successResponse with the nonexistent code named argument.
+6. A route-wide regression assertion confirms that every registered controller route targets a method that exists.
+
+### Priority 1 - Fix next: broken requests or data/operational integrity
+
+1. Report target validation permits a targetless report
+   - StoreReportRequest allows both event_id and booth_id to be absent.
+   - ReportService then selects Booth with a null reportable id, so an otherwise validated request can fail during persistence.
+
+2. Visitor scan history does not execute/load the intended query correctly
+   - Mobile LeadController passes the leads relationship builder directly to a resource collection.
+   - ScanHistoryResource dereferences polymorphic leadable data, booth company media, and event media without eager loading.
+
+3. Two documented filters target nonexistent columns
+   - ManagerDirectoryController exposes filter[phone], but system_users has no phone column.
+   - FaciltyController maps filter[type] to gender, but facilities stores type and has no gender column.
+   - Supplying either affected filter can produce a database error.
+
+4. Announcement and review API contracts contain executable typos/inconsistent values
+   - StoreAnnouncementRequest accepts Exhibitors/visitors/all, update accepts exhibitors/visitors/all, and the enum uses singular values.
+   - StoreAnnouncementRequest spells webp as webg, rejecting valid WebP uploads on create.
+   - The exhibitor booth-review path is published as reviews/booht/{booth}.
+
+5. Booth approval is not protected against concurrent approvals
+   - Event approval locks the event hall before conflict checking.
+   - Booth approval checks status before the transaction and does not lock the booth/request row before assigning the company.
+   - Concurrent admin requests can race and overwrite allocation state.
+
+6. Scheduled auto-deploy is unsafe as a production mechanism
+   - app:auto-deploy runs git reset --hard origin/master, migrations, queue restart, and blocking queue:work.
+   - It is scheduled every two hours without environment restriction, withoutOverlapping, onOneServer, or a deployment lock.
+
+### Priority 2 - Security/reliability hardening and release quality
+
+7. Rate limiting is incomplete
+   - Admin login and exhibitor login/register/Google auth have no named throttle.
+   - The visitor phone-request route does not use the already-defined phone_update_request limiter.
+   - Most authenticated traffic has no general per-user limiter.
+
+8. Invitation lists perform per-row queries and lazy loads
+   - InvitaionResource runs a SystemUser existence query for every invitation.
+   - List queries eager-load sender but not inviteable, which the resource dereferences.
+   - Model::preventLazyLoading is not enabled to expose regressions during development.
+
+9. Lookup caches can return stale authorization/ownership choices
+   - Per-user company, booth, and event lookups are cached for 15 minutes.
+   - Invitation acceptance, booking approval, and company/event creation do not invalidate those keys.
+
+10. Queued external delivery needs bounded failure behavior
+    - SendOtpWhatsappJob has fixed retries/backoff but no HTTP connect/read timeout, failed handler, uniqueness, or external rate-limit middleware.
+    - FCM channel exceptions are logged and swallowed, so failed sends are not retried.
+    - Global queue after_commit remains false, requiring every transactional dispatch to opt in correctly.
+
+11. API exception JSON depends on the Accept header
+    - The exception renderer uses expectsJson only.
+    - An /api request without Accept: application/json may receive an HTML error response.
+
+12. Passport integration and configuration need validation
+    - User and SystemUser use HasApiTokens but do not implement the current OAuthenticatable contract.
+    - config/passport.php names web as the guard although the application defines system and mobile Passport guards.
+
+13. The release gate is not clean
+    - The full suite has one failure and one error in MapDataSeederTest due to non-idempotent/order-dependent seeding.
+    - PHPStan reports 281 issues; many are metadata/inference problems, but real runtime defects must be separated and fixed rather than suppressed.
+    - api.json has not yet been regenerated after the route repair.
+
+14. Saved-event support is asymmetric in the implemented API
+    - Visitors can toggle saved events and booths.
+    - Only saved booths have a retrieval endpoint, leaving saved events write-only from the API consumer's perspective.
+
+### Product decisions - not classified as defects
+
+- Visitor visibility of pending companies or unallocated booths needs an explicit product decision; the current map/browse code exposes them, so the old SRS alone is not evidence of a bug.
+- Reviews currently target booths and events. Company reviews are not assumed missing unless product scope changes.
+- Exhibitor company/booth editing, volunteer import, messaging portals, and other old-SRS items are candidates for future scope, not implementation defects without a new product decision.
+
+## 13. Unimplemented or Incomplete Capabilities
+
+### Confirmed from partial code paths
+
+- Saved events can be toggled but cannot be retrieved through a saved-events endpoint.
+- Visitor scan history has a route/resource but its query execution and relation loading are defective.
+- Reports have a complete visitor-to-admin workflow, but target validation does not enforce a target.
+- Announcement creation/update is implemented, but its receiver and media-validation contracts are inconsistent.
+- API documentation exists but has not been regenerated against the repaired 156-route API surface.
+- Authorization coverage exists for core models, but comprehensive forbidden-access tests do not.
+- Production queue monitoring, bounded external-service retries, safe deployment, and a passing release gate remain incomplete.
+
+### Not present in current code; product scope must be confirmed
+
+- Exhibitor event update/cancel/delete.
+- Company write APIs outside booking/event creation.
+- Booth create/delete administration.
+- Hall/facility administration and hall pricing workflows.
+- Visitor report history/status for reporter follow-up.
+- Volunteer/Google Forms ingestion and admin review.
+- Admin/exhibitor interactive messaging portals.
+- Exhibitor editing of approved company and booth profiles.
+- Company saving and company reviews.
+- Unified exhibitor dashboard across all booths/events.
+- Postman collection.
+- The mobile app, interactive map client, admin panel, and exhibitor panel; those clients are outside this backend repository.
+
+The second list is descriptive, not an approved backlog. Confirm product intent from implemented behavior and stakeholders before building it, then rewrite the SRS accordingly.
+
+## 14. Recommended Implementation Order
+
+1. Fix directly broken request paths
+   - Fix scan-history execution/eager loading.
+   - Require exactly one report target.
+   - Remove the nonexistent manager phone filter or add the intended schema.
+   - Correct facility filtering, announcement values/WebP validation, and the booht route typo.
+
+2. Protect data and operations
+   - Add booth-row locking during approval.
+   - Replace scheduled auto-deploy with controlled CI/CD or restrict it to an explicitly safe environment.
+   - Expand object-level authorization tests beyond the new role-boundary cases.
+
+3. Strengthen API reliability
+   - Add cache invalidation.
+   - Add system-auth and general API rate limits.
+   - Force JSON rendering for /api routes.
+   - Add timeouts, retry/failure handling, and observability for external services.
+
+4. Build a real release gate
+   - Fix the two failing tests.
+   - Add feature tests for each implemented workflow and important role boundary.
+   - Fix PHPStan real errors and improve generics/resource annotations.
+   - Run Pint, tests, PHPStan, and Scramble export in CI.
+
+5. Production hardening
+   - Configure SMTP, Firebase, UltraMsg, Passport keys/clients, queue workers, and monitoring.
+   - Validate Passport contracts/configuration and production cache/queue choices.
+
+6. Confirm future product scope
+   - Use current code behavior as the baseline.
+   - Decide which unimplemented capabilities are actually required.
+   - Rewrite the SRS after those decisions instead of treating the old document as authoritative.
+
+## 15. Quick File Map
+
+Requirements and handover:
+
+- AI_CONTEXT.md
+- C:\Users\LAPTOP KING\Desktop\EMS\SRS.pdf
+- database_architecture.dbml
+- api.json
+
+Routing:
+
+- routes/api.php
+- routes/api/v1/admin.php
+- routes/api/v1/exhibitor.php
+- routes/api/v1/mobile.php
+- routes/web.php
+- routes/console.php
+
+Authentication:
+
+- config/auth.php
+- config/passport.php
+- app/Models/User.php
+- app/Models/SystemUser.php
+- app/Services/Mobile/AuthService.php
+- app/Services/Mobile/OtpService.php
+- app/Services/SystemUser/Exhibitor/AuthService.php
+- app/Services/SystemUser/Exhibitor/GoogleAuthService.php
+
+Core workflows:
+
+- app/Services/SystemUser/Exhibitor/BoothRequestService.php
+- app/Services/SystemUser/Admin/BoothRequestService.php
+- app/Services/SystemUser/Exhibitor/EventService.php
+- app/Services/SystemUser/Admin/EventRequestService.php
+- app/Services/SystemUser/Exhibitor/InvitationService.php
+- app/Services/Mobile/ReviewService.php
+- app/Services/Mobile/ReportService.php
+- app/Services/Mobile/LeadService.php
+- app/Services/Mobile/SavedService.php
+
+Cross-cutting:
+
+- bootstrap/app.php
+- app/Providers/AppServiceProvider.php
+- app/Helper/ApiResponse.php
+- app/Services/Shared/NotificationService.php
+- app/Services/Shared/NotificationRecipientResolver.php
+- app/Services/Shared/FCMService.php
+- app/Channels/FcmChannel.php
+- app/Jobs/SendOtpWhatsappJob.php
+
+Verification:
+
+- tests/
+- phpunit.xml
+- phpstan.neon
+- .github/skills/
+
+## 16. Standard Audit Commands
+
+Use the Laragon PHP executable if php is not on PATH.
+
+    php artisan route:list --except-vendor
+    php artisan test --compact
+    vendor/bin/phpstan analyse --no-progress
+    vendor/bin/pint --dirty --format agent
+
+For database inspection and version-specific documentation, prefer Laravel Boost:
+
+- application-info
+- database-schema
+- database-query for read-only queries
+- search-docs
+- get-absolute-url before sharing project URLs
+
+## 17. Final Handover Rule
+
+Do not mark a feature complete only because a model, migration, route, or controller exists.
+
+For future AI updates, require:
+
+1. Route and implementation evidence.
+2. Correct actor/role authorization.
+3. Validation and transaction behavior.
+4. A passing feature test for the main happy path and important failures.
+5. Updated API documentation.
+6. A code-first product decision before changing behavior merely to match the historical SRS.

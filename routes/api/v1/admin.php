@@ -45,7 +45,6 @@ Route::prefix('admin')->group(function () {
             Route::get('/{hall}', [HallController::class, 'show']);
         });
 
-
         // booths
         Route::prefix('booths')->group(function () {
 
@@ -76,10 +75,11 @@ Route::prefix('admin')->group(function () {
         });
 
         // services
-        Route::resource('service', ServiceController::class);
+        Route::apiResource('service', ServiceController::class)
+            ->only(['index', 'show', 'store', 'update']);
 
         // announcments
-        Route::prefix('announcements')->group(function(){
+        Route::prefix('announcements')->group(function () {
             Route::get('/', [AnnouncementController::class, 'index']);
             Route::get('/{announcement}', [AnnouncementController::class, 'show']);
             Route::post('/', [AnnouncementController::class, 'store']);
@@ -87,8 +87,8 @@ Route::prefix('admin')->group(function () {
             Route::delete('/{announcement}', [AnnouncementController::class, 'destroy']);
         });
 
-        //busCatalog
-        Route::prefix('buses')->group(function(){
+        // busCatalog
+        Route::prefix('buses')->group(function () {
             Route::get('', [BusController::class, 'index']);
             Route::get('/{busCatalog}', [BusController::class, 'show']);
             Route::post('/', [BusController::class, 'create']);
@@ -96,8 +96,8 @@ Route::prefix('admin')->group(function () {
             Route::delete('/{busCatalog}', [BusController::class, 'destroy']);
         });
 
-        //facilities
-        Route::prefix('facilities')->group(function(){
+        // facilities
+        Route::prefix('facilities')->group(function () {
             Route::get('', [FaciltyController::class, 'index']);
             Route::get('/{facility}', [FaciltyController::class, 'show']);
         });
@@ -119,13 +119,13 @@ Route::prefix('admin')->group(function () {
         });
 
         // visitor
-        Route::prefix('visitor/')->group(function(){
+        Route::prefix('visitor/')->group(function () {
             Route::get('', [VisitorController::class, 'index']);
             Route::get('stats', [VisitorController::class, 'statistics']);
         });
 
-        //reports
-        Route::prefix('reports')->group(function(){
+        // reports
+        Route::prefix('reports')->group(function () {
             Route::get('/statistics', [ReportController::class, 'statistics']);
             Route::get('{report}', [ReportController::class, 'show']);
             Route::get('/', [ReportController::class, 'index']);

@@ -18,25 +18,27 @@ class ResetPasswordController extends Controller
     public function __construct(
         private readonly ResetSystemUserPasswordService $resetPasswordService,
         private readonly PasswordService $passwordService,
-    ){}
+    ) {}
 
     /**
      * change password
      */
-    public function changePassword(UpdatePasswordRequest $request){
+    public function changePassword(UpdatePasswordRequest $request)
+    {
         $dto = UpdatePasswordDTO::fromRequest($request->validated());
         $this->passwordService->updatePassword($request->user(), $dto);
+
         return successResponse(
             data: null,
-            message: __('passwords.password_changed'),
-            code: 200
+            message: __('passwords.password_changed')
         );
     }
 
     /**
      * send reset link
      */
-    public function sendResetLink(ForgotPasswordRequest $request){
+    public function sendResetLink(ForgotPasswordRequest $request)
+    {
         $status = $this->resetPasswordService
             ->sendResetLink($request->validated());
 
@@ -54,7 +56,8 @@ class ResetPasswordController extends Controller
     /**
      * reset password
      */
-    public function resetPassword(ResetPasswordRequest $request){
+    public function resetPassword(ResetPasswordRequest $request)
+    {
         $status = $this->resetPasswordService->resetPassword($request->validated());
 
         if ($status !== Password::PASSWORD_RESET) {
@@ -62,9 +65,9 @@ class ResetPasswordController extends Controller
                 message: __($status)
             );
         }
+
         return successResponse(
             message: __($status)
         );
     }
 }
-
