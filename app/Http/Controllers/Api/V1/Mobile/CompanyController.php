@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Mobile;
 
+use App\Enum\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SystemUser\Shared\CompanyResource;
 use App\Models\Company;
@@ -23,6 +24,7 @@ class CompanyController extends Controller
     public function index()
     {
         $companies = QueryBuilder::for(Company::class)
+            ->where('status', Status::APPROVED)
             ->allowedFilters('name', AllowedFilter::exact('business_sector'))
             ->allowedSorts('name', 'created_at')
             ->with(['logoMedia', 'booths'])
