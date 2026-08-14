@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BusController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\CompanyDirectoryController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\DashboardController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ManagerDirectoryController;
@@ -26,6 +27,7 @@ Route::prefix('admin')->group(function () {
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
 
     Route::middleware(['auth:system', 'type.admin'])->group(function () {
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         // store fcm token
         Route::post('fcm/register-token', [FCMController::class, 'store'])
             ->defaults('guardName', 'system')->name('admin.fcm.store');
