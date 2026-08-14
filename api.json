@@ -4588,7 +4588,7 @@
                 }
             }
         },
-        "/v1/exhibitor/leads/{booth}": {
+        "/v1/exhibitor/leads/booths/{booth}": {
             "get": {
                 "operationId": "lead.boothLeads",
                 "summary": "booth Leads",
@@ -4629,7 +4629,7 @@
                 }
             }
         },
-        "/v1/exhibitor/leads/{event}": {
+        "/v1/exhibitor/leads/events/{event}": {
             "get": {
                 "operationId": "lead.eventLeads",
                 "summary": "event Leads",
