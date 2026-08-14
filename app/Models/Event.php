@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Enum\EventType;
 use App\Enum\Status;
+use App\Observers\EventObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +22,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property Status $status
  * @property EventType $type
  */
+#[ObservedBy([EventObserver::class])]
 #[Fillable(['eventable_type', 'eventable_id', 'event_hall_id', 'type', 'status', 'qr_token', 'start_at', 'end_at', 'duration', 'title', 'description'])]
 class Event extends Model implements HasMedia
 {
