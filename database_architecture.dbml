@@ -1,343 +1,691 @@
-// Mobile Users (Visitors)
+Project EMS_Backend {
+  database_type: 'MySQL'
+  Note: 'Physical schema derived from the Laravel migrations and verified against the live database. Polymorphic Eloquent relationships are documented as column notes because they are not database foreign keys.'
+}
+
+// Application identities
 Table users {
-  id integer [primary key]
-  first_name varchar
-  last_name varchar
-  email varchar [unique]
-  phone varchar [unique]
-  password varchar
-  job varchar
-  location varchar
-  birthday date
-  gender varchar
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [note: 'Soft Delete']
+  id "bigint unsigned" [pk, increment, not null]
+  first_name varchar(255) [not null]
+  last_name varchar(255) [not null]
+  email varchar(255) [not null, unique]
+  phone varchar(20) [not null, unique]
+  password varchar(255) [not null]
+  job varchar(255) [not null]
+  location varchar(255) [not null]
+  birthday date [not null]
+  gender varchar(255) [not null, note: 'App\Enum\Gender: male, female']
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  deleted_at timestamp [null, note: 'Soft delete timestamp']
+
+  indexes {
+    first_name
+    last_name
+    job
+    location
+    gender
+    created_at
+  }
 }
 
-// Admins & Exhibitors
 Table system_users {
-  id integer [primary key]
-  name varchar
-  email varchar [unique]
-  password varchar [note: Nullable]
-  google_id varchar [note: Nullable]
-  type varchar [default: 'exhibitor', note: 'admin, exhibitor']
-  email_verified_at timestamp [note: Nullable]
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [note: 'Soft Delete']
+  id "bigint unsigned" [pk, increment, not null]
+  name varchar(255) [not null]
+  email varchar(255) [not null, unique]
+  password varchar(255) [null]
+  google_id varchar(255) [null]
+  type varchar(255) [not null, default: 'exhibitor', note: 'App\Enum\SystemUserType: admin, exhibitor']
+  email_verified_at timestamp [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  deleted_at timestamp [null, note: 'Soft delete timestamp']
 }
 
-// Core Exhibition Entities
+// Exhibition companies and team assignments
 Table companies {
-  id integer [primary key]
-  name varchar
-  business_sector varchar
-  social_links json [note: 'JSON object for website, facebook, twitter, linkedin, etc.']
-  phone varchar [note: 'Company public phone']
-  year_founded integer
-  description text
-  headquarters_lat float
-  headquarters_lng float
-  status varchar [default: 'pending']
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [note: 'Soft Delete']
+  id "bigint unsigned" [pk, increment, not null]
+  name varchar(255) [not null]
+  business_sector varchar(255) [not null, note: 'Cast to App\Enum\BusinessSectors by the Company model']
+  social_links json [not null]
+  phone varchar(255) [not null]
+  year_founded int [not null]
+  description text [not null]
+  headquarters_lat double [null]
+  headquarters_lng double [null]
+  status varchar(255) [not null, default: 'pending', note: 'App\Enum\Status: pending, approved, rejected']
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  deleted_at timestamp [null, note: 'Soft delete timestamp']
+
+  indexes {
+    name
+    business_sector
+    status
+  }
 }
 
-// Pivot Table for Exhibitor -> Companies
 Table company_system_users {
-  company_id integer
-  system_user_id integer
-  Indexes {
+  company_id "bigint unsigned" [not null]
+  system_user_id "bigint unsigned" [not null]
+  assigned_by "bigint unsigned" [null, note: 'System user who made the assignment']
+  created_at timestamp [not null]
+
+  indexes {
     (company_id, system_user_id) [pk]
+    system_user_id
+    assigned_by
+  }
+}
+
+// Venue and booth booking
+Table halls {
+  id "bigint unsigned" [pk, increment, not null]
+  number varchar(255) [not null, unique]
+  area double [not null]
+  type varchar(255) [not null, default: 'exhibition', note: 'App\Enum\HallType: exhibition, restaurant, mosque, bathroom, parking']
+  svg_id varchar(255) [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  deleted_at timestamp [null, note: 'Soft delete timestamp']
+}
+
+Table booths {
+  id "bigint unsigned" [pk, increment, not null]
+  hall_id "bigint unsigned" [not null]
+  company_id "bigint unsigned" [null, note: 'Assigned when a booking request is approved']
+  qr_token varchar(255) [null, unique]
+  number varchar(255) [not null]
+  area double [not null]
+  price decimal(10,2) [not null]
+  svg_id varchar(255) [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  deleted_at timestamp [null, note: 'Soft delete timestamp']
+
+  indexes {
+    company_id
+    (hall_id, number) [unique, note: 'Booth number is unique within a hall']
   }
 }
 
 Table booth_system_users {
-  booth_id integer
-  system_user_id integer
-  assigned_by integer [note: 'Admin or Owner who assigned this user']
-  created_at timestamp
-  Indexes {
+  booth_id "bigint unsigned" [not null]
+  system_user_id "bigint unsigned" [not null]
+  assigned_by "bigint unsigned" [null, note: 'System user who made the assignment']
+  created_at timestamp [not null]
+
+  indexes {
     (booth_id, system_user_id) [pk]
+    system_user_id
+    assigned_by
   }
 }
 
-Table halls {
-  id integer [primary key]
-  number varchar [unique]
-  svg_id varchar [note: Nullable]
-  area float
-  type varchar [default: 'exhibition', note: 'company, restaurant']
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [note: 'Soft Delete']
-}
-
-Table booths {
-  id integer [primary key]
-  hall_id integer
-  company_id integer [note: 'Nullable. Set automatically when a request is approved']
-  qr_token varchar [unique, note: 'Secure Token for QR Generation. Nullable']
-  svg_id varchar [note: Nullable]
-  number varchar
-  area float
-  price decimal
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [note: 'Soft Delete']
-  Indexes {
-    (hall_id, number) [unique, note: 'Booth number must be unique within the same hall']
-  }
-}
-
-// Booking System
 Table booth_requests {
-  id integer [primary key]
-  booth_id integer
-  company_id integer
-  system_user_id integer [note: 'The exhibitor who initiated the request']
-  final_price decimal
-  status varchar [default: 'pending', note: 'pending, approved, rejected']
-  reason_for_booking text
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [note: 'Soft Delete']
+  id "bigint unsigned" [pk, increment, not null]
+  booth_id "bigint unsigned" [not null]
+  company_id "bigint unsigned" [not null]
+  system_user_id "bigint unsigned" [not null, note: 'Exhibitor who initiated the request']
+  final_price decimal(10,2) [not null]
+  status varchar(255) [not null, default: 'pending', note: 'App\Enum\Status: pending, approved, rejected']
+  reason_for_booking text [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  deleted_at timestamp [null, note: 'Soft delete timestamp']
+
+  indexes {
+    booth_id
+    company_id
+    system_user_id
+    status
+  }
 }
 
 Table services {
-  id integer [primary key]
-  name varchar [unique]
-  price decimal
-  is_active boolean [default: true]
-  created_at timestamp
-  updated_at timestamp
+  id "bigint unsigned" [pk, increment, not null]
+  name varchar(255) [not null, unique]
+  price decimal(10,2) [not null]
+  is_active boolean [not null, default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  deleted_at timestamp [null, note: 'Soft delete timestamp']
 }
 
 Table booth_request_services {
-  id integer [primary key]
-  request_id integer
-  service_id integer
-  quantity integer
-  unit_price decimal [note: 'Snapshot of service price at booking time']
+  id "bigint unsigned" [pk, increment, not null]
+  request_id "bigint unsigned" [not null]
+  service_id "bigint unsigned" [not null]
+  quantity int [not null]
+  unit_price decimal(10,2) [not null, note: 'Snapshot of the service price at booking time']
+
+  indexes {
+    (request_id, service_id) [unique]
+    service_id
+  }
 }
 
-// Events System
+// Events
 Table event_halls {
-  id integer [primary key]
-  number varchar [unique]
-  svg_id varchar [unique, note: Nullable]
-  area float
-  price_per_hour decimal
+  id "bigint unsigned" [pk, increment, not null]
+  number varchar(255) [not null, unique]
+  area double [not null]
+  svg_id varchar(255) [null]
+  price_per_hour decimal(10,2) [not null]
+
+  indexes {
+    area
+  }
 }
 
 Table events {
-  id integer [primary key]
-  eventable_type varchar [note: 'App\\Models\\Company or App\\Models\\SystemUser']
-  eventable_id integer
-  event_hall_id integer
-  type varchar
-  status varchar [default: 'pending']
-  qr_token varchar [unique, note: 'Secure Token for QR Generation']
-  date datetime
-  duration integer
-  title varchar
-  description text
-  avg_rating decimal [default: 0]
-  created_at timestamp
-  updated_at timestamp
-  deleted_at timestamp [note: 'Soft Delete']
+  id "bigint unsigned" [pk, increment, not null]
+  eventable_type varchar(255) [not null, note: 'Polymorphic owner: App\Models\Company or App\Models\SystemUser']
+  eventable_id "bigint unsigned" [not null, note: 'ID in the table selected by eventable_type']
+  event_hall_id "bigint unsigned" [not null]
+  title varchar(255) [not null]
+  description text [not null]
+  avg_rating decimal(3,2) [not null, default: 0]
+  type varchar(255) [not null, default: 'other', note: 'App\Enum\EventType: conference, workshop, lecture, other']
+  status varchar(255) [not null, default: 'pending', note: 'App\Enum\Status: pending, approved, rejected']
+  qr_token varchar(255) [null, unique]
+  start_at datetime [not null]
+  duration int [not null]
+  end_at datetime [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  deleted_at timestamp [null, note: 'Soft delete timestamp']
+
+  indexes {
+    (eventable_type, eventable_id)
+    (event_hall_id, status, start_at, end_at)
+  }
 }
 
 Table event_speakers {
-  id integer [primary key]
-  event_id integer
-  name varchar
+  id "bigint unsigned" [pk, increment, not null]
+  event_id "bigint unsigned" [not null]
+  name varchar(255) [not null]
+
+  indexes {
+    event_id
+  }
 }
 
-// General Info & Interactions
+// Application communication and user interactions
 Table announcements {
-  id integer [primary key]
-  title varchar
-  description text
-  is_active boolean [default: true]
-  receiver varchar [default: 'all']
-  created_at timestamp
-  updated_at timestamp
+  id "bigint unsigned" [pk, increment, not null]
+  title varchar(255) [not null]
+  receiver varchar(255) [not null, default: 'all', note: 'App\Enum\AnnouncementReceiverType: visitor, exhibitor, all']
+  description text [not null]
+  is_active boolean [not null, default: true]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+
+  indexes {
+    receiver
+  }
 }
 
-// User Interactions (Leads, Saved, Reviews)
 Table leads {
-  id integer [primary key]
-  user_id integer
-  leadable_type varchar [note: 'App\\Models\\Booth or App\\Models\\Event']
-  leadable_id integer
-  created_at timestamp
-  Indexes {
-    (user_id, leadable_type, leadable_id) [unique, note: 'Prevent duplicate scans']
+  id "bigint unsigned" [pk, increment, not null]
+  user_id "bigint unsigned" [not null]
+  leadable_type varchar(255) [not null, note: 'Polymorphic target: App\Models\Booth or App\Models\Event']
+  leadable_id "bigint unsigned" [not null, note: 'ID in the table selected by leadable_type']
+  created_at timestamp [not null]
+
+  indexes {
+    (leadable_type, leadable_id)
+    (user_id, leadable_type, leadable_id) [unique, note: 'Prevents duplicate scans']
   }
 }
 
 Table saved {
-  id integer [primary key]
-  user_id integer
-  savedable_type varchar [note: 'App\\Models\\Company or App\\Models\\Event']
-  savedable_id integer
-  created_at timestamp
-  Indexes {
-    (user_id, savedable_type, savedable_id) [unique, note: 'Prevent duplicate saves']
+  id "bigint unsigned" [pk, increment, not null]
+  user_id "bigint unsigned" [not null]
+  savedable_type varchar(255) [not null, note: 'Polymorphic target: App\Models\Booth or App\Models\Event']
+  savedable_id "bigint unsigned" [not null, note: 'ID in the table selected by savedable_type']
+  created_at timestamp [not null]
+
+  indexes {
+    (savedable_type, savedable_id)
+    (user_id, savedable_type, savedable_id) [unique, note: 'Prevents duplicate saves']
   }
 }
 
 Table reviews {
-  id integer [primary key]
-  user_id integer
-  reviewable_type varchar [note: 'App\\Models\\Event or App\\Models\\Booth']
-  reviewable_id integer
-  rating integer [note: 'Value between 1 and 5']
-  comment text
-  created_at timestamp
-  updated_at timestamp
-  Indexes {
-    (user_id, reviewable_type, reviewable_id) [unique, note: 'Prevent multiple reviews']
+  id "bigint unsigned" [pk, increment, not null]
+  user_id "bigint unsigned" [not null]
+  reviewable_type varchar(255) [not null, note: 'Polymorphic target: App\Models\Booth or App\Models\Event']
+  reviewable_id "bigint unsigned" [not null, note: 'ID in the table selected by reviewable_type']
+  rating "tinyint unsigned" [not null, note: 'Application validation limits this value to 1 through 5']
+  comment text [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+
+  indexes {
+    (reviewable_type, reviewable_id)
+    (user_id, reviewable_type, reviewable_id) [unique, note: 'Prevents multiple reviews by the same user']
   }
 }
 
-// Laravel Native Database Notifications Table
-Table notifications {
-  id uuid [primary key]
-  type varchar
-  notifiable_type varchar [note: 'App\\Models\\User or App\\Models\\SystemUser']
-  notifiable_id integer
-  data text [note: 'JSON payload containing title, message, action_url, etc.']
-  read_at timestamp
-  created_at timestamp
-  updated_at timestamp
-}
-
-// Advanced Reports System (Complaints)
 Table reports {
-  id integer [primary key]
-  reporter_type varchar [note: 'App\\Models\\User or App\\Models\\SystemUser (Who sent the report)']
-  reporter_id integer
-  reportable_type varchar [note: 'App\\Models\\Booth, App\\Models\\Event, App\\Models\\Review, etc. Nullable if general complaint']
-  reportable_id integer [note: 'Nullable']
-  title varchar
-  description text
-  resolved_by integer [note: 'FK to system_users.id (The admin who handled it)']
-  status varchar [default: 'pending', note: 'pending, resolved, dismissed']
-  admin_notes text [note: 'Internal notes written by the admin']
-  created_at timestamp
-  updated_at timestamp
+  id "bigint unsigned" [pk, increment, not null]
+  reporter_type varchar(255) [not null, note: 'Polymorphic reporter: App\Models\User']
+  reporter_id "bigint unsigned" [not null, note: 'ID in the table selected by reporter_type']
+  reportable_type varchar(255) [null, note: 'Optional polymorphic target: App\Models\Booth or App\Models\Event']
+  reportable_id "bigint unsigned" [null, note: 'ID in the table selected by reportable_type']
+  title varchar(255) [not null]
+  description text [not null]
+  resolved_by "bigint unsigned" [null, note: 'Admin who handled the report']
+  status varchar(255) [not null, default: 'pending', note: 'App\Enum\ReportStatus: pending, resolved, rejected']
+  admin_notes text [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+
+  indexes {
+    (reporter_type, reporter_id)
+    (reportable_type, reportable_id)
+    resolved_by
+  }
 }
 
-Table bus_catalog {
-  id integer [primary key]
-  location varchar
-  start_time time
-  end_time time
-  duration integer
-  created_at timestamp
-  updated_at timestamp
+Table invitations {
+  id "bigint unsigned" [pk, increment, not null]
+  sender_id "bigint unsigned" [not null]
+  inviteable_type varchar(255) [not null, note: 'Polymorphic target: App\Models\Company or App\Models\Booth']
+  inviteable_id "bigint unsigned" [not null, note: 'ID in the table selected by inviteable_type']
+  email varchar(255) [not null]
+  token varchar(255) [not null, unique]
+  status varchar(255) [not null, default: 'pending', note: 'App\Enum\Status: pending, approved, rejected']
+  expires_at timestamp [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+
+  indexes {
+    sender_id
+    (inviteable_type, inviteable_id)
+    email
+  }
+}
+
+Table notifications {
+  id char(36) [pk, not null]
+  type varchar(255) [not null]
+  notifiable_type varchar(255) [not null, note: 'Polymorphic recipient: App\Models\User or App\Models\SystemUser']
+  notifiable_id "bigint unsigned" [not null, note: 'ID in the table selected by notifiable_type']
+  data text [not null, note: 'JSON notification payload stored as text']
+  read_at timestamp [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+
+  indexes {
+    (notifiable_type, notifiable_id)
+  }
+}
+
+// Venue utilities
+Table bus_catalogs {
+  id "bigint unsigned" [pk, increment, not null]
+  location varchar(255) [not null]
+  start_time time [not null]
+  end_time time [not null]
+  duration int [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+
+  indexes {
+    location
+  }
 }
 
 Table facilities {
-  id integer [primary key]
-  number varchar [unique]
-  gender varchar
-  svg_id varchar [note: Nullable]
-  type varchar [note: 'toilet, mosque, etc.']
+  id "bigint unsigned" [pk, increment, not null]
+  number varchar(255) [not null, unique]
+  gender varchar(255) [not null, note: 'App\Enum\Gender: male, female']
+  svg_id varchar(255) [null]
+  type varchar(255) [not null, note: 'Cast to App\Enum\FacilityType by the Facility model']
 }
 
-// Polymorphic & Auth Meta
+// Authentication support
 Table device_tokens {
-  id integer [primary key]
-  tokenable_type varchar [note: 'App\\Models\\User or App\\Models\\SystemUser']
-  tokenable_id integer
-  fcm_token varchar [unique]
-  device_type varchar
-  oauth_access_token_id char [note: Nullable]
-  created_at timestamp
-  updated_at timestamp
+  id "bigint unsigned" [pk, increment, not null]
+  tokenable_type varchar(255) [not null, note: 'Polymorphic owner: App\Models\User or App\Models\SystemUser']
+  tokenable_id "bigint unsigned" [not null, note: 'ID in the table selected by tokenable_type']
+  fcm_token varchar(255) [not null, unique]
+  device_type varchar(255) [not null, note: 'App\Enum\DeviceType: android, ios, web']
+  oauth_access_token_id char(80) [null, note: 'Logical Passport access-token ID; no database foreign key is declared']
+  created_at timestamp [null]
+  updated_at timestamp [null]
+
+  indexes {
+    (tokenable_type, tokenable_id)
+  }
 }
 
 Table otp_codes {
-  id integer [primary key]
-  phone varchar
-  otp varchar
-  type varchar
-  attempts integer [default: 0]
-  is_used boolean [default: false]
-  expires_at timestamp
-  session_id varchar [unique]
-  created_at timestamp
-  updated_at timestamp
-  Indexes {
+  id "bigint unsigned" [pk, increment, not null]
+  phone varchar(255) [not null]
+  otp varchar(255) [not null]
+  type varchar(255) [not null]
+  attempts int [not null, default: 0]
+  is_used boolean [not null, default: false]
+  expires_at timestamp [not null]
+  session_id varchar(255) [not null, unique]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+
+  indexes {
     phone [name: 'idx_phone']
   }
 }
 
-// Spatie Media Library (For Centralized Media Management)
+Table password_reset_tokens {
+  email varchar(255) [pk, not null]
+  token varchar(255) [not null]
+  created_at timestamp [null]
+}
+
+Table sessions {
+  id varchar(255) [pk, not null]
+  user_id "bigint unsigned" [null, note: 'Logical authenticatable ID; no database foreign key is declared']
+  ip_address varchar(45) [null]
+  user_agent text [null]
+  payload longtext [not null]
+  last_activity int [not null]
+
+  indexes {
+    user_id
+    last_activity
+  }
+}
+
+// Laravel Passport
+Table oauth_clients {
+  id char(36) [pk, not null]
+  owner_type varchar(255) [null, note: 'Optional polymorphic client owner']
+  owner_id "bigint unsigned" [null, note: 'ID in the table selected by owner_type']
+  name varchar(255) [not null]
+  secret varchar(255) [null]
+  provider varchar(255) [null]
+  redirect_uris text [not null]
+  grant_types text [not null]
+  revoked boolean [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+
+  indexes {
+    (owner_type, owner_id)
+  }
+}
+
+Table oauth_auth_codes {
+  id char(80) [pk, not null]
+  user_id "bigint unsigned" [not null, note: 'Logical authenticatable ID; no database foreign key is declared']
+  client_id char(36) [not null, note: 'Logical oauth_clients ID; no database foreign key is declared']
+  scopes text [null]
+  revoked boolean [not null]
+  expires_at datetime [null]
+
+  indexes {
+    user_id
+  }
+}
+
+Table oauth_access_tokens {
+  id char(80) [pk, not null]
+  user_id "bigint unsigned" [null, note: 'Logical authenticatable ID; no database foreign key is declared']
+  client_id char(36) [not null, note: 'Logical oauth_clients ID; no database foreign key is declared']
+  name varchar(255) [null]
+  scopes text [null]
+  revoked boolean [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  expires_at datetime [null]
+
+  indexes {
+    user_id
+  }
+}
+
+Table oauth_refresh_tokens {
+  id char(80) [pk, not null]
+  access_token_id char(80) [not null, note: 'Logical oauth_access_tokens ID; no database foreign key is declared']
+  revoked boolean [not null]
+  expires_at datetime [null]
+
+  indexes {
+    access_token_id
+  }
+}
+
+Table oauth_device_codes {
+  id char(80) [pk, not null]
+  user_id "bigint unsigned" [null, note: 'Logical authenticatable ID; no database foreign key is declared']
+  client_id char(36) [not null, note: 'Logical oauth_clients ID; no database foreign key is declared']
+  user_code char(8) [not null, unique]
+  scopes text [not null]
+  revoked boolean [not null]
+  user_approved_at datetime [null]
+  last_polled_at datetime [null]
+  expires_at datetime [null]
+
+  indexes {
+    user_id
+    client_id
+  }
+}
+
+// Spatie Media Library
 Table media {
-  id integer [primary key]
-  model_type varchar
-  model_id integer
-  uuid uuid [unique, note: Nullable]
-  collection_name varchar
-  name varchar
-  file_name varchar
-  mime_type varchar [note: Nullable]
-  disk varchar
-  conversions_disk varchar [note: Nullable]
-  size integer
-  manipulations json
-  custom_properties json
-  generated_conversions json
-  responsive_images json
-  order_column integer [note: Nullable]
-  created_at timestamp
-  updated_at timestamp
+  id "bigint unsigned" [pk, increment, not null]
+  model_type varchar(255) [not null, note: 'Polymorphic media owner: Announcement, Booth, BoothRequest, Company, Event, Hall, SystemUser, or User']
+  model_id "bigint unsigned" [not null, note: 'ID in the table selected by model_type']
+  uuid char(36) [null, unique]
+  collection_name varchar(255) [not null]
+  name varchar(255) [not null]
+  file_name varchar(255) [not null]
+  mime_type varchar(255) [null]
+  disk varchar(255) [not null]
+  conversions_disk varchar(255) [null]
+  size "bigint unsigned" [not null]
+  manipulations json [not null]
+  custom_properties json [not null]
+  generated_conversions json [not null]
+  responsive_images json [not null]
+  order_column "int unsigned" [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+
+  indexes {
+    (model_type, model_id)
+    order_column
+  }
 }
 
-Table invitations {
-  id integer [primary key]
-  sender_id integer
-  inviteable_type varchar
-  inviteable_id integer
-  email varchar
-  token varchar [unique]
-  status varchar [default: 'pending']
-  expires_at timestamp
-  created_at timestamp
-  updated_at timestamp
+// Laravel cache and queues
+Table cache {
+  key varchar(255) [pk, not null]
+  value mediumtext [not null]
+  expiration bigint [not null]
+
+  indexes {
+    expiration
+  }
 }
 
-// Relationships
-Ref: company_system_users.system_user_id > system_users.id [delete: cascade]
-Ref: company_system_users.company_id > companies.id [delete: cascade]
+Table cache_locks {
+  key varchar(255) [pk, not null]
+  owner varchar(255) [not null]
+  expiration bigint [not null]
 
-Ref: booth_system_users.booth_id > booths.id [delete: cascade]
-Ref: booth_system_users.system_user_id > system_users.id [delete: cascade]
-Ref: booth_system_users.assigned_by > system_users.id [delete: set null]
+  indexes {
+    expiration
+  }
+}
 
-Ref: booths.hall_id > halls.id [delete: cascade]
-Ref: booths.company_id > companies.id [delete: set null]
+Table jobs {
+  id "bigint unsigned" [pk, increment, not null]
+  queue varchar(255) [not null]
+  payload longtext [not null]
+  attempts "smallint unsigned" [not null]
+  reserved_at "int unsigned" [null]
+  available_at "int unsigned" [not null]
+  created_at "int unsigned" [not null]
 
-Ref: booth_requests.booth_id > booths.id
-Ref: booth_requests.company_id > companies.id
-Ref: booth_requests.system_user_id > system_users.id
+  indexes {
+    queue
+  }
+}
 
-Ref: booth_request_services.request_id > booth_requests.id [delete: cascade]
-Ref: booth_request_services.service_id > services.id
+Table job_batches {
+  id varchar(255) [pk, not null]
+  name varchar(255) [not null]
+  total_jobs int [not null]
+  pending_jobs int [not null]
+  failed_jobs int [not null]
+  failed_job_ids longtext [not null]
+  options mediumtext [null]
+  cancelled_at int [null]
+  created_at int [not null]
+  finished_at int [null]
+}
 
-Ref: events.event_hall_id > event_halls.id
-Ref: event_speakers.event_id > events.id [delete: cascade]
+Table failed_jobs {
+  id "bigint unsigned" [pk, increment, not null]
+  uuid varchar(255) [not null, unique]
+  connection text [not null]
+  queue text [not null]
+  payload longtext [not null]
+  exception longtext [not null]
+  failed_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+}
 
-Ref: leads.user_id > users.id [delete: cascade]
-Ref: saved.user_id > users.id [delete: cascade]
-Ref: reviews.user_id > users.id [delete: cascade]
-Ref: reports.resolved_by > system_users.id [delete: set null]
+Table migrations {
+  id "int unsigned" [pk, increment, not null]
+  migration varchar(255) [not null]
+  batch int [not null]
+}
 
-Ref: invitations.sender_id > system_users.id [delete: cascade]
+// Laravel Telescope
+Table telescope_entries {
+  sequence "bigint unsigned" [pk, increment, not null]
+  uuid char(36) [not null, unique]
+  batch_id char(36) [not null]
+  family_hash varchar(255) [null]
+  should_display_on_index boolean [not null, default: true]
+  type varchar(20) [not null]
+  content longtext [not null]
+  created_at datetime [null]
+
+  indexes {
+    batch_id
+    family_hash
+    created_at
+    (type, should_display_on_index)
+  }
+}
+
+Table telescope_entries_tags {
+  entry_uuid char(36) [not null]
+  tag varchar(255) [not null]
+
+  indexes {
+    (entry_uuid, tag) [pk]
+    tag
+  }
+}
+
+Table telescope_monitoring {
+  tag varchar(255) [pk, not null]
+}
+
+// Physical foreign keys
+Ref: company_system_users.company_id > companies.id [delete: cascade, update: no action]
+Ref: company_system_users.system_user_id > system_users.id [delete: cascade, update: no action]
+Ref: company_system_users.assigned_by > system_users.id [delete: set null, update: no action]
+
+Ref: booths.hall_id > halls.id [delete: no action, update: no action]
+Ref: booths.company_id > companies.id [delete: set null, update: no action]
+
+Ref: booth_system_users.booth_id > booths.id [delete: cascade, update: no action]
+Ref: booth_system_users.system_user_id > system_users.id [delete: cascade, update: no action]
+Ref: booth_system_users.assigned_by > system_users.id [delete: set null, update: no action]
+
+Ref: booth_requests.booth_id > booths.id [delete: no action, update: no action]
+Ref: booth_requests.company_id > companies.id [delete: no action, update: no action]
+Ref: booth_requests.system_user_id > system_users.id [delete: no action, update: no action]
+
+Ref: booth_request_services.request_id > booth_requests.id [delete: cascade, update: no action]
+Ref: booth_request_services.service_id > services.id [delete: restrict, update: no action]
+
+Ref: events.event_hall_id > event_halls.id [delete: no action, update: no action]
+Ref: event_speakers.event_id > events.id [delete: cascade, update: no action]
+
+Ref: leads.user_id > users.id [delete: cascade, update: no action]
+Ref: saved.user_id > users.id [delete: cascade, update: no action]
+Ref: reviews.user_id > users.id [delete: cascade, update: no action]
+Ref: reports.resolved_by > system_users.id [delete: set null, update: no action]
+Ref: invitations.sender_id > system_users.id [delete: cascade, update: no action]
+
+Ref: telescope_entries_tags.entry_uuid > telescope_entries.uuid [delete: cascade, update: no action]
+
+// Diagram organization
+TableGroup identities_and_authentication {
+  users
+  system_users
+  password_reset_tokens
+  sessions
+  device_tokens
+  otp_codes
+  oauth_clients
+  oauth_auth_codes
+  oauth_access_tokens
+  oauth_refresh_tokens
+  oauth_device_codes
+}
+
+TableGroup exhibition_management {
+  companies
+  company_system_users
+  halls
+  booths
+  booth_system_users
+  booth_requests
+  services
+  booth_request_services
+}
+
+TableGroup events_and_engagement {
+  event_halls
+  events
+  event_speakers
+  announcements
+  leads
+  saved
+  reviews
+  reports
+  invitations
+  notifications
+}
+
+TableGroup venue_utilities {
+  bus_catalogs
+  facilities
+}
+
+TableGroup media_storage {
+  media
+}
+
+TableGroup laravel_infrastructure {
+  cache
+  cache_locks
+  jobs
+  job_batches
+  failed_jobs
+  migrations
+  telescope_entries
+  telescope_entries_tags
+  telescope_monitoring
+}
