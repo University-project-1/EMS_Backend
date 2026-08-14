@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Booth;
+use App\Models\Event;
+use App\Observers\BoothObserver;
+use App\Observers\EventObserver;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
@@ -75,8 +79,8 @@ class AppServiceProvider extends ServiceProvider
             });
         });
 
-        RateLimiter::for('report', function(Request $reqeust){
-            return Limit::perHour(5)->by($reqeust->user()->id)->response(function(){
+        RateLimiter::for('report', function (Request $reqeust) {
+            return Limit::perHour(5)->by($reqeust->user()->id)->response(function () {
                 return errorResponse(__('rate_limit.report'), [], 429);
             });
         });
