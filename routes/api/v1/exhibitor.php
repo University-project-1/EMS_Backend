@@ -90,8 +90,8 @@ Route::prefix('exhibitor')->group(function () {
         Route::get('services', [ServiceController::class, 'index']);
 
         Route::prefix('leads')->group(function(){
-            Route::get('/{booth}', [LeadController::class, 'boothLeads']);
-            Route::get('/{event}', [LeadController::class, 'eventLeads']);
+            Route::get('/booths/{booth}', [LeadController::class, 'boothLeads']);
+            Route::get('/events/{event}', [LeadController::class, 'eventLeads']);
         });
 
         // eventHall
