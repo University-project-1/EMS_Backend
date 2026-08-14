@@ -19,4 +19,13 @@ return [
     'review_created_body' => 'وصلك تقييم جديد بمعدل :rating نجوم.',
     'booking_request_created_title' => 'طلب حجز جديد',
     'booking_request_created_body' => 'يوجد طلب حجز جديد لبوث أو فعالية بانتظار مراجعتك.',
+    'event_reminder_title' => 'إيفنتك سيبدأ قريباً',
+    'event_reminder_body' => 'سيبدأ إيفنت :title بعد 15 دقيقة.',
+    'company_booth_created_title' => 'بوث جديد من شركة مهتم بها',
+    'company_booth_created_body' => 'شركة مهتم بها حجزت :title.',
+    'company_event_created_title' => 'إيفنت جديد من شركة مهتم بها',
+    'company_event_created_body' => 'شركة مهتم بها أنشأت إيفنت :title.',
+    'organizer_event_created_title' => 'إيفنت جديد من منظم مهتم به',
+    'organizer_event_created_body' => 'منظم مهتم به أنشأ إيفنت :title.',
+    'booth_label' => 'البوث رقم :number',
 ];
