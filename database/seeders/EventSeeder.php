@@ -8,8 +8,10 @@ use App\Models\Company;
 use App\Models\Event;
 use App\Models\EventHall;
 use App\Models\SystemUser;
+use App\Services\Shared\QrCodeService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class EventSeeder extends Seeder
 {
@@ -123,7 +125,9 @@ class EventSeeder extends Seeder
             ],
         ];
 
-        foreach ($events as $eventData) {
+        $eventAssets = ['alawael.png', 'Elba3eth.png', 'RBCs.png', 'RGBs.jpg', 'wasem.png'];
+
+        foreach ($events as $index => $eventData) {
             $startAt = $eventData['start_at'];
             $eventable = $eventData['eventable'];
             $speakers = $eventData['speakers'];
@@ -148,6 +152,51 @@ class EventSeeder extends Seeder
             $event->speakers()->createMany(
                 array_map(fn (string $speaker): array => ['name' => $speaker], $speakers)
             );
+
+            if ($event->status === Status::APPROVED && $event->eventable_type === Company::class) {
+                $event->loadMissing('eventable');
+
+                if ($event->eventable instanceof Company) {
+                    $event->eventable->update(['status' => Status::APPROVED]);
+                }
+            }
+
+            $this->syncQrCodeMedia($event);
+            $this->syncEventImage(
+                $event,
+                $eventAssets[$index % count($eventAssets)]
+            );
         }
+    }
+
+    private function syncEventImage(Event $event, string $asset): void
+    {
+        $assetPath = database_path('assets/'.$asset);
+
+        if (! is_file($assetPath)) {
+            throw new \RuntimeException("Missing event image asset: {$asset}");
+        }
+
+        $event->clearMediaCollection('event-logo');
+        $event->copyMedia($assetPath)->toMediaCollection('event-logo');
+    }
+
+    private function syncQrCodeMedia(Event $event): void
+    {
+        $event->clearMediaCollection('qr_code');
+
+        if ($event->status !== Status::APPROVED) {
+            return;
+        }
+
+        $token = $event->qr_token ?? 'E-SEED-'.Str::slug($event->title);
+
+        if ($event->qr_token !== $token) {
+            $event->forceFill(['qr_token' => $token])->saveQuietly();
+        }
+
+        $event->addMediaFromString(app(QrCodeService::class)->generateSvg($token))
+            ->usingFileName("{$token}.svg")
+            ->toMediaCollection('qr_code');
     }
 }

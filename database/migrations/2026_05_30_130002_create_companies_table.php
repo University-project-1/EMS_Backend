@@ -10,15 +10,15 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table): void {
             $table->id();
-            $table->string('name');
-            $table->string('business_sector');
+            $table->string('name')->index();
+            $table->string('business_sector')->index();
             $table->json('social_links');
             $table->string('phone');
             $table->integer('year_founded');
             $table->text('description');
-            $table->float('headquarters_lat');
-            $table->float('headquarters_lng');
-            $table->string('status')->default('pending');
+            $table->float('headquarters_lat')->nullable();
+            $table->float('headquarters_lng')->nullable();
+            $table->string('status')->default('pending')->index();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['hall_id', 'company_id', 'qr_token', 'number', 'svg_id', 'area', 'price'])]
 class Booth extends Model implements HasMedia
@@ -44,6 +45,11 @@ class Booth extends Model implements HasMedia
     public function boothRequests(): HasMany
     {
         return $this->hasMany(BoothRequest::class);
+    }
+
+    public function latestBoothRequest(): HasOne
+    {
+        return $this->hasOne(BoothRequest::class)->latestOfMany();
     }
 
     public function leads(): MorphMany

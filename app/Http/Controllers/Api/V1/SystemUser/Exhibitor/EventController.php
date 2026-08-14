@@ -12,8 +12,11 @@ use App\Http\Resources\Shared\EventResource;
 use App\Models\Event;
 use App\Services\SystemUser\Exhibitor\EventService;
 use Dedoc\Scramble\Attributes\Group;
+use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 #[Group('SystemUser/Exhibitor/Events')]
 class EventController extends Controller
@@ -44,9 +47,14 @@ class EventController extends Controller
     /**
      * myEvents
      */
+    #[QueryParameter('filter[status]', 'Filter booths by exact booth status', required: false, type: 'string')]
     public function index()
     {
-        $events = Event::query()->accessibleBy(auth('system')->user())
+        $events = QueryBuilder::for(Event::class)
+            ->allowedFilters(
+                AllowedFilter::exact('status')
+            )
+            ->accessibleBy(auth('system')->user())
             ->select('events.*')
             ->selectRaw('1 as can_view_qr')
             ->with(['media', 'speakers', 'eventable'])

@@ -20,12 +20,17 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CompanySeeder::class,
             ServiceSeeder::class,
-            BusCatalogSeeder::class,
+            BusCatalogsSeeder::class,
             HallSeeder::class,
             FacilitySeeder::class,
             BoothSeeder::class,
             BoothRequestSeeder::class,
             EventSeeder::class,
+            LeadSeeder::class,
+            SavedSeeder::class,
+            NotificationSeeder::class,
+            ReportSeeder::class,
+            ReviewSeeder::class,
         ]);
     }
 }

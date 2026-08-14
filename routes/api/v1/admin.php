@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\V1\Shared\EventHallController;
+use App\Http\Controllers\Api\V1\Shared\FaciltyController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
 use App\Http\Controllers\Api\V1\Shared\NotificationController;
@@ -8,8 +8,9 @@ use App\Http\Controllers\Api\V1\SystemUser\Admin\AnnouncementController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\BoothRequestController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\BusController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\CompanyDirectoryController;
-use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController as AdminEventHallController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\EventHallController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\EventRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ManagerDirectoryController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ReportController;
@@ -27,7 +28,7 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth:system', 'type.admin'])->group(function () {
         // store fcm token
         Route::post('fcm/register-token', [FCMController::class, 'store'])
-            ->defaults('guardName', 'web')->name('admin.fcm.store');
+            ->defaults('guardName', 'system')->name('admin.fcm.store');
 
         Route::post('change-password', [ResetPasswordController::class, 'changePassword'])->middleware('throttle:password_update');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -83,13 +84,27 @@ Route::prefix('admin')->group(function () {
             Route::patch('/{announcement}', [AnnouncementController::class, 'update']);
             Route::delete('/{announcement}', [AnnouncementController::class, 'destroy']);
         });
-        // Route::resource('announcement', AnnouncementController::class);
+
+        //busCatalog
+        Route::prefix('buses')->group(function(){
+            Route::get('', [BusController::class, 'index']);
+            Route::get('/{busCatalog}', [BusController::class, 'show']);
+            Route::post('/', [BusController::class, 'create']);
+            Route::patch('/{busCatalog}', [BusController::class, 'update']);
+            Route::delete('/{busCatalog}', [BusController::class, 'destroy']);
+        });
+
+        //facilities
+        Route::prefix('facilities')->group(function(){
+            Route::get('', [FaciltyController::class, 'index']);
+            Route::get('/{facility}', [FaciltyController::class, 'show']);
+        });
 
         // eventHall
         Route::prefix('eventHall/')->group(function () {
             Route::get('', [EventHallController::class, 'index'])->name('admin.event_halls.index');
             Route::get('{eventHall}', [EventHallController::class, 'show'])->name('admin.event_halls.show');
-            Route::patch('{eventHall}', [AdminEventHallController::class, 'update']);
+            Route::patch('{eventHall}', [EventHallController::class, 'update']);
         });
 
         // event request

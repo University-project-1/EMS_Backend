@@ -11,7 +11,6 @@ use App\Models\BoothRequest;
 use App\Services\SystemUser\Admin\BoothRequestService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
-use Illuminate\Support\Facades\Cache;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -22,18 +21,28 @@ class BoothRequestController extends Controller
         public readonly BoothRequestService $boothRequestService,
     ) {}
 
+    /**
+     * statistics
+     */
     public function statistics()
     {
-        $stats = Cache::remember('admin_bootRequests_stat', 600, function () {
-            return [
-                'total_requests' => BoothRequest::count(),
-                'pending_requests' => BoothRequest::where('status', Status::PENDING->value)->count(),
-                'approved_requests' => BoothRequest::where('status', Status::APPROVED->value)->count(),
-            ];
-        });
+
+        $stats = BoothRequest::query()
+            ->selectRaw('COUNT(*) AS total_requests')
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS pending_requests', [Status::PENDING->value])
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS approved_requests', [Status::APPROVED->value])
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS rejected_requests', [Status::REJECTED->value])
+            ->first();
+
+        $result =  [
+            'total_requests' => (int) $stats->total_requests,
+            'pending_requests' => (int) $stats->pending_requests,
+            'approved_requests' => (int) $stats->approved_requests,
+            'rejected_requests' => (int) $stats->rejected_requests,
+        ];
 
         return successResponse(
-            data: $stats,
+            data: $result,
             message: 'booth request statistics retrived successfully',
         );
     }

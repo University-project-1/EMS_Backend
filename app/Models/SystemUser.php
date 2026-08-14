@@ -38,7 +38,7 @@ class SystemUser extends Authenticatable implements HasMedia, MustVerifyEmail
 
     public function companies(): BelongsToMany
     {
-        return $this->belongsToMany(Company::class, 'company_system_users');
+        return $this->belongsToMany(Company::class, 'company_system_users')->withPivot('assigned_by');
     }
 
     public function booths(): BelongsToMany

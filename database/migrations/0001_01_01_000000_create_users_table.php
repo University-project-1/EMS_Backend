@@ -23,7 +23,7 @@ return new class extends Migration
             $table->date('birthday');
             $table->string('gender')->index();
             $table->timestamp('created_at')->index();
-            $table->timestamp('updated_at');            
+            $table->timestamp('updated_at');
             $table->softDeletes();
         });
 

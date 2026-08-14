@@ -9,17 +9,11 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class NotificationService
 {
-    /**
-     * Get authenticated user according to the guard.
-     */
     protected function user(string $guardName)
     {
         return auth($guardName)->user();
     }
 
-    /**
-     * Get notifications.
-     */
     public function index(string $guardName, int $perPage)
     {
         $user = $this->user($guardName);
@@ -60,9 +54,6 @@ class NotificationService
         return $query->paginate($perPage);
     }
 
-    /**
-     * Get notification statistics.
-     */
     public function statistics(string $guardName): array
     {
         $user = $this->user($guardName);
@@ -79,9 +70,6 @@ class NotificationService
         ];
     }
 
-    /**
-     * Mark all notifications as read.
-     */
     public function markAllAsRead(string $guardName): void
     {
         $this->user($guardName)
@@ -90,9 +78,6 @@ class NotificationService
             ->update(['read_at' => now(),]);
     }
 
-    /**
-     * Mark a notification as read.
-     */
     public function markAsRead(DatabaseNotification $notification,string $guardName): void {
         $user = $this->user($guardName);
 
@@ -104,12 +89,9 @@ class NotificationService
             ]);
     }
 
-    /**
-     * Delete a notification.
-     */
     public function destroy(DatabaseNotification $notification,string $guardName): void {
         $user = $this->user($guardName);
-
+        
         $user->notifications()
             ->whereKey($notification->getKey())
             ->delete();

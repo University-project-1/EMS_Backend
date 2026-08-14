@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\ApiLocalization;
 use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\EnsureUserIsExhibitor;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -23,7 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->alias(['type.admin' => EnsureUserIsAdmin::class]);
+        $middleware->alias([
+            'type.admin' => EnsureUserIsAdmin::class, 
+            'type.exhibitor' => EnsureUserIsExhibitor::class
+        ]);
         $middleware->api([
             'ApiLocalization' => ApiLocalization::class,
         ]);

@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['company_id', 'system_user_id'])]
+#[Fillable(['company_id', 'system_user_id', 'assigned_by'])]
 #[Table('company_system_users')]
 class CompanySystemUser extends Model
 {
-    public $timestamps = false;
+    public const UPDATED_AT = null;
 }

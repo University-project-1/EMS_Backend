@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('announcements', function (Blueprint $table): void {
             $table->id();
             $table->string('title');
-            $table->string('receiver')->default('all');
+            $table->string('receiver')->default('all')->index();
             $table->text('description');
             $table->boolean('is_active')->default(true);
             $table->timestamps();

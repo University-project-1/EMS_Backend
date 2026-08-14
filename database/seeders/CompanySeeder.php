@@ -87,38 +87,123 @@ class CompanySeeder extends Seeder
             'status' => Status::APPROVED,
         ]);
 
+        $companyG = Company::create([
+            'name' => 'Al-Noor Publishing House',
+            'business_sector' => BusinessSectors::CULTURE,
+            'social_links' => ['website' => 'https://alnoor-publishing.example', 'instagram' => 'https://instagram.com/alnoorpublishing'],
+            'phone' => '+963119990011',
+            'year_founded' => 2017,
+            'description' => 'Publishing house focused on books, magazines, and literary programs.',
+            'headquarters_lat' => 33.512900,
+            'headquarters_lng' => 36.279400,
+            'status' => Status::APPROVED,
+        ]);
+
+        $companyH = Company::create([
+            'name' => 'Cedar Build Works',
+            'business_sector' => BusinessSectors::CONSTRUCTION,
+            'social_links' => ['website' => 'https://cedarbuild.example', 'linkedin' => 'https://linkedin.com/company/cedarbuildworks'],
+            'phone' => '+963120001122',
+            'year_founded' => 2011,
+            'description' => 'Construction and interior solutions provider for exhibition spaces.',
+            'headquarters_lat' => 33.507600,
+            'headquarters_lng' => 36.287300,
+            'status' => Status::APPROVED,
+        ]);
+
+        $companyI = Company::create([
+            'name' => 'Meridian Health Alliance',
+            'business_sector' => BusinessSectors::HEALTHCARE,
+            'social_links' => ['website' => 'https://meridian-health.example', 'facebook' => 'https://facebook.com/meridianhealthalliance'],
+            'phone' => '+963121112233',
+            'year_founded' => 2014,
+            'description' => 'Healthcare group presenting medical services and outreach programs.',
+            'headquarters_lat' => 33.516500,
+            'headquarters_lng' => 36.292800,
+            'status' => Status::APPROVED,
+        ]);
+
+        $companyJ = Company::create([
+            'name' => 'Atlas Commerce Hub',
+            'business_sector' => BusinessSectors::COMMERCE,
+            'social_links' => ['website' => 'https://atlas-commerce.example', 'x' => 'https://x.com/atlascommercehub'],
+            'phone' => '+963122223344',
+            'year_founded' => 2020,
+            'description' => 'Retail and wholesale hub for multi-brand exhibition participation.',
+            'headquarters_lat' => 33.520200,
+            'headquarters_lng' => 36.283900,
+            'status' => Status::APPROVED,
+        ]);
+
+        $companyK = Company::create([
+            'name' => 'SkyPoint Tourism Ventures',
+            'business_sector' => BusinessSectors::TOURISM,
+            'social_links' => ['website' => 'https://skypoint-tourism.example', 'instagram' => 'https://instagram.com/skypointtourism'],
+            'phone' => '+963123334455',
+            'year_founded' => 2018,
+            'description' => 'Tourism operator used as a non-approved company fixture for testing.',
+            'headquarters_lat' => 33.501100,
+            'headquarters_lng' => 36.298600,
+            'status' => Status::PENDING,
+        ]);
+
         $elcoach = SystemUser::where('name', 'Elcoach')->firstOrFail();
         $fawzy = SystemUser::where('name', 'Fawzy')->firstOrFail();
         $elza3eem = SystemUser::where('name', 'Elza3eem')->firstOrFail();
 
         $companyA->systemUsers()->syncWithoutDetaching([
-            $elcoach->id,
-            $fawzy->id,
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
         ]);
 
         $companyB->systemUsers()->syncWithoutDetaching([
-            $elza3eem->id,
-            $elcoach->id,
+            $elza3eem->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $elcoach->id, 'created_at' => now()],
         ]);
 
         $companyC->systemUsers()->syncWithoutDetaching([
-            $fawzy->id,
-            $elcoach->id,
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
         ]);
 
         $companyD->systemUsers()->syncWithoutDetaching([
-            $elcoach->id,
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
         ]);
 
         $companyE->systemUsers()->syncWithoutDetaching([
-            $elza3eem->id,
-            $elcoach->id,
+            $elza3eem->id => ['assigned_by' => $elcoach->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
         ]);
 
         $companyF->systemUsers()->syncWithoutDetaching([
-            $fawzy->id,
-            $elcoach->id,
-            $elza3eem->id,
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elza3eem->id => ['assigned_by' => $elcoach->id, 'created_at' => now()],
+        ]);
+
+        $companyG->systemUsers()->syncWithoutDetaching([
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+        ]);
+
+        $companyH->systemUsers()->syncWithoutDetaching([
+            $elza3eem->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $elcoach->id, 'created_at' => now()],
+        ]);
+
+        $companyI->systemUsers()->syncWithoutDetaching([
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elza3eem->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+        ]);
+
+        $companyJ->systemUsers()->syncWithoutDetaching([
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+        ]);
+
+        $companyK->systemUsers()->syncWithoutDetaching([
+            $fawzy->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elcoach->id => ['assigned_by' => $fawzy->id, 'created_at' => now()],
+            $elza3eem->id => ['assigned_by' => $elcoach->id, 'created_at' => now()],
         ]);
 
         $companyALogo = database_path('assets/alawael.png');
@@ -139,6 +224,60 @@ class CompanySeeder extends Seeder
         $companyDLogo = database_path('assets/RGBs.jpg');
         if (is_file($companyDLogo)) {
             $companyD->copyMedia($companyDLogo)->toMediaCollection('logo');
+        }
+
+        $companyGLogo = database_path('assets/elsaadeh.png');
+        if (is_file($companyGLogo)) {
+            $companyG->copyMedia($companyGLogo)->toMediaCollection('logo');
+        }
+
+        $companyHLogo = database_path('assets/Elba3eth.png');
+        if (is_file($companyHLogo)) {
+            $companyH->copyMedia($companyHLogo)->toMediaCollection('logo');
+        }
+
+        $companyILogo = database_path('assets/wasem.png');
+        if (is_file($companyILogo)) {
+            $companyI->copyMedia($companyILogo)->toMediaCollection('logo');
+        }
+
+        $companyJLogo = database_path('assets/RBCs.png');
+        if (is_file($companyJLogo)) {
+            $companyJ->copyMedia($companyJLogo)->toMediaCollection('logo');
+        }
+
+        $companyKLogo = database_path('assets/RGBs.jpg');
+        if (is_file($companyKLogo)) {
+            $companyK->copyMedia($companyKLogo)->toMediaCollection('logo');
+        }
+
+        $galleryAssets = ['alawael.png', 'Elba3eth.png', 'elsaadeh.png', 'fawzy.jpg', 'RBCs.png', 'RGBs.jpg', 'wasem.png'];
+        $companies = [$companyA, $companyB, $companyC, $companyD, $companyE, $companyF, $companyG, $companyH, $companyI, $companyJ, $companyK];
+
+        foreach ($companies as $index => $company) {
+            $assetCount = count($galleryAssets);
+            $this->syncGallery($company, [
+                $galleryAssets[$index % $assetCount],
+                $galleryAssets[($index + 1) % $assetCount],
+            ]);
+        }
+    }
+
+    /**
+     * @param  array<int, string>  $assets
+     */
+    private function syncGallery(Company $company, array $assets): void
+    {
+        $company->clearMediaCollection('gallery');
+
+        foreach ($assets as $asset) {
+            $assetPath = database_path('assets/'.$asset);
+
+            if (! is_file($assetPath)) {
+                throw new \RuntimeException("Missing company gallery asset: {$asset}");
+            }
+
+            $company->copyMedia($assetPath)->toMediaCollection('gallery');
         }
     }
 }

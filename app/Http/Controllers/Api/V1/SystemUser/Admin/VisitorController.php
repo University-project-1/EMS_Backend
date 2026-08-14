@@ -54,8 +54,8 @@ class VisitorController extends Controller
                 AllowedFilter::exact('gender'),
                 AllowedFilter::partial('job'),
                 AllowedFilter::partial('location'),
-                AllowedFilter::custom('created_from', new CreatedFromFilter()),
-                AllowedFilter::custom('created_to', new CreatedToFilter()),
+                AllowedFilter::custom('created_from', new CreatedFromFilter(), 'created_at'),
+                AllowedFilter::custom('created_to', new CreatedToFilter(), 'created_at'),
             )
             ->allowedSorts(
                 'first_name',
