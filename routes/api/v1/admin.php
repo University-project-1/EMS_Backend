@@ -133,16 +133,13 @@ Route::prefix('admin')->group(function () {
 
         // notifications
         Route::prefix('notifications')->group(function () {
-            Route::get('/', [NotificationController::class, 'index'])
-                ->name('admin.notifications.index')->defaults('guardName', 'system');
-            Route::get('/statistics', [NotificationController::class, 'statistics'])
-                ->name('admin.notifications.statistics')->defaults('guardName', 'system');
-            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
-                ->name('admin.notifications.read-all')->defaults('guardName', 'system');
-            Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])
-                ->name('admin.notifications.read')->defaults('guardName', 'system');
-            Route::delete('/{notification}', [NotificationController::class, 'destroy'])
-                ->name('admin.notifications.destroy')->defaults('guardName', 'system');
+            Route::get('/', [NotificationController::class, 'index'])->name('admin.notifications.index')->defaults('guardName', 'system');
+            Route::get('/unread', [NotificationController::class, 'unreadNotification'])->name('admin.notifications.unread')->defaults('guardName', 'system');
+            Route::get('/unread/count', [NotificationController::class, 'numberOfUnreadNotifications'])->name('admin.notifications.unread.count')->defaults('guardName', 'system');
+            Route::get('/statistics', [NotificationController::class, 'statistics'])->name('admin.notifications.statistics')->defaults('guardName', 'system');
+            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])->name('admin.notifications.read-all')->defaults('guardName', 'system');
+            Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('admin.notifications.read')->defaults('guardName', 'system');
+            Route::delete('/{notification}', [NotificationController::class, 'destroy'])->name('admin.notifications.destroy')->defaults('guardName', 'system');
         });
     });
 });

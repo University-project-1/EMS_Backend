@@ -33,7 +33,27 @@ class NotificationService
 
         return $query->paginate($perPage);
     }
-    
+
+    public function unreadNotification(string $guardName, int $perPage)
+    {
+        $user = $this->user($guardName);
+
+        $query = QueryBuilder::for($user->unreadNotifications())
+                    ->allowedFilters(
+                        AllowedFilter::exact('type'),
+                    )
+                    ->allowedSorts(
+                        'created_at',
+                    )
+                    ->defaultSort('-created_at');
+
+        if($guardName === 'mobile'){
+            return $query->cursorPaginate($perPage);
+        }
+
+        return $query->paginate($perPage);
+    }
+
     public function statistics(string $guardName): array
     {
         $user = $this->user($guardName);
