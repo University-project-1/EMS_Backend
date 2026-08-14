@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class LeadInterestNotificationDispatcher
 {
-    /** @param Collection<int, User> $recipients */
     public function send(Collection $recipients, Booth|Event $content, LeadInterestNotificationType $type,): void {
         foreach ($recipients as $recipient) {
             $wasRecorded = DB::table('lead_interest_notification_deliveries')->insertOrIgnore([
