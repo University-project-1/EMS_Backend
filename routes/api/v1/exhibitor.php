@@ -96,16 +96,13 @@ Route::prefix('exhibitor')->group(function () {
 
         // notifications
         Route::prefix('notifications')->group(function () {
-            Route::get('/', [NotificationController::class, 'index'])
-                ->name('exhibitor.notifications.index')->defaults('guardName', 'system');
-            Route::get('/statistics', [NotificationController::class, 'statistics'])
-                ->name('exhibitor.notifications.statistics')->defaults('guardName', 'system');
-            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])
-                ->name('exhibitor.notifications.read-all')->defaults('guardName', 'system');
-            Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])
-                ->name('exhibitor.notifications.read')->defaults('guardName', 'system');
-            Route::delete('/{notification}', [NotificationController::class, 'destroy'])
-                ->name('exhibitor.notifications.destroy')->defaults('guardName', 'system');
+            Route::get('/', [NotificationController::class, 'index'])->name('exhibitor.notifications.index')->defaults('guardName', 'system');
+            Route::get('/unread', [NotificationController::class, 'unreadNotification'])->name('exhibitor.notifications.unread')->defaults('guardName', 'system');
+            Route::get('/unread/count', [NotificationController::class, 'numberOfUnreadNotifications'])->name('exhibitor.notifications.unread.count')->defaults('guardName', 'system');
+            Route::get('/statistics', [NotificationController::class, 'statistics'])->name('exhibitor.notifications.statistics')->defaults('guardName', 'system');
+            Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])->name('exhibitor.notifications.read-all')->defaults('guardName', 'system');
+            Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('exhibitor.notifications.read')->defaults('guardName', 'system');
+            Route::delete('/{notification}', [NotificationController::class, 'destroy'])->name('exhibitor.notifications.destroy')->defaults('guardName', 'system');
         });
         
         // reviews
