@@ -19,4 +19,13 @@ return [
     'review_created_body' => 'You received a new :rating-star review.',
     'booking_request_created_title' => 'New Booking Request',
     'booking_request_created_body' => 'A new booth or event booking request requires your review.',
+    'event_reminder_title' => 'Event Starting Soon',
+    'event_reminder_body' => ':title starts in 15 minutes.',
+    'company_booth_created_title' => 'New Booth From a Company You Follow',
+    'company_booth_created_body' => 'A company you are interested in has booked :title.',
+    'company_event_created_title' => 'New Event From a Company You Follow',
+    'company_event_created_body' => 'A company you are interested in has created the event :title.',
+    'organizer_event_created_title' => 'New Event From an Organizer You Follow',
+    'organizer_event_created_body' => 'An organizer you are interested in has created the event :title.',
+    'booth_label' => 'Booth :number',
 ];

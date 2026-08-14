@@ -11,3 +11,5 @@ Artisan::command('inspire', function () {
 Schedule::command('cleanup:unverified')->daily();
 
 Schedule::command('app:auto-deploy')->everyTwoHours();
+
+Schedule::command('notifications:send-event-reminders')->everyMinute();

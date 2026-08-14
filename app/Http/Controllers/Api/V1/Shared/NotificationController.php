@@ -40,6 +40,29 @@ class NotificationController extends Controller
     }
 
     /**
+     * unread notification
+     */
+    #[QueryParameter('filter[type]',type: 'string',description: 'Filter notifications by exact type.',required: false)]
+    #[QueryParameter('per_page',type: 'integer',description: 'Number of notifications per page. Default: 15, Max: 100.',required: false)]
+    #[QueryParameter('sort',type: 'string',description: 'Sort by created_at. Use -created_at for descending.',required: false)]
+    public function unreadNotification(string $guardName){
+        $perPage = min(max(request()->integer('per_page', 10), 1),100);
+        
+        $unreadNotifications = $this->notificationService->unreadNotification($guardName, $perPage);
+
+        return successResponse(NotificationResource::collection($unreadNotifications));
+    }
+
+    /**
+     * number of unread notifications
+     */
+    public function numberOfUnreadNotifications(string $guardName){
+        $numberOfUnreadNotifications = auth($guardName)->user()->unreadNotifications()->count();
+        
+        return successResponse(['numberOfUnreadNotifications' => $numberOfUnreadNotifications]);
+    }
+
+    /**
      * mark all notifications as read
      */
     public function markAllAsRead(string $guardName)

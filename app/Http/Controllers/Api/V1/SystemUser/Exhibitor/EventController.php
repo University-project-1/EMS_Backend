@@ -61,7 +61,7 @@ class EventController extends Controller
             ->withAvg('reviews', 'rating')
             ->withCount(['leads', 'savedItems', 'reviews'])
             ->latest('created_at')
-            ->paginate(10);
+            ->paginate(5);
 
         return successResponse(EventResource::collection($events));
     }
