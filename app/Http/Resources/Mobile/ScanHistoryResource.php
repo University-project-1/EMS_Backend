@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Http\Resources\Mobile;
 
 use App\Models\Booth;
 use App\Models\Event;
+use BackedEnum;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -34,10 +36,15 @@ class ScanHistoryResource extends JsonResource
 
     private function mapEvent(): array
     {
+        $eventType = $this->leadable?->type;
+        $eventTypeValue = $eventType instanceof BackedEnum
+            ? $eventType->value
+            : ($eventType ?? 'Other');
+
         return [
             'type' => 'event',
             'title' => $this->leadable?->title ?? 'Unknown Event',
-            'subtitle' => 'Event - ' . ($this->leadable?->type ?? 'Other'),
+            'subtitle' => 'Event - ' . $eventTypeValue,
             'image_url' => $this->leadable?->getFirstMediaUrl('cover') ?: null,
         ];
     }
