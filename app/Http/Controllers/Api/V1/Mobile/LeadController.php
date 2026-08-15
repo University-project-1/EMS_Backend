@@ -35,7 +35,6 @@ class LeadController extends Controller
             ->with('leadable')
             ->latest()
             ->get();
-
         return successResponse(ScanHistoryResource::collection($leads));
     }
 }
