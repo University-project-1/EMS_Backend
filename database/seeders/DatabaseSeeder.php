@@ -1,20 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class DatabaseSeeder extends Seeder
+final class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
     public function run(): void
     {
-        // The legacy seeders predate idempotent re-runs. Keep them for a fresh
-        // database, but do not run them again over an existing dev database.
-        if (! DB::table('users')->exists() && ! DB::table('system_users')->exists()) {
+        if ((int) DB::table('companies')->count() === 0) {
             $this->call([
                 AnnouncementSeeder::class,
                 PassportSeeder::class,
@@ -35,17 +35,17 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // =====================================================================
-        // CLEAN REAL-TECH DATA — separate from the legacy seeders above.
-        // This section creates no Events and reuses existing sectors, services,
-        // halls, and booths. Run order is dependency-safe.
-        // =====================================================================
         $this->call([
             RealTechPeopleSeeder::class,
             RealTechCompaniesSeeder::class,
             RealTechCompanyMembershipsSeeder::class,
             RealTechBoothBookingsSeeder::class,
             RealTechMediaSeeder::class,
+            ExpandedTechPeopleSeeder::class,
+            ExpandedTechCompaniesSeeder::class,
+            ExpandedTechCompanyMembershipsSeeder::class,
+            ExpandedTechMediaSeeder::class,
+            ExpandedTechBoothBookingsSeeder::class,
         ]);
     }
 }
