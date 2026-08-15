@@ -90,26 +90,28 @@ class BoothController extends Controller
      * My booths
      */
     #[QueryParameter('filter[status]', 'Filter booths by exact booth status', required: false, type: 'string')]
+    #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 15')]
     public function ownedBooths(Request $request)
     {
         $userId = $request->user('system')->id;
 
         $booths = QueryBuilder::for(Booth::class)
-            ->allowedFilters(
-                AllowedFilter::custom('status', new BoothStatusFilter()),
-            )
-            ->with([
-            'company',
-            'hall',
-            'latestBoothRequest',
-            'boothRequests.attachedServices'
-        ])
         ->where(function ($query) use ($userId) {
-            $query->whereHas('systemUsers', fn($q) => $q->whereKey($userId))
-                ->orWhereHas('company.systemUsers', fn($q) => $q->whereKey($userId));
+            $query->whereHas('systemUsers', function ($q) use ($userId) {
+                $q->whereKey($userId);
+            })
+            ->orWhereHas('company.systemUsers', function ($q) use ($userId) {
+                $q->whereKey($userId);
+            })
+            ->orWhereHas('boothRequests', function ($q) use ($userId) {
+                $q->where('system_user_id', $userId)
+                ->whereIn('status', [Status::PENDING->value, Status::APPROVED->value]);
+            });
         })
+        ->with(['company', 'hall', 'latestBoothRequest', 'boothRequests.attachedServices'])
         ->latest()
-        ->paginate(5);
+        ->paginate(request()->query('per_page', 5));
+
 
         return successResponse(
             data: BoothResource::collection($booths),
