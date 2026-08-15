@@ -2,8 +2,16 @@
 
 namespace Database\Seeders;
 
+use App\Enum\SystemUserType;
+use App\Models\Announcement;
+use App\Models\Booth;
+use App\Models\BoothRequest;
+use App\Models\Event;
+use App\Models\Report;
+use App\Models\Review;
 use App\Models\SystemUser;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -11,151 +19,123 @@ class NotificationSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = User::query()->get();
-        $systemUsers = SystemUser::query()->get();
+        $this->removeLegacyNotifications();
 
-        if ($users->isEmpty() || $systemUsers->isEmpty()) {
-            return;
+        $event = Event::query()->first();
+        $booth = Booth::query()->first();
+        $boothRequest = BoothRequest::query()->first();
+        $announcement = Announcement::query()->first();
+        $report = Report::query()->first();
+        $review = Review::query()->first();
+
+        $admins = SystemUser::query()
+            ->where('type', SystemUserType::ADMIN)
+            ->get();
+        $exhibitors = SystemUser::query()
+            ->where('type', SystemUserType::EXHIBITOR)
+            ->get();
+        $visitors = User::query()->get();
+
+        $this->seed($admins, array_filter([
+            $this->notification('report_created', 'notifications.report_created_title', 'notifications.report_created_body', $report),
+            $this->notification('event_booking_request_created', 'notifications.booking_request_created_title', 'notifications.booking_request_created_body', $event),
+            $this->notification('booth_booking_request_created', 'notifications.booking_request_created_title', 'notifications.booking_request_created_body', $boothRequest),
+        ]));
+
+        $this->seed($exhibitors, array_filter([
+            $this->notification('event_approved', 'notifications.event_approved_title', 'notifications.event_approved_body', $event),
+            $this->notification('event_rejected', 'notifications.event_rejected_title', 'notifications.event_rejected_body', $event, read: true),
+            $this->notification('booth_approved', 'notifications.booth_approved_title', 'notifications.booth_approved_body', $boothRequest),
+            $this->notification('booth_rejected', 'notifications.booth_rejected_title', 'notifications.booth_rejected_body', $boothRequest, read: true),
+            $this->notification('review_created', 'notifications.review_created_title', 'notifications.review_created_body', $review),
+            $this->announcementNotification($announcement),
+        ]));
+
+        $this->seed($visitors, array_filter([
+            $this->announcementNotification($announcement, read: true),
+            $this->notification('event_reminder', 'notifications.event_reminder_title', 'notifications.event_reminder_body', $event),
+            $this->notification('company_booth_created', 'notifications.company_booth_created_title', 'notifications.company_booth_created_body', $booth, ['target_type' => Booth::class]),
+            $this->notification('company_event_created', 'notifications.company_event_created_title', 'notifications.company_event_created_body', $event, ['target_type' => Event::class]),
+            $this->notification('organizer_event_created', 'notifications.organizer_event_created_title', 'notifications.organizer_event_created_body', $event, ['target_type' => Event::class]),
+        ]));
+    }
+
+    /**
+     * @param  iterable<int, SystemUser|User>  $notifiables
+     * @param  array<int, array{data: array<string, mixed>, read: bool}>  $notifications
+     */
+    private function seed(iterable $notifiables, array $notifications): void
+    {
+        foreach ($notifiables as $notifiable) {
+            foreach ($notifications as $notification) {
+                $databaseNotification = $notifiable->notifications()
+                    ->firstOrNew(['type' => $notification['data']['type']]);
+
+                if (! $databaseNotification->exists) {
+                    $databaseNotification->id = (string) Str::uuid();
+                }
+
+                $databaseNotification->data = $notification['data'];
+                $databaseNotification->read_at = $notification['read'] ? now()->subHours(2) : null;
+                $databaseNotification->save();
+            }
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $extra
+     * @return array{data: array<string, mixed>, read: bool}|null
+     */
+    private function notification(string $type, string $title, string $body, ?Model $target, array $extra = [], bool $read = false): ?array
+    {
+        if (! $target) {
+            return null;
         }
 
-        $firstEvent = null;
-        $firstBooth = null;
-
-        if (class_exists(\App\Models\Event::class)) {
-            $firstEvent = \App\Models\Event::query()->first();
-        }
-
-        if (class_exists(\App\Models\Booth::class)) {
-            $firstBooth = \App\Models\Booth::query()->first();
-        }
-
-        $notifications = [
-            [
-                'notifiable' => $users[0],
-                'type' => 'welcome',
-                'data' => [
-                    'type' => 'welcome',
-                    'title' => 'Welcome to EMS',
-                    'body' => 'Thank you for joining the Exhibition Management System.',
-                    'target_id' => null,
-                ],
-                'read_at' => null,
-            ],
-            [
-                'notifiable' => $users[1],
-                'type' => 'event_reminder',
-                'data' => [
-                    'type' => 'event_reminder',
-                    'title' => 'Event reminder',
-                    'body' => 'Your next event starts soon. Please check the schedule.',
-                    'target_id' => $firstEvent?->getKey(),
-                ],
-                'read_at' => now(),
-            ],
-            [
-                'notifiable' => $users[2],
-                'type' => 'booth_update',
-                'data' => [
-                    'type' => 'booth_update',
-                    'title' => 'Booth update',
-                    'body' => 'A booth you follow has a new update.',
-                    'target_id' => $firstBooth?->getKey(),
-                ],
-                'read_at' => null,
-            ],
-            [
-                'notifiable' => $systemUsers->first(),
-                'type' => 'report_created',
-                'data' => [
-                    'type' => 'report_created',
-                    'title' => 'New report submitted',
-                    'body' => 'A new report has been submitted and requires your review.',
-                    'target_id' => null,
-                ],
-                'read_at' => null,
-            ],
-            [
-                'notifiable' => $systemUsers->skip(1)->first() ?? $systemUsers->first(),
-                'type' => 'user_message',
-                'data' => [
-                    'type' => 'user_message',
-                    'title' => 'New message received',
-                    'body' => 'You have received a new message from an exhibition participant.',
-                    'target_id' => null,
-                ],
-                'read_at' => now(),
-            ],
-            [
-                'notifiable' => $systemUsers->last(),
-                'type' => 'booking_request',
-                'data' => [
-                    'type' => 'booking_request',
-                    'title' => 'New booth booking request',
-                    'body' => 'A visitor requested to book a booth. Please confirm the request.',
-                    'target_id' => $firstBooth?->getKey(),
-                ],
-                'read_at' => null,
-            ],
-            [
-                'notifiable' => $users[0],
-                'type' => 'feedback_request',
-                'data' => [
-                    'type' => 'feedback_request',
-                    'title' => 'Leave a review',
-                    'body' => 'Please tell us about your experience at the latest exhibition.',
-                    'target_id' => null,
-                ],
-                'read_at' => now(),
-            ],
-            [
-                'notifiable' => $users[1],
-                'type' => 'system_notice',
-                'data' => [
-                    'type' => 'system_notice',
-                    'title' => 'System maintenance',
-                    'body' => 'The EMS platform will undergo a short maintenance tonight.',
-                    'target_id' => null,
-                ],
-                'read_at' => null,
-            ],
-            [
-                'notifiable' => $users[2],
-                'type' => 'event_cancellation',
-                'data' => [
-                    'type' => 'event_cancellation',
-                    'title' => 'Event cancellation',
-                    'body' => 'An event has been cancelled. Check your notifications for details.',
-                    'target_id' => $firstEvent?->getKey(),
-                ],
-                'read_at' => now(),
-            ],
-            [
-                'notifiable' => $systemUsers->first(),
-                'type' => 'approval_request',
-                'data' => [
-                    'type' => 'approval_request',
-                    'title' => 'Approval request pending',
-                    'body' => 'A new request is waiting for your approval.',
-                    'target_id' => null,
-                ],
-                'read_at' => null,
-            ],
+        return [
+            'data' => array_merge([
+                'type' => $type,
+                'title' => $title,
+                'body' => $body,
+                'target_id' => (string) $target->getKey(),
+            ], $extra),
+            'read' => $read,
         ];
+    }
 
-        foreach ($notifications as $notificationData) {
-            $notifiable = $notificationData['notifiable'];
-            unset($notificationData['notifiable']);
-
-            $notifiable->notifications()->updateOrCreate(
-                [
-                    'type' => $notificationData['type'],
-                    'data' => $notificationData['data'],
-                ],
-                [
-                    'id' => Str::uuid()->toString(),
-                    'read_at' => $notificationData['read_at'],
-                ],
-            );
+    /**
+     * @return array{data: array<string, mixed>, read: bool}|null
+     */
+    private function announcementNotification(?Announcement $announcement, bool $read = false): ?array
+    {
+        if (! $announcement) {
+            return null;
         }
+
+        return [
+            'data' => [
+                'type' => 'announcement',
+                'title' => $announcement->title,
+                'body' => $announcement->description,
+                'target_id' => (string) $announcement->getKey(),
+            ],
+            'read' => $read,
+        ];
+    }
+
+    private function removeLegacyNotifications(): void
+    {
+        SystemUser::query()->each(function (SystemUser $systemUser): void {
+            $systemUser->notifications()
+                ->whereIn('type', ['new_message', 'approval_request', 'welcome'])
+                ->delete();
+        });
+
+        User::query()->each(function (User $user): void {
+            $user->notifications()
+                ->whereIn('type', ['new_message', 'approval_request', 'welcome'])
+                ->delete();
+        });
+
     }
 }
