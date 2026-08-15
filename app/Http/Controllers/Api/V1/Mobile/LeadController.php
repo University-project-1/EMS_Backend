@@ -26,7 +26,12 @@ class LeadController extends Controller
      * leads history
      */
     public function index(){
-        $leads = Request()->user('mobile')->leads();
+        $leads = request()
+            ->user('mobile')
+            ->leads()
+            ->with('leadable')
+            ->latest()
+            ->get();
         return successResponse(ScanHistoryResource::collection($leads));
     }
 }
