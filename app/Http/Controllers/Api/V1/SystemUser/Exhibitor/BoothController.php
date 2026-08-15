@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\SystemUser\Exhibitor;
 
 use App\DTOs\SystemUser\BoothRequestDTO;
 use App\DTOs\SystemUser\CompanyDTO;
+use App\Enum\Status;
 use App\Filter\BookedBoothFilter;
 use App\Filter\BoothStatusFilter;
 use App\Filter\MaxFilter;
