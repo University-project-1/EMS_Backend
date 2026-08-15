@@ -97,6 +97,7 @@ class BoothController extends Controller
         $userId = $request->user('system')->id;
 
         $booths = QueryBuilder::for(Booth::class)
+        ->allowedFilters(AllowedFilter::custom('status', new BoothStatusFilter()))
         ->where(function ($query) use ($userId) {
             $query->whereHas('systemUsers', function ($q) use ($userId) {
                 $q->whereKey($userId);
