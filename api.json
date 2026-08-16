@@ -75,6 +75,9 @@
             "name": "SystemUser/Exhibitor/Events"
         },
         {
+            "name": "SystemUser/Exhibitor/BoothRequests"
+        },
+        {
             "name": "SystemUser/Exhibitor/Booths"
         },
         {
@@ -1802,7 +1805,7 @@
         },
         "/v1/admin/booths/requests": {
             "get": {
-                "operationId": "boothRequest.index",
+                "operationId": "v1.systemUser.admin.boothRequest.index",
                 "summary": "all requests",
                 "tags": [
                     "SystemUser/Admin/BoothRequests"
@@ -3937,6 +3940,48 @@
                 }
             }
         },
+        "/v1/exhibitor/booth-requests": {
+            "get": {
+                "operationId": "v1.systemUser.exhibitor.boothRequest.index",
+                "summary": "show all requests",
+                "tags": [
+                    "SystemUser/Exhibitor/BoothRequests"
+                ],
+                "parameters": [
+                    {
+                        "name": "filter[status]",
+                        "in": "query",
+                        "description": "Filter booths by exact booth request status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page. Default: 10",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/exhibitor/booth": {
             "get": {
                 "operationId": "v1.systemUser.exhibitor.booth.index",
@@ -4060,6 +4105,14 @@
                         "description": "Filter booths by exact booth status",
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page. Default: 15",
+                        "schema": {
+                            "type": "integer"
                         }
                     }
                 ],
@@ -7467,12 +7520,18 @@
                                 "maxItems": 5
                             },
                             "headquarters_lat": {
-                                "type": "number",
+                                "type": [
+                                    "number",
+                                    "null"
+                                ],
                                 "minimum": -90,
                                 "maximum": 90
                             },
                             "headquarters_lng": {
-                                "type": "number",
+                                "type": [
+                                    "number",
+                                    "null"
+                                ],
                                 "minimum": -180,
                                 "maximum": 180
                             },
@@ -7624,12 +7683,18 @@
                                 "maxItems": 5
                             },
                             "headquarters_lat": {
-                                "type": "number",
+                                "type": [
+                                    "number",
+                                    "null"
+                                ],
                                 "minimum": -90,
                                 "maximum": 90
                             },
                             "headquarters_lng": {
-                                "type": "number",
+                                "type": [
+                                    "number",
+                                    "null"
+                                ],
                                 "minimum": -180,
                                 "maximum": 180
                             },
