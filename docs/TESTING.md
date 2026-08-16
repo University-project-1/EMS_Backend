@@ -58,7 +58,7 @@ composer test:coverage
 |---|---|---|
 | المصادقة والأدوار | `MobileAuthTest`, `SystemUserAuthenticationTest`, `SystemUserRoleIsolationTest` | تسجيل الدخول والخروج، منع دخول المدير كعارض والعكس، عزل الحراس والأدوار |
 | العارض | `ExhibitorProfileTest`, `ExhibitorCompanyTest`, `ExhibitorEventTest`, `ExhibitorBoothTest`, `ExhibitorInvitationTest`, `ExhibitorLeadTest` | تحديث الملف، عرض الشركة، ملكية الأحداث والأكشاك، حماية الدعوات وسجل الاهتمامات |
-| الزائر | `VisitorSavedItemsTest`, `VisitorLeadHistoryTest`, `VisitorEventTest`, `VisitorReviewTest`, `VisitorReportTest` | العناصر المحفوظة، إخفاء الأحداث غير المعتمدة، التقييمات والتقارير والتحقق والإشعارات |
+| الزائر | `VisitorSavedItemsTest`, `VisitorLeadHistoryTest`, `VisitorEventTest`, `VisitorReviewTest`, `VisitorReportTest` | العناصر المحفوظة، منع حفظ فعالية غير معتمدة أو كشك غير محجوز، إخفاء الأحداث غير المعتمدة، التقييمات والتقارير والتحقق والإشعارات |
 | الإدارة | `AdminDashboardTest`, `AdminAnnouncementTest`, `AdminReportTest` | بنية لوحة التحكم، إنشاء الإعلان والتحقق منه، حل التقرير ومنع إعادة معالجته |
 | الرحلات المتكاملة | `EventLifecycleE2ETest` | ظهور فعالية العارض، تفاعل الزائر معها، ثم معالجة المدير للتقرير |
 | العقود والبذر | اختبارات `Contracts/*` و`Seeders/DatabaseSeederCoverageTest` | توافق المسارات والنماذج والتعدادات والطلبات والاستجابات والـ Seeder |
