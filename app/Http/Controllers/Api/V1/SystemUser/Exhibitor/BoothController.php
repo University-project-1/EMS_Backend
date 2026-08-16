@@ -14,7 +14,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Exhibitor\StoreBoothRequestRequest;
 use App\Http\Resources\SystemUser\Shared\BoothRequestResource;
 use App\Http\Resources\SystemUser\Shared\BoothResource;
-use App\Http\Resources\SystemUser\Shared\OwnedBoothResource;
 use App\Models\Booth;
 use App\Services\SystemUser\Exhibitor\BoothRequestService;
 use Dedoc\Scramble\Attributes\Group;
