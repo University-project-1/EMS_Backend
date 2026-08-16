@@ -50,7 +50,7 @@ test('visitor cannot save an event until it is approved', function (): void {
         ->postJson("/api/v1/visitor/saved/events/{$event->id}")
         ->assertUnprocessable()
         ->assertJsonValidationErrors('event_id')
-        ->assertJsonPath('errors.event_id.0', __('saved.event_not_approved'));
+        ->assertJsonPath('errors.event_id.0', __('validation.invalid_status'));
 
     $this->assertDatabaseMissing('saved', [
         'user_id' => $visitor->id,
@@ -83,7 +83,7 @@ test('visitor cannot save a booth until it is booked', function (): void {
         ->postJson("/api/v1/visitor/saved/booths/{$booth->id}")
         ->assertUnprocessable()
         ->assertJsonValidationErrors('booth_id')
-        ->assertJsonPath('errors.booth_id.0', __('saved.booth_not_booked'));
+        ->assertJsonPath('errors.booth_id.0', __('validation.invalid_status'));
 
     $this->assertDatabaseMissing('saved', [
         'user_id' => $visitor->id,

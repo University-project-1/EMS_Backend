@@ -48,7 +48,6 @@ class SavedService
             ])
             ->allowedFilters(
                 AllowedFilter::exact('business_sector', 'company.business_sector'),
-                AllowedFilter::partial('number'),
                 AllowedFilter::custom('search', new BoothSearchFilter)
             )
             ->allowedIncludes('company', 'hall', 'company.logoMedia')
@@ -59,13 +58,13 @@ class SavedService
     {
         if ($model instanceof Event && $model->status !== Status::APPROVED) {
             throw ValidationException::withMessages([
-                'event_id' => [__('saved.event_not_approved')],
+                'event_id' => [__('validation.invalid_status')],
             ]);
         }
 
         if ($model instanceof Booth && $model->company_id === null) {
             throw ValidationException::withMessages([
-                'booth_id' => [__('saved.booth_not_booked')],
+                'booth_id' => [__('validation.invalid_status')],
             ]);
         }
     }
