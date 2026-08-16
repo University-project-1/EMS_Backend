@@ -3400,7 +3400,7 @@
                     {
                         "name": "per_page",
                         "in": "query",
-                        "description": "Number of items per page. Default: 10",
+                        "description": "Number of items per page. Default: 5",
                         "schema": {
                             "type": "integer"
                         }
@@ -3541,17 +3541,9 @@
                 ],
                 "parameters": [
                     {
-                        "name": "filter[status]",
-                        "in": "query",
-                        "description": "Filter booths by exact booth status",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "per_page",
                         "in": "query",
-                        "description": "Number of items per page. Default: 15",
+                        "description": "Number of items per page. Default: 5",
                         "schema": {
                             "type": "integer"
                         }
