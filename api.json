@@ -3546,7 +3546,7 @@
                     {
                         "name": "per_page",
                         "in": "query",
-                        "description": "Number of items per page. Default: 5",
+                        "description": "Number of items per page. Default: 15",
                         "schema": {
                             "type": "integer"
                         }
