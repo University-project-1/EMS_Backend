@@ -26,6 +26,10 @@ class BoothResource extends JsonResource
                 'is_saved',
                 fn (): bool => (bool) $this->getAttribute('is_saved'),
             ),
+            'is_review' => $this->whenHas(
+                'is_review',
+                fn (): bool => (bool) $this->getAttribute('is_review'),
+            ),
         ];
     }
 }
