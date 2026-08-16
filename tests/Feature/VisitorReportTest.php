@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Event;
 use App\Models\EventHall;
 use App\Models\User;
+use App\Notifications\SystemUser\Admin\NewReportNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\Support\CreatesActors;
@@ -16,6 +17,7 @@ uses(RefreshDatabase::class, CreatesActors::class);
 
 test('visitor can report an approved event', function (): void {
     Notification::fake();
+    $administrator = $this->createAdministrator();
     $visitor = $this->createVisitor();
     $event = createReportableVisitorEvent();
 
@@ -36,18 +38,21 @@ test('visitor can report an approved event', function (): void {
         'title' => 'Incorrect schedule',
         'status' => ReportStatus::PENDING->value,
     ]);
+
+    Notification::assertSentTo($administrator, NewReportNotification::class);
 });
 
-test('visitor cannot submit a report without selecting a reportable resource', function (): void {
+test('visitor cannot submit a report without a title', function (): void {
     $visitor = $this->createVisitor();
+    $event = createReportableVisitorEvent();
 
     $this->actingAs($visitor, 'mobile')
         ->postJson('/api/v1/visitor/report', [
-            'title' => 'Incomplete report',
-            'description' => 'No event or booth was selected.',
+            'event_id' => $event->id,
+            'description' => 'A title is required to submit this report.',
         ])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['event_id', 'booth_id']);
+        ->assertJsonValidationErrors('title');
 });
 
 function createReportableVisitorEvent(): Event

@@ -89,7 +89,11 @@
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ],
-        "contracts": "php artisan test --compact tests/Feature/Contracts"
+        "contracts": "php artisan test --compact tests/Feature/Contracts",
+        "test:coverage": [
+            "@php artisan config:clear --ansi",
+            "@php vendor/bin/pest --coverage --min=5 --coverage-clover=coverage/clover.xml"
+        ]
     },
     "extra": {
         "laravel": {

@@ -21,9 +21,9 @@ jobs:
         with:
           php-version: '8.3'
           extensions: mbstring, dom, curl, fileinfo, sqlite3
-          coverage: none
+          coverage: pcov
 
-      - name: Install PHP dependencies
+      - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Prepare Laravel environment
@@ -36,3 +36,14 @@ jobs:
 
       - name: Run test suite
         run: composer test
+
+      - name: Generate coverage report
+        run: composer test:coverage
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-coverage-clover
+          path: coverage/clover.xml
+          if-no-files-found: error

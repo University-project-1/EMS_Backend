@@ -6,6 +6,7 @@ use App\Enum\Status;
 use App\Models\Company;
 use App\Models\Event;
 use App\Models\EventHall;
+use App\Notifications\SystemUser\Exhibitor\NewReviewNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\Support\CreatesActors;
@@ -14,8 +15,12 @@ uses(RefreshDatabase::class, CreatesActors::class);
 
 test('visitor can review an approved event', function (): void {
     Notification::fake();
+    $exhibitor = $this->createExhibitor();
     $visitor = $this->createVisitor();
     $event = createReviewableVisitorEvent();
+    $event->eventable->systemUsers()->attach($exhibitor->id, [
+        'created_at' => now(),
+    ]);
 
     $this->actingAs($visitor, 'mobile')
         ->postJson('/api/v1/visitor/reviews', [
@@ -33,6 +38,8 @@ test('visitor can review an approved event', function (): void {
         'rating' => 5,
         'comment' => 'Very useful event.',
     ]);
+
+    Notification::assertSentTo($exhibitor, NewReviewNotification::class);
 });
 
 test('visitor cannot submit a review with an invalid rating', function (): void {
