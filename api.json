@@ -111,6 +111,9 @@
             "name": "Visitor/Announcement"
         },
         {
+            "name": "Visitor/Search"
+        },
+        {
             "name": "Visitor/Booth"
         },
         {
@@ -5933,6 +5936,54 @@
                 }
             }
         },
+        "/v1/visitor/search": {
+            "get": {
+                "operationId": "mobile.search",
+                "summary": "home search",
+                "tags": [
+                    "Visitor/Search"
+                ],
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 2,
+                            "maxLength": 100
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/exhibitor/companies/{company}/profile": {
             "get": {
                 "operationId": "v1.systemUser.exhibitor.company.show",
@@ -6061,53 +6112,6 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
-                    }
-                }
-            }
-        },
-        "/v1/visitor/search": {
-            "get": {
-                "operationId": "mobile.search",
-                "tags": [
-                    "Search"
-                ],
-                "parameters": [
-                    {
-                        "name": "q",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "minLength": 2,
-                            "maxLength": 100
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "schema": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 20
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
