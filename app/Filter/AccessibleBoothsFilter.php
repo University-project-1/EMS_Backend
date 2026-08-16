@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Filter;
 
 use App\Models\SystemUser;
@@ -8,25 +7,20 @@ use Spatie\QueryBuilder\Filters\Filter;
 
 class AccessibleBoothsFilter implements Filter
 {
-    public function __construct(
-        private readonly SystemUser $user,
-    ) {}
+    public function __construct(protected SystemUser $user) {}
 
-    public function apply(Builder $query): Builder
+    public function __invoke(Builder $query, $value, string $property): void
     {
-        return $query->where(function (Builder $q): void {
-            $q->whereHas('systemUsers', function (Builder $sub): void {
-                $sub->where('system_users.id', $this->user->getKey());
-            })->orWhereIn('company_id', function ($sub): void {
+        $user = $this->user;
+
+        $query->where(function (Builder $q) use ($user) {
+            $q->whereHas('systemUsers', function (Builder $sub) use ($user) {
+                $sub->where('system_users.id', $user->getKey());
+            })->orWhereIn('company_id', function ($sub) use ($user) {
                 $sub->select('company_id')
                     ->from('company_system_users')
-                    ->where('system_user_id', $this->user->getKey());
+                    ->where('system_user_id', $user->getKey());
             });
         });
-    }
-
-    public function __invoke(Builder $query, mixed $value, string $property): void
-    {
-        $this->apply($query);
     }
 }

@@ -90,7 +90,7 @@ class BoothController extends Controller
     /**
      * My booths
      */
-    #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 5')]
+    #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 15')]
     public function ownedBooths(Request $request)
     {
         $booths = QueryBuilder::for(Booth::class)
