@@ -25,12 +25,12 @@ final class RealTechMediaSeeder extends Seeder
                 throw new RuntimeException("Missing verified company media for {$slug}; Seeder stopped before attaching incomplete data.");
             }
             if (! $company->getFirstMedia('logo')) {
-                $company->addMedia($logos[0])->usingFileName(basename($logos[0]))->toMediaCollection('logo');
+                $company->addMedia($logos[0])->usingFileName(basename($logos[0]))->preservingOriginal()->toMediaCollection('logo');
             }
             foreach ($gallery as $path) {
                 $filename = basename($path);
                 if (! $company->media()->where('collection_name', 'gallery')->where('file_name', $filename)->exists()) {
-                    $company->addMedia($path)->usingFileName($filename)->toMediaCollection('gallery');
+                    $company->addMedia($path)->usingFileName($filename)->preservingOriginal()->toMediaCollection('gallery');
                 }
             }
         }
@@ -43,7 +43,7 @@ final class RealTechMediaSeeder extends Seeder
                 throw new RuntimeException("Missing verified avatar for {$person['key']}: {$path}");
             }
             if (! $systemUser->getFirstMedia('avatar')) {
-                $systemUser->addMedia($path)->usingFileName(basename($path))->toMediaCollection('avatar');
+                $systemUser->addMedia($path)->usingFileName(basename($path))->preservingOriginal()->toMediaCollection('avatar');
             }
         }
     }

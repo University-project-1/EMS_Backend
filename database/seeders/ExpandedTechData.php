@@ -57,6 +57,6 @@ final class ExpandedTechData
             ['anghami','Elie Habib','elie.habib@expanded-tech.test','https://www.linkedin.com/in/eliehabib','Co-Founder'],
             ['tabby','Hosam Arab','hosam.arab@expanded-tech.test','https://ae.linkedin.com/in/hosam','Co-Founder & CEO'],
         ];
-        return array_map(static fn(array $p): array => ['key' => $p[0].'-'.substr(md5($p[1]),0,6), 'company' => $p[0], 'name' => $p[1], 'email' => $p[2], 'linkedin' => $p[3], 'role' => $p[4], 'asset' => $p[0].'/'.strtolower(preg_replace('/[^a-z0-9]+/i','-', $p[1]))], $leaders);
+        return array_map(static fn(array $p): array => ['key' => $p[0].'-'.substr(md5($p[1]),0,6), 'company' => $p[0], 'name' => $p[1], 'email' => $p[2], 'linkedin' => $p[3], 'role' => $p[4], 'asset' => strtolower(preg_replace('/[^a-z0-9]+/i','-', $p[1]))], $leaders);
     }
 }
