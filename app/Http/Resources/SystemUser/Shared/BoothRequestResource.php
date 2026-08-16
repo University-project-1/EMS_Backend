@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\SystemUser\Shared;
 
-use App\Http\Resources\SystemUser\Shared\BoothRequestServiceResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -10,18 +9,20 @@ class BoothRequestResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $catalog = $this->getFirstMedia('products_catalog');
+
         return [
             'id' => $this->id,
             'booth_id' => $this->booth_id,
             'company_id' => $this->company_id,
             'company_name' => $this->whenLoaded('company', fn () => $this->company?->name),
-            'status' => $this->status,
+            'final_price' => $this->final_price,
+            'status' => $this->status?->value ?? $this->status,
             'reason_for_booking' => $this->reason_for_booking,
-            'final_price' => (float) $this->final_price,
-            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
-
             'services' => BoothRequestServiceResource::collection($this->whenLoaded('services')),
-            'company' => new CompanyResource($this->whenLoaded('company')),
+            'products_count' => $this->whenCounted('products'),
+            'products_file_url' => $catalog?->getUrl(),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
         ];
     }
 }
