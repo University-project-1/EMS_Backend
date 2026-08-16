@@ -31,5 +31,8 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
+      - name: Generate Passport keys for tests
+        run: php artisan passport:keys --force
+
       - name: Run test suite
         run: composer test
