@@ -21,6 +21,8 @@ final class ExpandedTechBoothBookingsSeeder extends Seeder
     {
         $available = Booth::query()->whereNull('company_id')->orderBy('id')->get()->values();
         $index = 0;
+        $people = collect(ExpandedTechData::people());
+
         foreach (ExpandedTechData::companies() as $slug => $definition) {
             $company = Company::query()->where('name', $definition['name'])->firstOrFail();
             $booth = Booth::query()->where('company_id', $company->id)->first();
@@ -31,16 +33,24 @@ final class ExpandedTechBoothBookingsSeeder extends Seeder
                 throw new RuntimeException('Not enough existing unassigned booths; no booth was created.');
             }
             $booth->update(['company_id' => $company->id]);
-            $person = collect(ExpandedTechData::people())->firstWhere('company', $slug);
+
+            $person = $people->first(static fn (array $person): bool => in_array($slug, $person['companies'], true));
+            if (! $person) {
+                throw new RuntimeException("No canonical company representative found for {$slug}.");
+            }
             $user = SystemUser::query()->where('email', $person['email'])->firstOrFail();
             $request = BoothRequest::query()->updateOrCreate(
                 ['company_id' => $company->id, 'booth_id' => $booth->id],
                 ['system_user_id' => $user->id, 'status' => Status::APPROVED->value, 'reason_for_booking' => 'Expanded verified technology-company exhibition booking; source links are stored in ExpandedTechData.', 'final_price' => $booth->price ?? 0],
             );
             $this->syncQr($request);
-            foreach (collect(ExpandedTechData::people())->where('company', $slug) as $member) {
+
+            foreach ($people->filter(static fn (array $member): bool => in_array($slug, $member['companies'], true)) as $member) {
                 $memberUser = SystemUser::query()->where('email', $member['email'])->firstOrFail();
-                DB::table('booth_system_users')->updateOrInsert(['booth_id' => $booth->id, 'system_user_id' => $memberUser->id], ['assigned_by' => null, 'created_at' => now()]);
+                DB::table('booth_system_users')->updateOrInsert(
+                    ['booth_id' => $booth->id, 'system_user_id' => $memberUser->id],
+                    ['assigned_by' => null, 'created_at' => now()],
+                );
             }
         }
     }

@@ -30,33 +30,47 @@ final class ExpandedTechData
             'tamara' => ['name' => 'Tamara', 'sector' => 'Fintech', 'description' => 'A Saudi financial technology company offering flexible payments and financial services.', 'linkedin' => 'https://www.linkedin.com/company/tamara', 'website' => 'https://tamara.co', 'year' => 2020, 'domain' => 'tamara.co'],
             'anghami' => ['name' => 'Anghami', 'sector' => 'Consumer Technology', 'description' => 'A leading MENA music streaming and consumer technology platform.', 'linkedin' => 'https://www.linkedin.com/company/anghami', 'website' => 'https://www.anghami.com', 'year' => 2012, 'domain' => 'anghami.com'],
             'tabby' => ['name' => 'Tabby', 'sector' => 'Fintech', 'description' => 'A leading MENA financial services and flexible-payments platform.', 'linkedin' => 'https://www.linkedin.com/company/tabbypay', 'website' => 'https://tabby.ai', 'year' => 2019, 'domain' => 'tabby.ai'],
+            // LinkedIn provenance: https://lk.linkedin.com/company/nooncom/ and https://www.linkedin.com/posts/nooncom_techtalent-syria-activity-7462041397160828928-8738
+            'noon' => ['name' => 'noon', 'sector' => 'E-commerce & Technology', 'description' => 'A regional digital ecosystem with a technology centre and engineering presence in Damascus, Syria.', 'linkedin' => 'https://lk.linkedin.com/company/nooncom/', 'website' => 'https://www.noon.com', 'year' => 2017, 'domain' => 'noon.com'],
         ];
     }
 
     public static function people(): array
     {
         $leaders = [
-            ['workiom','Sinan Hatahet','sinan.hatahet@expanded-tech.test','https://www.linkedin.com/in/shatahet','Co-Founder'],
-            ['techtown','Sinan Hatahet','sinan.hatahet.techtown@expanded-tech.test','https://www.linkedin.com/in/shatahet','Co-Founder & CEO'],
-            ['writer','Waseem AlShikh','waseem.alshikh@expanded-tech.test','https://www.linkedin.com/in/waseemalshikh','Co-Founder & CTO'],
-            ['salehli','AbdulRhman Arnaout','abdulrhman.arnaout@expanded-tech.test','https://www.linkedin.com/in/abdulrhman-arnaout','Co-Founder & CEO'],
-            ['wusool','Mohammad Alammar','mohammad.alammar@expanded-tech.test','https://www.linkedin.com/in/mhmd3mmr','Founder'],
-            ['quizat','Hamza Hourani','hamza.hourani@expanded-tech.test','https://www.linkedin.com/in/hamza-hourani','Founder'],
-            ['yallago','Bashar Saaduddin Al Jbawi','bashar.jbawi@expanded-tech.test','https://www.linkedin.com/in/bashar-saaduddin-al-jbawi','Co-Founder'],
-            ['beeorder','Abdel Malek Al-Mouzayen','abdelmalek.mouzayen@expanded-tech.test','https://ae.linkedin.com/in/abdelmalekalmouzayen','CEO & Co-Founder'],
-            ['nsave','Amer Baroudi','amer.baroudi@expanded-tech.test','https://uk.linkedin.com/in/amer-baroudi','Co-Founder & CEO'],
-            ['tradinos','Abdel Malek Al-Mouzayen','abdelmalek.tradinos@expanded-tech.test','https://ae.linkedin.com/in/abdelmalekalmouzayen','CEO'],
-            ['digit_innovation_hub','Abdel Malek Al-Mouzayen','abdelmalek.digit@expanded-tech.test','https://ae.linkedin.com/in/abdelmalekalmouzayen','Ecosystem Mentor'],
-            ['ixcoders','Mhd Tarek Almalek','tarek.almalek@expanded-tech.test','https://sy.linkedin.com/in/mhd-tarek-almalek','Co-Founder & COO'],
-            ['eb_tech','MHD Yasser Kaziz','yasser.kaziz@expanded-tech.test','https://ae.linkedin.com/in/yasserkaziz','Founder & CEO'],
-            ['planlyze','Sara Kataf','sara.kataf@expanded-tech.test','https://sy.linkedin.com/in/sarakataf','CMO & Co-Founder'],
-            ['arageek','Ahmad Sufian Bayram','ahmad.arageek@expanded-tech.test','https://www.linkedin.com/in/ahmadsufianbayram','Founder'],
-            ['souq','Ronaldo Mouchawar','ronaldo.mouchawar@expanded-tech.test','https://www.linkedin.com/in/ronaldomouchawar','Co-Founder'],
-            ['careem','Mudassir Sheikha','mudassir.sheikha@expanded-tech.test','https://www.linkedin.com/in/mudassirsheikha','Co-Founder & CEO'],
-            ['tamara','Abdulmajeed Alsukhan','abdulmajeed.alsukhan@expanded-tech.test','https://www.linkedin.com/in/abdulmajeed-alsukhan-13000a58','Co-Founder & CEO'],
-            ['anghami','Elie Habib','elie.habib@expanded-tech.test','https://www.linkedin.com/in/eliehabib','Co-Founder'],
-            ['tabby','Hosam Arab','hosam.arab@expanded-tech.test','https://ae.linkedin.com/in/hosam','Co-Founder & CEO'],
+            ['memberships' => [['company' => 'workiom', 'role' => 'Co-Founder'], ['company' => 'techtown', 'role' => 'Co-Founder & CEO']], 'name' => 'Sinan Hatahet', 'email' => 'sinan.hatahet@expanded-tech.test', 'linkedin' => 'https://www.linkedin.com/in/shatahet'],
+            ['memberships' => [['company' => 'writer', 'role' => 'Co-Founder & CTO']], 'name' => 'Waseem AlShikh', 'email' => 'waseem.alshikh@expanded-tech.test', 'linkedin' => 'https://www.linkedin.com/in/waseemalshikh'],
+            ['memberships' => [['company' => 'salehli', 'role' => 'Co-Founder & CEO']], 'name' => 'AbdulRhman Arnaout', 'email' => 'abdulrhman.arnaout@expanded-tech.test', 'linkedin' => 'https://www.linkedin.com/in/abdulrhman-arnaout'],
+            ['memberships' => [['company' => 'wusool', 'role' => 'Founder']], 'name' => 'Mohammad Alammar', 'email' => 'mohammad.alammar@expanded-tech.test', 'linkedin' => 'https://www.linkedin.com/in/mhmd3mmr'],
+            ['memberships' => [['company' => 'quizat', 'role' => 'Founder']], 'name' => 'Hamza Hourani', 'email' => 'hamza.hourani@expanded-tech.test', 'linkedin' => 'https://www.linkedin.com/in/hamza-hourani'],
+            ['memberships' => [['company' => 'yallago', 'role' => 'Co-Founder']], 'name' => 'Bashar Saaduddin Al Jbawi', 'email' => 'bashar.jbawi@expanded-tech.test', 'linkedin' => 'https://www.linkedin.com/in/bashar-saaduddin-al-jbawi'],
+            ['memberships' => [['company' => 'beeorder', 'role' => 'CEO & Co-Founder'], ['company' => 'tradinos', 'role' => 'CEO'], ['company' => 'digit_innovation_hub', 'role' => 'Ecosystem Mentor']], 'name' => 'Abdel Malek Al-Mouzayen', 'email' => 'abdelmalek.mouzayen@expanded-tech.test', 'linkedin' => 'https://ae.linkedin.com/in/abdelmalekalmouzayen'],
+            ['memberships' => [['company' => 'nsave', 'role' => 'Co-Founder & CEO']], 'name' => 'Amer Baroudi', 'email' => 'amer.baroudi@expanded-tech.test', 'linkedin' => 'https://uk.linkedin.com/in/amer-baroudi'],
+            ['memberships' => [['company' => 'ixcoders', 'role' => 'Co-Founder & COO']], 'name' => 'Mhd Tarek Almalek', 'email' => 'tarek.almalek@expanded-tech.test', 'linkedin' => 'https://sy.linkedin.com/in/mhd-tarek-almalek'],
+            ['memberships' => [['company' => 'eb_tech', 'role' => 'Founder & CEO']], 'name' => 'MHD Yasser Kaziz', 'email' => 'yasser.kaziz@expanded-tech.test', 'linkedin' => 'https://ae.linkedin.com/in/yasserkaziz'],
+            ['memberships' => [['company' => 'planlyze', 'role' => 'CMO & Co-Founder']], 'name' => 'Sara Kataf', 'email' => 'sara.kataf@expanded-tech.test', 'linkedin' => 'https://sy.linkedin.com/in/sarakataf'],
+            ['memberships' => [['company' => 'arageek', 'role' => 'Founder']], 'name' => 'Ahmad Sufian Bayram', 'email' => 'ahmad.arageek@expanded-tech.test', 'linkedin' => 'https://www.linkedin.com/in/ahmadsufianbayram'],
+            ['memberships' => [['company' => 'souq', 'role' => 'Co-Founder']], 'name' => 'Ronaldo Mouchawar', 'email' => 'ronaldo.mouchawar@expanded-tech.test', 'linkedin' => 'https://www.linkedin.com/in/ronaldomouchawar'],
+            ['memberships' => [['company' => 'careem', 'role' => 'Co-Founder & CEO']], 'name' => 'Mudassir Sheikha', 'email' => 'mudassir.sheikha@expanded-tech.test', 'linkedin' => 'https://www.linkedin.com/in/mudassirsheikha'],
+            ['memberships' => [['company' => 'tamara', 'role' => 'Co-Founder & CEO']], 'name' => 'Abdulmajeed Alsukhan', 'email' => 'abdulmajeed.alsukhan@expanded-tech.test', 'linkedin' => 'https://www.linkedin.com/in/abdulmajeed-alsukhan-13000a58'],
+            ['memberships' => [['company' => 'anghami', 'role' => 'Co-Founder']], 'name' => 'Elie Habib', 'email' => 'elie.habib@expanded-tech.test', 'linkedin' => 'https://www.linkedin.com/in/eliehabib'],
+            ['memberships' => [['company' => 'tabby', 'role' => 'Co-Founder & CEO']], 'name' => 'Hosam Arab', 'email' => 'hosam.arab@expanded-tech.test', 'linkedin' => 'https://ae.linkedin.com/in/hosam'],
+            ['memberships' => [['company' => 'noon', 'role' => 'Vice President of Special Projects Technology']], 'name' => 'Nizar Zarka', 'email' => 'nizar.zarka@expanded-tech.test', 'linkedin' => 'https://ae.linkedin.com/in/nizar-zarka-phd-7ab22114'],
         ];
-        return array_map(static fn(array $p): array => ['key' => $p[0].'-'.substr(md5($p[1]),0,6), 'company' => $p[0], 'name' => $p[1], 'email' => $p[2], 'linkedin' => $p[3], 'role' => $p[4], 'asset' => strtolower(preg_replace('/[^a-z0-9]+/i','-', $p[1]))], $leaders);
+
+        return array_map(static function (array $person): array {
+            $memberships = $person['memberships'];
+            return [
+                'key' => $memberships[0]['company'].'-'.substr(md5($person['name']), 0, 6),
+                'company' => $memberships[0]['company'],
+                'companies' => array_values(array_unique(array_column($memberships, 'company'))),
+                'memberships' => $memberships,
+                'name' => $person['name'],
+                'email' => $person['email'],
+                'linkedin' => $person['linkedin'],
+                'role' => $memberships[0]['role'],
+                'asset' => strtolower(preg_replace('/[^a-z0-9]+/i', '-', $person['name'])),
+            ];
+        }, $leaders);
     }
 }
