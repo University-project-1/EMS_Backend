@@ -60,8 +60,14 @@ class ReviewService
         if ($booth->company_id === null) {
             return throw new ModelNotFoundException;
         }
-
-        return $booth->reviews()->latest()->with('user.media')->cursorPaginate(10);
+        $reviweCount = $booth->reviews()->count();
+        $avgRating = round($booth->reviews()->avg('rating'), 1);
+        $reviews = $booth->reviews()->latest()->with('user.media')->cursorPaginate(10);
+        return [
+            'reviews' => $reviews,
+            'avgRating' => $avgRating,
+            'reviweCount' => $reviweCount
+        ];
     }
 
     public function eventReviews(Event $event)

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['booth_id', 'system_user_id', 'assigned_by'])]
+#[Fillable(['booth_id', 'system_user_id', 'assigned_by', 'created_at'])]
 #[Table('booth_system_users')]
 class BoothSystemUser extends Model
 {
