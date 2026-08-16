@@ -23,7 +23,7 @@ class ReviewController extends Controller
     public function store(StoreReviewRequest $request){
         $this->reviewService->store(ReviewDTO::fromRequest($request->validated()));
 
-        return successResponse(); 
+        return successResponse();
     }
 
     /**
@@ -31,8 +31,12 @@ class ReviewController extends Controller
      */
     public function boothReviews(Booth $booth){
         $reviews = $this->reviewService->boothReviews($booth);
-        
-        return successResponse(ReviewResource::collection($reviews));
+
+        return successResponse([
+            'avg_reviews' => $reviews['avgRating'],
+            'reviews_count' => $reviews['reviweCount'],
+            'reviews' => ReviewResource::collection($reviews['reviews']),
+            ]);
     }
 
     /**
@@ -40,7 +44,7 @@ class ReviewController extends Controller
      */
     public function eventReviews(Event $event){
         $reviews = $this->reviewService->eventReviews($event);
-        
+
         return successResponse(ReviewResource::collection($reviews));
     }
 

@@ -37,6 +37,14 @@ class BoothResource extends JsonResource
             'svg_id' => $this->svg_id,
             'is_booked' => ! is_null($this->qr_token),
             'status' => $status,
+            'is_saved' => $this->whenHas(
+                'is_saved',
+                fn (): bool => (bool) $this->getAttribute('is_saved'),
+            ),
+            'is_review' => $this->whenHas(
+                'is_review',
+                fn (): bool => (bool) $this->getAttribute('is_review'),
+            ),
             'hall_id' => new HallResource($this->whenLoaded('hall')),
             'company' => $company ? [
                 'id' => $company->id,
