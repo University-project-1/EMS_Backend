@@ -7,7 +7,6 @@ use App\DTOs\SystemUser\CompanyDTO;
 use App\Enum\Status;
 use App\Filter\AccessibleBoothsFilter;
 use App\Filter\BookedBoothFilter;
-use App\Filter\BoothStatusFilter;
 use App\Filter\MaxFilter;
 use App\Filter\MinFilter;
 use App\Http\Controllers\Controller;
@@ -91,13 +90,11 @@ class BoothController extends Controller
     /**
      * My booths
      */
-    #[QueryParameter('filter[status]', 'Filter booths by exact booth status', required: false, type: 'string')]
-    #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 15')]
+    #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 5')]
     public function ownedBooths(Request $request)
     {
         $booths = QueryBuilder::for(Booth::class)
             ->allowedFilters(
-                AllowedFilter::custom('status', new BoothStatusFilter()),
                 AllowedFilter::custom('accessible', new AccessibleBoothsFilter($request->user('system'))),
             )
             ->whereRelation('boothRequests', 'status', Status::APPROVED->value)

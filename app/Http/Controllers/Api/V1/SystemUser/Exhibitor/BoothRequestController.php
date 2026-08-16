@@ -15,7 +15,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class BoothRequestController extends Controller
 {
     #[QueryParameter('filter[status]', 'Filter booths by exact booth request status', required: false, type: 'string')]
-    #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 10')]
+    #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 5')]
     /**
      * show all requests
      */
@@ -39,7 +39,7 @@ class BoothRequestController extends Controller
             })
             ->with(['company', 'company.logoMedia', 'booth', 'services.service'])
             ->latest()
-            ->paginate($request->integer('per_page', 10));
+            ->paginate($request->integer('per_page', 5));
 
         return successResponse(
             data: BoothRequestResource::collection($boothRequests),
