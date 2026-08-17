@@ -9,7 +9,7 @@ use Tests\Support\CreatesActors;
 
 uses(RefreshDatabase::class, CreatesActors::class);
 
-test('exhibitor can list booths of their assigned company only', function (): void {
+test('exhibitor can list booths with an approved booking request only', function (): void {
     $exhibitor = $this->createExhibitor();
     $hall = Hall::query()->create([
         'number' => 'HALL-601',
@@ -29,6 +29,14 @@ test('exhibitor can list booths of their assigned company only', function (): vo
         'area' => 25,
         'price' => 500,
     ]);
+    $ownedBooth->boothRequests()->create([
+        'company_id' => $assignedCompany->id,
+        'system_user_id' => $exhibitor->id,
+        'final_price' => 500,
+        'status' => Status::APPROVED->value,
+        'reason_for_booking' => 'A confirmed booking for the exhibitor.',
+    ]);
+
     $hall->booths()->create([
         'company_id' => $foreignCompany->id,
         'number' => 'A-102',
