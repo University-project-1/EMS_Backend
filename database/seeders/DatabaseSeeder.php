@@ -17,6 +17,7 @@ final class DatabaseSeeder extends Seeder
         if ((int) DB::table('companies')->count() === 0) {
             $this->call([
                 AnnouncementSeeder::class,
+            ExhibitionAnnouncementsSeeder::class,
                 PassportSeeder::class,
                 UserSeeder::class,
                 CompanySeeder::class,
