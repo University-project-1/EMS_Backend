@@ -52,6 +52,7 @@ final class DatabaseSeeder extends Seeder
             GovernmentHall11MediaSeeder::class,
             GovernmentHall11BoothBookingsSeeder::class,
             GovernmentHall11InvitationsSeeder::class,
+            ApprovedCompanyManagerBackfillSeeder::class,
         ]);
     }
 }
