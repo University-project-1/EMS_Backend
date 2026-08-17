@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use Throwable;
 
@@ -56,7 +55,7 @@ final class BoothBookingWithProductsService
     private function readProducts(UploadedFile $productsFile): array
     {
         try {
-            $reader = IOFactory::createReaderForFile($productsFile->getRealPath());
+            $reader = new Xlsx;
 
             if (! $reader instanceof Xlsx) {
                 throw new \RuntimeException('Unsupported spreadsheet format.');

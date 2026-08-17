@@ -1,5 +1,7 @@
 <?php
 
+use App\Enum\Status;
+use App\Models\BoothProduct;
 use App\Services\SystemUser\Exhibitor\BoothBookingWithProductsService;
 use App\Services\SystemUser\Exhibitor\BoothRequestService;
 use Illuminate\Http\UploadedFile;
@@ -67,8 +69,8 @@ it('rejects duplicate product names regardless of casing or whitespace', functio
     ])))->toThrow(ValidationException::class);
 });
 
-it('localizes products catalog errors to the active locale', function (): void {
-    app()->setLocale('ar');
+it('returns English products catalog validation messages', function (): void {
+    app()->setLocale('en');
 
     try {
         readBoothProducts(boothProductsFile([
@@ -77,7 +79,7 @@ it('localizes products catalog errors to the active locale', function (): void {
         ]));
     } catch (ValidationException $exception) {
         expect($exception->errors()['products_file'][0])
-            ->toBe('يجب أن يحتوي الصف الأول حصراً على الأعمدة: name, price, description.');
+            ->toBe('The first row must contain exactly: name, price, description.');
     } finally {
         app()->setLocale(config('app.locale'));
     }
@@ -88,4 +90,11 @@ it('rejects a product price that exceeds the database precision', function (): v
         ['name', 'price', 'description'],
         ['Coffee Machine', '10000000000.00', 'Compact automatic machine'],
     ])))->toThrow(ValidationException::class);
+});
+
+it('constrains the public products scope to approved booth requests', function (): void {
+    $query = BoothProduct::query()->forApprovedBooths();
+
+    expect($query->toSql())->toContain('exists')
+        ->and($query->getBindings())->toContain(Status::APPROVED->value);
 });

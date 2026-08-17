@@ -71,6 +71,7 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     Route::prefix('booth/')->group(function () {
         Route::get('', [BoothController::class, 'index']);
         Route::get('{booth}/products', [BoothProductController::class, 'index']);
+        Route::get('products', [BoothProductController::class, 'allProducts']);
         Route::get('{booth}', [BoothController::class, 'show']);
     });
 

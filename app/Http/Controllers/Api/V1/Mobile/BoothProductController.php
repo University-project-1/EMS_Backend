@@ -28,11 +28,11 @@ class BoothProductController extends Controller
         $approvedRequest = $booth->approvedBoothRequest()->first();
 
         if (! $approvedRequest) {
-            return successResponse(BoothProductResource::collection(collect()),);
+            return successResponse(BoothProductResource::collection(collect()));
         }
 
         $products = QueryBuilder::for(BoothProduct::query()->where('booth_request_id', $approvedRequest->getKey()))
-            ->allowedFilters(AllowedFilter::custom('search', new BoothProductsSearchFilter()))
+            ->allowedFilters(AllowedFilter::custom('search', new BoothProductsSearchFilter))
             ->allowedSorts(
                 AllowedSort::field('name'),
                 AllowedSort::field('price'),
@@ -42,5 +42,27 @@ class BoothProductController extends Controller
             ->cursorPaginate(min(max($request->integer('per_page', 10), 1), 50));
 
         return successResponse(BoothProductResource::collection($products));
+    }
+
+    /**
+     * all products in exhibition booths
+     */
+    #[QueryParameter('filter[search]', 'Search products by name or description', type: 'string')]
+    #[QueryParameter('sort', 'Allowed values: name, price, sort_order', type: 'string')]
+    #[QueryParameter('per_page', 'Number of items per page. Default: 20, maximum: 50', type: 'integer')]
+    public function allProducts(Request $request)
+    {
+        $allProducts = QueryBuilder::for(BoothProduct::query())
+            ->allowedFilters(AllowedFilter::custom('search', new BoothProductsSearchFilter))
+            ->allowedSorts(
+                AllowedSort::field('name'),
+                AllowedSort::field('price'),
+                AllowedSort::field('sort_order'),
+            )
+            ->defaultSort('sort_order')
+            ->with('boothRequest:id,booth_id')
+            ->cursorPaginate(min(max($request->integer('per_page', 10), 1), 50));
+
+        return successResponse(BoothProductResource::collection($allProducts));
     }
 }

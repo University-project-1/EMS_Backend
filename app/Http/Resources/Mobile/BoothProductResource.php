@@ -17,6 +17,7 @@ class BoothProductResource extends JsonResource
             'name' => $this->name,
             'price' => $this->price,
             'description' => $this->description,
+            'booth_id' => $this->whenLoaded('boothRequest', fn () => $this->boothRequest?->booth_id),
         ];
     }
 }
