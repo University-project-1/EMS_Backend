@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\V1\SystemUser\Exhibitor;
 use App\DTOs\SystemUser\BoothRequestDTO;
 use App\DTOs\SystemUser\CompanyDTO;
 use App\Enum\Status;
+use App\Filter\AccessibleBoothsFilter;
 use App\Filter\BookedBoothFilter;
-use App\Filter\BoothStatusFilter;
 use App\Filter\MaxFilter;
 use App\Filter\MinFilter;
 use App\Http\Controllers\Controller;
@@ -90,31 +90,20 @@ class BoothController extends Controller
     /**
      * My booths
      */
-    #[QueryParameter('filter[status]', 'Filter booths by exact booth status', required: false, type: 'string')]
     #[QueryParameter('per_page', type: 'integer', description: 'Number of items per page. Default: 15')]
     public function ownedBooths(Request $request)
     {
-        $userId = $request->user('system')->id;
-
         $booths = QueryBuilder::for(Booth::class)
-        ->allowedFilters(AllowedFilter::custom('status', new BoothStatusFilter()))
-        ->where(function ($query) use ($userId) {
-            $query->whereHas('systemUsers', function ($q) use ($userId) {
-                $q->whereKey($userId);
-            })
-            ->orWhereHas('company.systemUsers', function ($q) use ($userId) {
-                $q->whereKey($userId);
-            })
-            ->orWhereHas('boothRequests', function ($q) use ($userId) {
-                $q->where('system_user_id', $userId)
-                ->whereIn('status', [Status::PENDING->value, Status::APPROVED->value]);
-            });
-        })
-        ->with(['company', 'hall', 'latestBoothRequest', 'boothRequests.attachedServices'])
-        ->latest()
-        ->paginate(request()->query('per_page', 5));
-
-
+            ->allowedFilters(
+                AllowedFilter::custom('accessible', new AccessibleBoothsFilter($request->user('system'))),
+            )
+            ->whereRelation('boothRequests', 'status', Status::APPROVED->value)
+            ->with(['company', 'hall', 'boothRequests' => fn ($query) => $query
+                ->where('status', Status::APPROVED->value)
+                ->with(['company', 'services.service']),
+            ])
+            ->latest()
+            ->paginate(request()->query('per_page', 5));
         return successResponse(
             data: BoothResource::collection($booths),
             message: __('booth.list_success')
