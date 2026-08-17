@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\Mobile\ProfileController;
 use App\Http\Controllers\Api\V1\Mobile\ReportController;
 use App\Http\Controllers\Api\V1\Mobile\ReviewController;
 use App\Http\Controllers\Api\V1\Mobile\SavedController;
+use App\Http\Controllers\Api\V1\Mobile\SearchController;
 use App\Http\Controllers\Api\V1\Shared\FaciltyController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
@@ -62,6 +63,9 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
 
     // announcments
     Route::get('announcements', [AnnouncementController::class, 'index']);
+
+    // global search
+    Route::get('search', SearchController::class);
 
     // booths
     Route::prefix('booth/')->group(function () {

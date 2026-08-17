@@ -8,6 +8,7 @@ use App\Http\Resources\SystemUser\Shared\CompanyResource;
 use App\Models\Company;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -44,7 +45,12 @@ class CompanyController extends Controller
         $company->load(['galleryMedia', 'media','events' => function($query){
             $query->withAvg('reviews', 'rating');
         }, 'logoMedia' , 'booths' => function($query){
-            $query->withAvg('reviews', 'rating');
+            $query->withExists([
+                'reviews as is_review' => fn (Builder $reviews): Builder => $reviews
+                    ->where('user_id', auth('mobile')->user()->getKey()),
+                'savedItems as is_saved' => fn (Builder $savedItems): Builder => $savedItems
+                        ->where('user_id', auth('mobile')->user()->getKey())
+            ]);
         }, 'booths.hall']);
 
         return successResponse(

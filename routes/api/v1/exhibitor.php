@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Shared\NotificationController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AnnouncementController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\AuthController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothController;
+use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\BoothRequestController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\CompanyController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventController;
 use App\Http\Controllers\Api\V1\SystemUser\Exhibitor\EventHallController;
@@ -53,6 +54,10 @@ Route::prefix('exhibitor')->group(function () {
         Route::prefix('halls')->group(function () {
             Route::get('/', [HallController::class, 'index']);
             Route::get('/{hall}', [HallController::class, 'show']);
+        });
+
+        Route::prefix('booth-requests')->group(function(){
+            Route::get('/', [BoothRequestController::class, 'index']);
         });
 
         // booths
