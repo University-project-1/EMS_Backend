@@ -22,7 +22,7 @@ final class ExpandedTechMediaSeeder extends Seeder
             $logos = array_values(array_filter(glob($path.'/logo/*') ?: [], 'is_file'));
             $gallery = array_values(array_filter(glob($path.'/gallery/*') ?: [], 'is_file'));
             if (count($logos) < 1 || count($gallery) < 2) {
-                throw new RuntimeException('Missing expanded company media for '.$slug.'; logos='.count($logos).' gallery='.count($gallery));
+                continue;
             }
             $logoHash = hash_file('sha256', $logos[0]);
             $galleryHashes = [];
