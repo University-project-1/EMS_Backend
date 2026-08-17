@@ -46,6 +46,12 @@ final class DatabaseSeeder extends Seeder
             ExpandedTechCompanyMembershipsSeeder::class,
             ExpandedTechMediaSeeder::class,
             ExpandedTechBoothBookingsSeeder::class,
+            GovernmentHall11CompaniesSeeder::class,
+            GovernmentHall11PeopleSeeder::class,
+            GovernmentHall11MembershipsSeeder::class,
+            GovernmentHall11MediaSeeder::class,
+            GovernmentHall11BoothBookingsSeeder::class,
+            GovernmentHall11InvitationsSeeder::class,
         ]);
     }
 }
