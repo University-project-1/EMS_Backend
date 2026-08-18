@@ -5487,7 +5487,7 @@
         "/v1/visitor/leads/history": {
             "get": {
                 "operationId": "lead.index",
-                "summary": "leads history",
+                "summary": "Leads history",
                 "tags": [
                     "Visitor/Leads"
                 ],
