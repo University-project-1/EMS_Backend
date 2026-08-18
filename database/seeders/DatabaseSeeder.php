@@ -17,7 +17,7 @@ final class DatabaseSeeder extends Seeder
         if ((int) DB::table('companies')->count() === 0) {
             $this->call([
                 AnnouncementSeeder::class,
-            ExhibitionAnnouncementsSeeder::class,
+                ExhibitionAnnouncementsSeeder::class,
                 PassportSeeder::class,
                 UserSeeder::class,
                 CompanySeeder::class,
@@ -58,22 +58,6 @@ final class DatabaseSeeder extends Seeder
             RealData\ExhibitionWeekEventsSeeder::class,
             RealData\RealDataUserInteractionsSeeder::class,
             RealData\ApprovedCompanyManagerBackfillSeeder::class,
-            AnnouncementSeeder::class,
-            PassportSeeder::class,
-            UserSeeder::class,
-            CompanySeeder::class,
-            ServiceSeeder::class,
-            BusCatalogsSeeder::class,
-            HallSeeder::class,
-            FacilitySeeder::class,
-            BoothSeeder::class,
-            BoothRequestSeeder::class,
-            EventSeeder::class,
-            LeadSeeder::class,
-            SavedSeeder::class,
-            ReportSeeder::class,
-            ReviewSeeder::class,
-            NotificationSeeder::class,
         ]);
     }
 }
