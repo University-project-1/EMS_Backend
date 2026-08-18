@@ -24,11 +24,9 @@ use Illuminate\Support\Facades\Route;
 // auth routes with rate limiting
 Route::prefix('auth')->group(function () {
 
-    // login & register routes with rate limiting
-    Route::middleware('throttle:login_register')->group(function () {
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
-    });
+    // Authentication endpoints use dedicated limits because they are susceptible to abuse.
+    Route::post('register', [AuthController::class, 'register'])->middleware('throttle:registration');
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:mobile_login');
 
     // OTP verification route with its own rate limiting
     Route::middleware('throttle:verify_otp')->group(function () {
@@ -40,7 +38,7 @@ Route::prefix('auth')->group(function () {
     Route::prefix('password')->group(function () {
         Route::post('forgot', [PasswordController::class, 'forgotPassword'])->middleware('throttle:forgot_password');
         Route::post('otp/verify', [PasswordController::class, 'verifyForgotPasswordOtp'])->middleware('throttle:verify_otp');
-        Route::post('reset', [PasswordController::class, 'resetPassword'])->middleware('throttle:login_register');
+        Route::post('reset', [PasswordController::class, 'resetPassword'])->middleware('throttle:password_reset');
     });
 });
 
@@ -118,7 +116,7 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
 
     // reviews
     Route::prefix('reviews/')->group(function () {
-        Route::post('', [ReviewController::class, 'store']);
+        Route::post('', [ReviewController::class, 'store'])->middleware('throttle:review');
         Route::get('booth/{booth}', [ReviewController::class, 'boothReviews']);
         Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
         Route::delete('{review}', [ReviewController::class, 'destroy']);
@@ -126,7 +124,7 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
 
     // leads
     Route::prefix('leads')->group(function () {
-        Route::post('/', [LeadController::class, 'store']);
+        Route::post('/', [LeadController::class, 'store'])->middleware('throttle:lead');
         Route::get('/history', [LeadController::class, 'index']);
     });
     // notifications

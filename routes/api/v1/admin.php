@@ -22,7 +22,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
-    Route::post('login', [AuthController::class, 'login'])->name('login');
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:system_login')->name('login');
     Route::post('forgot-password', [ResetPasswordController::class, 'sendResetLink'])->middleware('throttle:forgot_password');
     Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
 
@@ -37,7 +37,7 @@ Route::prefix('admin')->group(function () {
 
         // profile
         Route::get('profile', [ProfileController::class, 'show']);
-        Route::post('profile', [ProfileController::class, 'update']);
+        Route::post('profile', [ProfileController::class, 'update'])->middleware('throttle:profile_update');
 
         // halls
         Route::prefix('halls')->group(function () {
