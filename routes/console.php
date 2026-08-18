@@ -9,7 +9,9 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('cleanup:unverified')->daily();
-
 Schedule::command('app:auto-deploy')->everyTwoHours();
-
 Schedule::command('notifications:send-event-reminders')->everyMinute();
+Schedule::command('events:reject-expired-pending')
+    ->everyFiveMinutes()
+    ->withoutOverlapping(10)
+    ->onOneServer();

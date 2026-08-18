@@ -21,8 +21,8 @@ use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('exhibitor')->group(function () {
-    Route::post('login', [AuthController::class, 'login'])->name('login');
-    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:system_login')->name('login');
+    Route::post('register', [AuthController::class, 'register'])->middleware('throttle:registration');
     Route::get('invitations/{invitation:token}', [InvitationController::class, 'show']);
     Route::post('register/{invitation:token}', [AuthController::class, 'registerViaInvite']);
     Route::post('/email/resend-verification', [AuthController::class, 'resendVerificationEmail'])
@@ -48,7 +48,7 @@ Route::prefix('exhibitor')->group(function () {
 
         // profile
         Route::get('profile', [ProfileController::class, 'show']);
-        Route::post('profile', [ProfileController::class, 'update']);
+        Route::post('profile', [ProfileController::class, 'update'])->middleware('throttle:profile_update');
 
         // halls
         Route::prefix('halls')->group(function () {
@@ -56,7 +56,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::get('/{hall}', [HallController::class, 'show']);
         });
 
-        Route::prefix('booth-requests')->group(function(){
+        Route::prefix('booth-requests')->group(function () {
             Route::get('/', [BoothRequestController::class, 'index']);
         });
 
@@ -64,7 +64,7 @@ Route::prefix('exhibitor')->group(function () {
         Route::prefix('booth')->group(function () {
             Route::get('/', [BoothController::class, 'index']);
             Route::get('/my', [BoothController::class, 'ownedBooths']);
-            Route::post('request-booth', [BoothController::class, 'book']);
+            Route::post('request-booth', [BoothController::class, 'book'])->middleware('throttle:booth_request');
             Route::get('/{booth}', [BoothController::class, 'show']);
             Route::get('/{booth}/invitations', [InvitationController::class, 'boothInvitations']);
             Route::post('/{booth}/invitations', [InvitationController::class, 'storeForBooth']);
@@ -117,7 +117,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::get('calendar', [EventController::class, 'calendar'])->name('exhibitor.events.calendar');
             Route::get('statistics', [EventController::class, 'statistics'])->name('exhibitor.events.statistics');
             Route::get('', [EventController::class, 'index'])->name('exhibitor.events.index');
-            Route::post('', [EventController::class, 'store']);
+            Route::post('', [EventController::class, 'store'])->middleware('throttle:event_request');
         });
 
         // notifications

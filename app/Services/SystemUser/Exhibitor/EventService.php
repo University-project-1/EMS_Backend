@@ -7,12 +7,14 @@ use App\DTOs\SystemUser\EventDTO;
 use App\Enum\Status;
 use App\Models\Company;
 use App\Models\Event;
+use App\Models\EventHall;
 use App\Models\SystemUser;
 use App\Notifications\SystemUser\Admin\NewBookingRequestNotification;
 use App\Services\Shared\NotificationRecipientResolver;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class EventService
 {
@@ -24,6 +26,21 @@ class EventService
     public function store(SystemUser $user, EventDTO $dto, ?CompanyDTO $companyDto): Event
     {
         return DB::transaction(function () use ($user, $dto, $companyDto) {
+            $start = Carbon::parse($dto->start_at);
+            $end = $start->copy()->addHours($dto->duration);
+
+            EventHall::query()->whereKey($dto->eventHallId)->lockForUpdate()->firstOrFail();
+
+            $hasApprovedConflict = Event::query()
+                ->where('event_hall_id', $dto->eventHallId)
+                ->where('status', Status::APPROVED->value)
+                ->where('start_at', '<', $end)
+                ->where('end_at', '>', $start)
+                ->exists();
+
+            if ($hasApprovedConflict) {
+                throw new HttpException(409, __('validation.hall_unavailable'));
+            }
 
             $eventable = $user;
             $eventableType = SystemUser::class;
@@ -35,9 +52,6 @@ class EventService
                 $eventable = Company::findOrFail($dto->companyId);
                 $eventableType = Company::class;
             }
-
-            $start = Carbon::parse($dto->start_at);
-            $end = $start->copy()->addHours($dto->duration);
 
             $event = Event::create([
                 'eventable_type' => $eventableType,
@@ -53,7 +67,7 @@ class EventService
             ]);
 
             $event->speakers()->createMany(
-                array_map(fn ($s) => ['name' => $s['name']], $dto->speakers)
+                array_map(fn ($speaker) => ['name' => $speaker['name']], $dto->speakers),
             );
 
             if ($dto->logo !== null) {
