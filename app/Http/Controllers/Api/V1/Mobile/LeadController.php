@@ -14,19 +14,27 @@ class LeadController extends Controller
 {
     public function __construct(
         private readonly LeadService $leadService
-    ){}
+    ) {}
 
-    public function store(ScanRequest $request){
+    public function store(ScanRequest $request)
+    {
         $lead = $this->leadService->registerScan(request()->user('mobile'), $request['token']);
         $lead->load('leadable');
+
         return successResponse(new LeadResource($lead));
     }
 
     /**
-     * leads history
+     * Leads history.
      */
-    public function index(){
-        $leads = Request()->user('mobile')->leads();
+    public function index()
+    {
+        $leads = request()
+            ->user('mobile')
+            ->leads()
+            ->with('leadable')
+            ->latest()
+            ->get();
         return successResponse(ScanHistoryResource::collection($leads));
     }
 }

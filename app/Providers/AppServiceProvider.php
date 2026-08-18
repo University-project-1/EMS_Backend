@@ -2,10 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\Booth;
-use App\Models\Event;
-use App\Observers\BoothObserver;
-use App\Observers\EventObserver;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
@@ -30,59 +26,149 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Scramble (Token-based authentication)
         Scramble::afterOpenApiGenerated(function (OpenApi $openApi) {
-            $openApi->secure(
-                SecurityScheme::http('bearer')
-            );
+            $openApi->secure(SecurityScheme::http('bearer'));
         });
 
         if (! app()->isLocal()) {
             URL::forceScheme('https');
         }
 
-        RateLimiter::for('login_register', function (Request $request) {
-            return Limit::perMinute(10)->by($request->ip())->response(function () {
-                return errorResponse(__('rate_limit.login_register'), [], 429);
-            });
-        });
+        $this->registerRateLimiters();
+    }
 
-        RateLimiter::for('verify_otp', function (Request $request) {
-            return Limit::perMinute(5)->by($request->ip())->response(function () {
-                return errorResponse(__('rate_limit.verify_otp'), [], 429);
-            });
-        });
+    private function registerRateLimiters(): void
+    {
+        RateLimiter::for('api', fn (Request $request) => $this->limitPerMinute(
+            attempts: 120,
+            request: $request,
+            message: 'rate_limit.api',
+        ));
 
-        RateLimiter::for('forgot_password', function (Request $request) {
-            $phone = $request->input('phone') ?? $request->ip();
+        RateLimiter::for('mobile_login', fn (Request $request) => $this->limitPerMinute(
+            attempts: 5,
+            request: $request,
+            message: 'rate_limit.mobile_login',
+            inputs: ['phone'],
+        ));
 
-            return Limit::perMinute(10)->by($phone)->response(function () { // perHour to perMinute for testing
-                return errorResponse(__('rate_limit.forgot_password'), [], 429);
-            });
-        });
+        RateLimiter::for('system_login', fn (Request $request) => $this->limitPerMinute(
+            attempts: 5,
+            request: $request,
+            message: 'rate_limit.system_login',
+            inputs: ['email'],
+        ));
 
-        RateLimiter::for('profile_update', function (Request $request) { // 2 to 20 for testing
-            return Limit::perMinute(20)->by($request->user()->id)->response(function () {
-                return errorResponse(__('rate_limit.profile_update'), [], 429);
-            });
-        });
+        RateLimiter::for('registration', fn (Request $request) => $this->limitPerMinute(
+            attempts: 3,
+            request: $request,
+            message: 'rate_limit.registration',
+            inputs: ['phone', 'email'],
+        ));
 
-        RateLimiter::for('password_update', function (Request $request) {
-            return Limit::perMinute(10)->by($request->user()->id)->response(function () { // 3 to 10 for testing
-                return errorResponse(__('rate_limit.password_update'), [], 429);
-            });
-        });
+        RateLimiter::for('verify_otp', fn (Request $request) => $this->limitPerMinute(
+            attempts: 5,
+            request: $request,
+            message: 'rate_limit.verify_otp',
+            inputs: ['phone'],
+        ));
 
-        RateLimiter::for('phone_update_request', function (Request $request) {
-            return Limit::perHour(2)->by($request->user()->id)->response(function () {
-                return errorResponse(__('rate_limit.phone_update_request'), [], 429);
-            });
-        });
+        RateLimiter::for('forgot_password', fn (Request $request) => $this->limitPerMinutes(
+            attempts: 3,
+            minutes: 15,
+            request: $request,
+            message: 'rate_limit.forgot_password',
+            inputs: ['phone'],
+        ));
 
-        RateLimiter::for('report', function (Request $reqeust) {
-            return Limit::perHour(5)->by($reqeust->user()->id)->response(function () {
-                return errorResponse(__('rate_limit.report'), [], 429);
-            });
-        });
+        RateLimiter::for('password_reset', fn (Request $request) => $this->limitPerMinutes(
+            attempts: 5,
+            minutes: 15,
+            request: $request,
+            message: 'rate_limit.password_reset',
+            inputs: ['phone'],
+        ));
+
+        RateLimiter::for('profile_update', fn (Request $request) => $this->limitPerMinute(
+            attempts: 20,
+            request: $request,
+            message: 'rate_limit.profile_update',
+        ));
+
+        RateLimiter::for('password_update', fn (Request $request) => $this->limitPerMinutes(
+            attempts: 5,
+            minutes: 15,
+            request: $request,
+            message: 'rate_limit.password_update',
+        ));
+
+        RateLimiter::for('phone_update_request', fn (Request $request) => $this->limitPerHour(
+            attempts: 2,
+            request: $request,
+            message: 'rate_limit.phone_update_request',
+        ));
+
+        RateLimiter::for('report', fn (Request $request) => $this->limitPerHour(
+            attempts: 5,
+            request: $request,
+            message: 'rate_limit.report',
+        ));
+
+        RateLimiter::for('review', fn (Request $request) => $this->limitPerHour(
+            attempts: 5,
+            request: $request,
+            message: 'rate_limit.review',
+        ));
+
+        RateLimiter::for('lead', fn (Request $request) => $this->limitPerHour(
+            attempts: 5,
+            request: $request,
+            message: 'rate_limit.lead',
+        ));
+
+        RateLimiter::for('booth_request', fn (Request $request) => $this->limitPerHour(
+            attempts: 3,
+            request: $request,
+            message: 'rate_limit.booth_request',
+        ));
+
+        RateLimiter::for('event_request', fn (Request $request) => $this->limitPerHour(
+            attempts: 3,
+            request: $request,
+            message: 'rate_limit.event_request',
+        ));
+    }
+
+    private function limitPerMinute(int $attempts, Request $request, string $message, array $inputs = []): Limit
+    {
+        return Limit::perMinute($attempts)
+            ->by($this->rateLimitKey($request, $inputs))
+            ->response(fn () => errorResponse(__($message), [], 429));
+    }
+
+    private function limitPerMinutes(int $attempts, int $minutes, Request $request, string $message, array $inputs = []): Limit
+    {
+        return Limit::perMinutes($minutes, $attempts)
+            ->by($this->rateLimitKey($request, $inputs))
+            ->response(fn () => errorResponse(__($message), [], 429));
+    }
+
+    private function limitPerHour(int $attempts, Request $request, string $message, array $inputs = []): Limit
+    {
+        return Limit::perHour($attempts)
+            ->by($this->rateLimitKey($request, $inputs))
+            ->response(fn () => errorResponse(__($message), [], 429));
+    }
+
+    private function rateLimitKey(Request $request, array $inputs = []): string
+    {
+        $identity = collect($inputs)
+            ->map(fn (string $input) => $request->input($input))
+            ->first(fn (mixed $value) => filled($value));
+        $identity ??= $request->user('mobile')?->getAuthIdentifier();
+        $identity ??= $request->user('system')?->getAuthIdentifier();
+        $identity ??= 'guest';
+
+        return hash('sha256', implode('|', [(string) $identity, $request->ip()]));
     }
 }

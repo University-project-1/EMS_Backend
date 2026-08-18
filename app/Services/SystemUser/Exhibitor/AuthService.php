@@ -4,6 +4,7 @@ namespace App\Services\SystemUser\Exhibitor;
 
 use App\DTOs\SystemUser\LoginDTO;
 use App\DTOs\SystemUser\RegisterDTO;
+use App\Enum\SystemUserType;
 use App\Models\Invitation;
 use App\Models\SystemUser;
 use Illuminate\Auth\AuthenticationException;
@@ -20,27 +21,30 @@ class AuthService
      */
     public function __construct(
         private readonly InvitationService $invitationService,
-    ){}
+    ) {}
 
-    public function login(LoginDTO $dto){
-        $exhibitor = SystemUser::where('email', $dto->email)->first();
-        if(!$exhibitor || !Hash::check($dto->password, $exhibitor->password)){
-            throw new AuthenticationException();
+    public function login(LoginDTO $dto)
+    {
+        $exhibitor = SystemUser::query()->where('email', $dto->email)->where('type', SystemUserType::EXHIBITOR)->first();
+        if (! $exhibitor || ! Hash::check($dto->password, $exhibitor->password)) {
+            throw new AuthenticationException;
         }
 
-        if(!$exhibitor->hasVerifiedEmail()){
+        if (! $exhibitor->hasVerifiedEmail()) {
             throw ValidationException::withMessages([
                 'email' => [__(__('auth.email_not_verified'))],
             ]);
         }
 
         $token = $exhibitor->createToken('exhibitor_token')->accessToken;
-        return ['success', 'token'=>$token, 'user' => $exhibitor];
+
+        return ['success', 'token' => $token, 'user' => $exhibitor];
     }
 
-    public function register(RegisterDTO $dto){
+    public function register(RegisterDTO $dto)
+    {
 
-        return DB::transaction(function() use ($dto){
+        return DB::transaction(function () use ($dto) {
             $exhibitor = SystemUser::updateOrCreate(
                 ['email' => $dto->email],
                 [
@@ -51,16 +55,18 @@ class AuthService
 
             event(new Registered($exhibitor));
             $token = $exhibitor->createToken('exhibitor_token')->accessToken;
+
             return [
-                'message' => "auth.verification_sent",
-                'user'  => $exhibitor,
+                'message' => 'auth.verification_sent',
+                'user' => $exhibitor,
                 'token' => $token,
             ];
         });
     }
 
-    public function registerViaInvitation(Invitation $invitation, RegisterDTO $dto){
-        return DB::transaction(function() use ($invitation, $dto){
+    public function registerViaInvitation(Invitation $invitation, RegisterDTO $dto)
+    {
+        return DB::transaction(function () use ($invitation, $dto) {
             $exhibitor = SystemUser::updateOrCreate(
                 ['email' => $invitation->email],
                 [
@@ -72,18 +78,20 @@ class AuthService
             $this->invitationService->approve($invitation);
 
             $token = $exhibitor->createToken('exhibitor_token')->accessToken;
+
             return [
-                'message' => "auth.email_verified",
-                'user'  => $exhibitor,
+                'message' => 'auth.email_verified',
+                'user' => $exhibitor,
                 'token' => $token,
             ];
         });
     }
+
     public function verifyEmail(SystemUser $user, string $hash)
     {
         if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
             throw ValidationException::withMessages([
-                'verification' => [__('validation.invalid_link')]
+                'verification' => [__('validation.invalid_link')],
             ]);
         }
 
@@ -95,6 +103,7 @@ class AuthService
 
         event(new Verified($user));
     }
+
     public function resendVerificationEmail(SystemUser $user)
     {
         if ($user->hasVerifiedEmail()) {
@@ -103,5 +112,4 @@ class AuthService
 
         $user->sendEmailVerificationNotification();
     }
-
 }

@@ -3,6 +3,7 @@ name: Auto Generate API Docs
 on:
   push:
     branches:
+      - master
       - main
       - dev
 

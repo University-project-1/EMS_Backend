@@ -2,12 +2,14 @@
 
 namespace App\Services\SystemUser\Admin;
 
+use App\Enum\RequestRejectionReason;
 use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\BoothRequest;
 use App\Notifications\SystemUser\Exhibitor\BoothRequestStatusNotification;
 use App\Services\Shared\NotificationRecipientResolver;
 use App\Services\Shared\QrCodeService;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
@@ -15,9 +17,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BoothRequestService
 {
-    /**
-     * Create a new class instance.
-     */
     public function __construct(
         private readonly QrCodeService $qrCodeService,
         private readonly NotificationRecipientResolver $notificationRecipients,
@@ -25,53 +24,64 @@ class BoothRequestService
 
     public function getConflictingRequests(BoothRequest $request)
     {
-        return $boothRequests = BoothRequest::where('id', '!=', $request->id)
+        return BoothRequest::query()
+            ->where('id', '!=', $request->id)
             ->where('booth_id', $request->booth_id)
             ->where('status', Status::PENDING)
             ->with(['company', 'company.logoMedia'])
             ->paginate(3);
     }
 
-    public function approve(BoothRequest $boothRequest)
+    public function approve(BoothRequest $boothRequest): BoothRequest
     {
-        if ($boothRequest->status !== Status::PENDING->value) {
-            throw new HttpException(400, __('validation.invalid_status'));
-        }
+        DB::transaction(function () use ($boothRequest): void {
+            $booth = Booth::query()->whereKey($boothRequest->booth_id)->lockForUpdate()->firstOrFail();
+            $boothRequest->refresh()->load('company.systemUsers');
 
-        // Eager load the company and its system users to prevent N+1 queries
-        $boothRequest->load('company.systemUsers');
+            if ($boothRequest->status !== Status::PENDING) {
+                throw new HttpException(400, __('validation.invalid_status'));
+            }
 
-        DB::transaction(function () use ($boothRequest) {
+            $conflictingRequests = BoothRequest::query()
+                ->where('id', '!=', $boothRequest->id)
+                ->where('booth_id', $boothRequest->booth_id)
+                ->where('status', Status::PENDING->value)
+                ->with(['company.systemUsers', 'systemUser'])
+                ->get();
+
             $boothRequest->update(['status' => Status::APPROVED]);
-
             $boothRequest->company->update(['status' => Status::APPROVED]);
 
             $token = 'B-'.$boothRequest->booth_id.'-'.Str::random(10);
-
-            $booth = Booth::findOrFail($boothRequest->booth_id);
             $booth->update([
                 'company_id' => $boothRequest->company_id,
                 'qr_token' => $token,
             ]);
 
-            BoothRequest::where('id', '!=', $boothRequest->id)
-                ->where('booth_id', $boothRequest->booth_id)
-                ->where('status', Status::PENDING)
-                ->update(['status' => Status::REJECTED]);
+            $conflictingRequests->each(
+                fn (BoothRequest $conflictingRequest) => $conflictingRequest->update(['status' => Status::REJECTED])
+            );
 
             $booth->addMediaFromString($this->qrCodeService->generateSvg($token))
                 ->usingFileName("{$token}.svg")
                 ->toMediaCollection('qr_code');
-        });
 
-        Notification::send($this->notificationRecipients->boothRequestRecipients($boothRequest), new BoothRequestStatusNotification($boothRequest, Status::APPROVED));
+            DB::afterCommit(function () use ($boothRequest, $conflictingRequests): void {
+                Notification::send(
+                    $this->notificationRecipients->boothRequestRecipients($boothRequest),
+                    new BoothRequestStatusNotification($boothRequest, Status::APPROVED),
+                );
+
+                $this->notifyConflictingRequestRecipients($conflictingRequests);
+            });
+        });
 
         return $boothRequest;
     }
 
     public function reject(BoothRequest $boothRequest)
     {
-        if ($boothRequest->status !== Status::PENDING->value) {
+        if ($boothRequest->status !== Status::PENDING) {
             throw new HttpException(400, __('validation.invalid_status'));
         }
 
@@ -81,11 +91,25 @@ class BoothRequestService
             DB::afterCommit(function () use ($boothRequest): void {
                 Notification::send(
                     $this->notificationRecipients->boothRequestRecipients($boothRequest),
-                    new BoothRequestStatusNotification($boothRequest, Status::REJECTED)
+                    new BoothRequestStatusNotification($boothRequest, Status::REJECTED),
                 );
             });
 
             return $updated;
+        });
+    }
+
+    private function notifyConflictingRequestRecipients(Collection $boothRequests): void
+    {
+        $boothRequests->each(function (BoothRequest $boothRequest): void {
+            Notification::send(
+                $this->notificationRecipients->boothRequestRecipients($boothRequest),
+                new BoothRequestStatusNotification(
+                    $boothRequest,
+                    Status::REJECTED,
+                    RequestRejectionReason::BOOTH_CONFLICT,
+                ),
+            );
         });
     }
 }

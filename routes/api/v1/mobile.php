@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Mobile\ProfileController;
 use App\Http\Controllers\Api\V1\Mobile\ReportController;
 use App\Http\Controllers\Api\V1\Mobile\ReviewController;
 use App\Http\Controllers\Api\V1\Mobile\SavedController;
+use App\Http\Controllers\Api\V1\Mobile\SearchController;
 use App\Http\Controllers\Api\V1\Shared\FaciltyController;
 use App\Http\Controllers\Api\V1\Shared\FCMController;
 use App\Http\Controllers\Api\V1\Shared\HallController;
@@ -22,11 +23,9 @@ use Illuminate\Support\Facades\Route;
 // auth routes with rate limiting
 Route::prefix('auth')->group(function () {
 
-    // login & register routes with rate limiting
-    Route::middleware('throttle:login_register')->group(function () {
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
-    });
+    // Authentication endpoints use dedicated limits because they are susceptible to abuse.
+    Route::post('register', [AuthController::class, 'register'])->middleware('throttle:registration');
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:mobile_login');
 
     // OTP verification route with its own rate limiting
     Route::middleware('throttle:verify_otp')->group(function () {
@@ -38,7 +37,7 @@ Route::prefix('auth')->group(function () {
     Route::prefix('password')->group(function () {
         Route::post('forgot', [PasswordController::class, 'forgotPassword'])->middleware('throttle:forgot_password');
         Route::post('otp/verify', [PasswordController::class, 'verifyForgotPasswordOtp'])->middleware('throttle:verify_otp');
-        Route::post('reset', [PasswordController::class, 'resetPassword'])->middleware('throttle:login_register');
+        Route::post('reset', [PasswordController::class, 'resetPassword'])->middleware('throttle:password_reset');
     });
 });
 
@@ -62,6 +61,9 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     // announcments
     Route::get('announcements', [AnnouncementController::class, 'index']);
 
+    // global search
+    Route::get('search', SearchController::class);
+
     // booths
     Route::prefix('booth/')->group(function () {
         Route::get('', [BoothController::class, 'index']);
@@ -73,7 +75,7 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::get('/', [CompanyController::class, 'index']);
         Route::get('/{company}', [CompanyController::class, 'show']);
     });
-
+    
     // eventHall
     Route::prefix('eventHall/')->group(function () {
         Route::get('', [EventHallController::class, 'index'])->name('visitor.event_halls.index');
@@ -94,7 +96,7 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     });
 
     // facilities
-    Route::prefix('facilities')->group(function(){
+    Route::prefix('facilities')->group(function () {
         Route::get('', [FaciltyController::class, 'index']);
         Route::get('/{facility}', [FaciltyController::class, 'show']);
     });
@@ -111,15 +113,15 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
 
     // reviews
     Route::prefix('reviews/')->group(function () {
-        Route::post('', [ReviewController::class, 'store']);
+        Route::post('', [ReviewController::class, 'store'])->middleware('throttle:review');
         Route::get('booth/{booth}', [ReviewController::class, 'boothReviews']);
         Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
         Route::delete('{review}', [ReviewController::class, 'destroy']);
     });
 
     // leads
-    Route::prefix('leads')->group(function(){
-        Route::post('/', [LeadController::class, 'store']);
+    Route::prefix('leads')->group(function () {
+        Route::post('/', [LeadController::class, 'store'])->middleware('throttle:lead');
         Route::get('/history', [LeadController::class, 'index']);
     });
     // notifications
