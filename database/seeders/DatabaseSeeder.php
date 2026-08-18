@@ -56,6 +56,7 @@ final class DatabaseSeeder extends Seeder
             RealData\GovernmentHall11BoothBookingsSeeder::class,
             RealData\GovernmentHall11InvitationsSeeder::class,
             RealData\ExhibitionWeekEventsSeeder::class,
+            RealData\RealDataUserInteractionsSeeder::class,
             RealData\ApprovedCompanyManagerBackfillSeeder::class,
         ]);
     }
