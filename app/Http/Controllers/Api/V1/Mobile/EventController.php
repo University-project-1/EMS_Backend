@@ -7,11 +7,14 @@ use App\Filter\EventDateFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Mobile\IndexEventRequest;
 use App\Http\Resources\Shared\EventResource;
+use App\Models\Company;
 use App\Models\Event;
 use App\Models\User;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -74,9 +77,15 @@ class EventController extends Controller
 
         $event = Event::query()
             ->where('status', Status::APPROVED->value)
-            ->with(['media', 'speakers', 'eventable'])
+            ->with(['media', 'speakers', 'eventable' => function (Relation $relation): void {
+                if ($relation instanceof MorphTo) {
+                    $relation->morphWith([
+                        Company::class => ['logoMedia'],
+                    ]);
+                }
+            }])
             ->withAvg('reviews', 'rating')
-            ->withCount(['leads', 'savedItems'])
+            ->withCount(['reviews'])
             ->withExists([
                 'savedItems as is_saved' => fn (Builder $savedItems): Builder => $savedItems
                     ->where('user_id', $user->getKey()),

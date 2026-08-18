@@ -2,6 +2,7 @@
 
 namespace App\Services\SystemUser\Admin;
 
+use App\Enum\RequestRejectionReason;
 use App\Enum\Status;
 use App\Models\Company;
 use App\Models\Event;
@@ -10,6 +11,7 @@ use App\Notifications\SystemUser\Exhibitor\EventRequestStatusNotification;
 use App\Services\Shared\NotificationRecipientResolver;
 use App\Services\Shared\QrCodeService;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
@@ -55,6 +57,16 @@ class EventRequestService
             if ($hasApprovedConflict) {
                 throw new HttpException(409, __('validation.hall_unavailable'));
             }
+
+            $conflictingEvents = Event::query()
+                ->where('id', '!=', $event->id)
+                ->where('event_hall_id', $event->event_hall_id)
+                ->where('status', Status::PENDING->value)
+                ->where('start_at', '<', $event->end_at)
+                ->where('end_at', '>', $event->start_at)
+                ->with('eventable')
+                ->get();
+
             $token = 'E-'.$event->id.'-'.Str::random(10);
             $event->update([
                 'status' => Status::APPROVED,
@@ -63,23 +75,22 @@ class EventRequestService
             $event->addMediaFromString($this->qrCodeService->generateSvg($token))
                 ->usingFileName("{$token}.svg")
                 ->toMediaCollection('qr_code');
+
             if ($event->eventable_type === Company::class) {
                 $event->eventable->update(['status' => Status::APPROVED]);
             }
 
-            Event::query()->where('id', '!=', $event->id)
-                ->where('event_hall_id', $event->event_hall_id)
-                ->where('status', Status::PENDING->value)
-                ->where('start_at', '<', $event->end_at)
-                ->where('end_at', '>', $event->start_at)
-                ->update(['status' => Status::REJECTED]);
+            $conflictingEvents->each(
+                fn (Event $conflictingEvent) => $conflictingEvent->update(['status' => Status::REJECTED])
+            );
 
-            DB::afterCommit(function () use ($event): void {
-
+            DB::afterCommit(function () use ($event, $conflictingEvents): void {
                 Notification::send(
                     $this->notificationRecipients->eventOwners($event)->filter()->unique('id'),
-                    new EventRequestStatusNotification($event, Status::APPROVED)
+                    new EventRequestStatusNotification($event, Status::APPROVED),
                 );
+
+                $this->notifyConflictingEventOwners($conflictingEvents);
             });
         });
     }
@@ -96,9 +107,23 @@ class EventRequestService
             DB::afterCommit(function () use ($event): void {
                 Notification::send(
                     $this->notificationRecipients->eventOwners($event)->filter()->unique('id'),
-                    new EventRequestStatusNotification($event, Status::REJECTED)
+                    new EventRequestStatusNotification($event, Status::REJECTED),
                 );
             });
+        });
+    }
+
+    private function notifyConflictingEventOwners(Collection $events): void
+    {
+        $events->each(function (Event $event): void {
+            Notification::send(
+                $this->notificationRecipients->eventOwners($event)->filter()->unique('id'),
+                new EventRequestStatusNotification(
+                    $event,
+                    Status::REJECTED,
+                    RequestRejectionReason::EVENT_SCHEDULE_CONFLICT,
+                ),
+            );
         });
     }
 }

@@ -31,6 +31,8 @@ class BoothController extends Controller
             ->withExists([
                 'savedItems as is_saved' => fn (Builder $savedItems): Builder => $savedItems
                     ->where('user_id', auth('mobile')->user()->getKey()),
+                'reviews as is_review' => fn (Builder $reviews): Builder => $reviews
+                    ->where('user_id', auth('mobile')->user()->getKey()),
             ])
             ->cursorPaginate(10);
         return successResponse(
@@ -43,7 +45,12 @@ class BoothController extends Controller
      * show
      */
     public function show(Booth $booth){
-        $booth->loadMissing(['hall', 'company']);
+        $booth->loadMissing(['hall', 'company'])->loadExists([
+            'reviews as is_review' => fn (Builder $reviews): Builder => $reviews
+                ->where('user_id', auth('mobile')->user()->getKey()),
+            'savedItems as is_saved' => fn (Builder $savedItems): Builder => $savedItems
+                    ->where('user_id', auth('mobile')->user()->getKey())
+            ]);
         return successResponse(
             data: new BoothResource($booth),
             message: 'booth returned successfully',

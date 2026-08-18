@@ -1,0 +1,49 @@
+name: EMS Test Suite
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Laravel test suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, dom, curl, fileinfo, sqlite3
+          coverage: pcov
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare Laravel environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Generate Passport keys for tests
+        run: php artisan passport:keys --force
+
+      - name: Run test suite
+        run: composer test
+
+      - name: Generate coverage report
+        run: composer test:coverage
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-coverage-clover
+          path: coverage/clover.xml
+          if-no-files-found: error

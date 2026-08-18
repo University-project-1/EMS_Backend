@@ -3,6 +3,7 @@
 namespace App\Notifications\SystemUser\Exhibitor;
 
 use App\Channels\FcmChannel;
+use App\Enum\RequestRejectionReason;
 use App\Enum\Status;
 use App\Interfaces\FcmNotification;
 use App\Models\BoothRequest;
@@ -22,10 +23,21 @@ class BoothRequestStatusNotification extends Notification implements FcmNotifica
 
     public int $backoff = 60;
 
-    public function __construct(public readonly BoothRequest $boothRequest, public readonly Status $status)
-    {
+    public function __construct(
+        public readonly BoothRequest $boothRequest,
+        public readonly Status $status,
+        public readonly ?RequestRejectionReason $rejectionReason = null,
+    ) {
         if ($status === Status::PENDING) {
             throw new InvalidArgumentException('Booth request status notifications only support approved or rejected states.');
+        }
+
+        if ($status === Status::APPROVED && $rejectionReason !== null) {
+            throw new InvalidArgumentException('Approved booth notifications cannot include a rejection reason.');
+        }
+
+        if ($rejectionReason !== null && $rejectionReason !== RequestRejectionReason::BOOTH_CONFLICT) {
+            throw new InvalidArgumentException('Only booth conflict is a valid booth rejection reason.');
         }
     }
 
@@ -37,7 +49,7 @@ class BoothRequestStatusNotification extends Notification implements FcmNotifica
     public function toDatabase(object $notifiable): array
     {
         return [
-            'type' => 'booth_'.$this->status->value,
+            'type' => $this->notificationType(),
             'title' => $this->key('title'),
             'body' => $this->key('body'),
             'target_id' => $this->boothRequest->getKey(),
@@ -54,8 +66,12 @@ class BoothRequestStatusNotification extends Notification implements FcmNotifica
         return (new MailMessage)
             ->subject($approved ? 'Booth Booking Confirmation - Booth Approved' : 'Booth Booking Request Update - Rejected')
             ->greeting('Hello '.$notifiable->name.',')
-            ->line($approved ? "We are pleased to inform you that your booth booking request for booth {$number} has been approved successfully." : "We regret to inform you that your booth booking request for booth {$number} has been rejected.")
-            ->line($approved ? 'You can now access your booth dashboard and prepare for the exhibition.' : 'You can review the request details and submit a new request when appropriate.')
+            ->line($approved
+                ? "We are pleased to inform you that your booth booking request for booth {$number} has been approved successfully."
+                : $this->rejectionMailLine($number))
+            ->line($approved
+                ? 'You can now access your booth dashboard and prepare for the exhibition.'
+                : 'You can review the request details and submit a new request when appropriate.')
             ->action('View Booth Details', $url)
             ->salutation('Best regards, System Management Team');
     }
@@ -68,14 +84,30 @@ class BoothRequestStatusNotification extends Notification implements FcmNotifica
                 'body' => __($this->key('body')),
             ],
             'data' => [
-                'type' => 'booth_'.$this->status->value,
+                'type' => $this->notificationType(),
                 'target_id' => (string) $this->boothRequest->getKey(),
             ],
         ];
     }
 
+    private function notificationType(): string
+    {
+        return $this->rejectionReason === null
+            ? 'booth_'.$this->status->value
+            : 'booth_'.$this->rejectionReason->value;
+    }
+
     private function key(string $suffix): string
     {
-        return 'notifications.booth_'.$this->status->value.'_'.$suffix;
+        return $this->rejectionReason === null
+            ? 'notifications.booth_'.$this->status->value.'_'.$suffix
+            : 'notifications.booth_'.$this->rejectionReason->value.'_'.$suffix;
+    }
+
+    private function rejectionMailLine(string $number): string
+    {
+        return $this->rejectionReason === RequestRejectionReason::BOOTH_CONFLICT
+            ? "We regret to inform you that your booth booking request for booth {$number} was automatically rejected because another request for the same booth was approved."
+            : "We regret to inform you that your booth booking request for booth {$number} has been rejected.";
     }
 }
