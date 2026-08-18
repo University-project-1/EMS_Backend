@@ -56,6 +56,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::get('/{hall}', [HallController::class, 'show']);
         });
 
+        // booth requests
         Route::prefix('booth-requests')->group(function () {
             Route::get('/', [BoothRequestController::class, 'index']);
         });
@@ -95,6 +96,7 @@ Route::prefix('exhibitor')->group(function () {
         Route::get('announcements', [AnnouncementController::class, 'index']);
         Route::get('services', [ServiceController::class, 'index']);
 
+        // leads
         Route::prefix('leads')->group(function () {
             Route::get('/booths/{booth}', [LeadController::class, 'boothLeads']);
             Route::get('/events/{event}', [LeadController::class, 'eventLeads']);
@@ -134,7 +136,7 @@ Route::prefix('exhibitor')->group(function () {
         // reviews
         Route::prefix('reviews')->group(function () {
             Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
-            Route::get('booht/{booth}', [ReviewController::class, 'boothReviews']);
+            Route::get('booth/{booth}', [ReviewController::class, 'boothReviews']);
             Route::get('reviewer/{review}', [ReviewController::class, 'reviewerDetails']);
         });
     });
