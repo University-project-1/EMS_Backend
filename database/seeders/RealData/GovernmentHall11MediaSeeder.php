@@ -13,7 +13,7 @@ final class GovernmentHall11MediaSeeder extends Seeder
 {
     public function run(): void
     {
-        $companyRoot = database_path('assets/government_hall11_companies');
+        $companyRoot = database_path('assets/companies/government_hall11_companies');
         $peopleRoot = database_path('assets/people/systemUsers');
 
         foreach (GovernmentHall11Data::companies() as $slug => $definition) {

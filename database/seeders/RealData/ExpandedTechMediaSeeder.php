@@ -13,7 +13,7 @@ final class ExpandedTechMediaSeeder extends Seeder
 {
     public function run(): void
     {
-        $companyRoot = database_path('assets/expanded_tech_companies');
+        $companyRoot = database_path('assets/companies/expanded_tech_companies');
         $peopleRoot = database_path('assets/people/systemUsers');
 
         foreach (ExpandedTechData::companies() as $slug => $definition) {

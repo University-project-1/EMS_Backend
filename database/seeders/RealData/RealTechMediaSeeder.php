@@ -13,7 +13,7 @@ final class RealTechMediaSeeder extends Seeder
 {
     public function run(): void
     {
-        $companyRoot = database_path('assets/real_tech_companies');
+        $companyRoot = database_path('assets/companies/real_tech_companies');
         $peopleRoot = database_path('assets/people/systemUsers');
 
         foreach (RealTechData::companies() as $slug => $definition) {
