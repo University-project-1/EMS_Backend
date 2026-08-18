@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             ReportSeeder::class,
             ReviewSeeder::class,
             NotificationSeeder::class,
+            VolunteerApplicationSeeder::class,
         ]);
     }
 }

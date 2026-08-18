@@ -137,6 +137,12 @@ class AppServiceProvider extends ServiceProvider
             request: $request,
             message: 'rate_limit.event_request',
         ));
+
+        RateLimiter::for('volunteer-application', fn (Request $request) => $this->limitPerHour(
+            attempts: 3,
+            request: $request,
+            message: 'rate_limit.volunteer_application',
+        ));
     }
 
     private function limitPerMinute(int $attempts, Request $request, string $message, array $inputs = []): Limit
@@ -170,5 +176,6 @@ class AppServiceProvider extends ServiceProvider
         $identity ??= 'guest';
 
         return hash('sha256', implode('|', [(string) $identity, $request->ip()]));
+
     }
 }

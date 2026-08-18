@@ -16,4 +16,5 @@ return [
     'lead' => 'You have submitted too many interest records. Please try again later.',
     'booth_request' => 'You have submitted too many booth requests. Please try again later.',
     'event_request' => 'You have submitted too many event requests. Please try again later.',
+    'volunteer_application' => 'You have submitted too many volunteer applications. Please try again later.',
 ];
