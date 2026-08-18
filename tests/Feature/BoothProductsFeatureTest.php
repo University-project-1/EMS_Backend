@@ -6,26 +6,9 @@ use App\Services\SystemUser\Exhibitor\BoothBookingWithProductsService;
 use App\Services\SystemUser\Exhibitor\BoothRequestService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Tests\Support\CreatesProductCatalog;
 
-function boothProductsFile(array $rows): UploadedFile
-{
-    $spreadsheet = new Spreadsheet;
-    $spreadsheet->getActiveSheet()->fromArray($rows);
-
-    $path = tempnam(sys_get_temp_dir(), 'booth-products-');
-    (new Xlsx($spreadsheet))->save($path);
-    $spreadsheet->disconnectWorksheets();
-
-    return new UploadedFile(
-        $path,
-        'products.xlsx',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        null,
-        true,
-    );
-}
+uses(CreatesProductCatalog::class);
 
 function readBoothProducts(UploadedFile $file): array
 {
@@ -40,7 +23,7 @@ afterEach(function (): void {
 });
 
 it('reads and normalizes a valid products catalog', function (): void {
-    $products = readBoothProducts(boothProductsFile([
+    $products = readBoothProducts($this->createProductCatalogFile([
         ['name', 'price', 'description'],
         ['  Coffee   Machine ', '1250.5', 'Compact automatic machine'],
     ]));
@@ -55,14 +38,14 @@ it('reads and normalizes a valid products catalog', function (): void {
 });
 
 it('rejects a catalog with invalid headings', function (): void {
-    expect(fn () => readBoothProducts(boothProductsFile([
+    expect(fn () => readBoothProducts($this->createProductCatalogFile([
         ['title', 'price', 'description'],
         ['Coffee Machine', '1250.50', 'Compact automatic machine'],
     ])))->toThrow(ValidationException::class);
 });
 
 it('rejects duplicate product names regardless of casing or whitespace', function (): void {
-    expect(fn () => readBoothProducts(boothProductsFile([
+    expect(fn () => readBoothProducts($this->createProductCatalogFile([
         ['name', 'price', 'description'],
         ['Coffee Machine', '1250.50', 'Compact automatic machine'],
         [' coffee machine ', '999.00', 'Duplicate product'],
@@ -73,7 +56,7 @@ it('returns English products catalog validation messages', function (): void {
     app()->setLocale('en');
 
     try {
-        readBoothProducts(boothProductsFile([
+        readBoothProducts($this->createProductCatalogFile([
             ['title', 'price', 'description'],
             ['Coffee Machine', '1250.50', 'Compact automatic machine'],
         ]));
@@ -86,7 +69,7 @@ it('returns English products catalog validation messages', function (): void {
 });
 
 it('rejects a product price that exceeds the database precision', function (): void {
-    expect(fn () => readBoothProducts(boothProductsFile([
+    expect(fn () => readBoothProducts($this->createProductCatalogFile([
         ['name', 'price', 'description'],
         ['Coffee Machine', '10000000000.00', 'Compact automatic machine'],
     ])))->toThrow(ValidationException::class);

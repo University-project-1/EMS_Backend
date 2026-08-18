@@ -7,8 +7,9 @@ use App\Models\Company;
 use App\Models\Hall;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\CreatesActors;
+use Tests\Support\CreatesProductCatalog;
 
-uses(RefreshDatabase::class, CreatesActors::class);
+uses(RefreshDatabase::class, CreatesActors::class, CreatesProductCatalog::class);
 
 test('exhibitor can submit a booth booking request for an assigned company', function (): void {
     $exhibitor = $this->createExhibitor();
@@ -27,10 +28,16 @@ test('exhibitor can submit a booth booking request for an assigned company', fun
     ]);
 
     $this->actingAs($exhibitor, 'system')
-        ->postJson('/api/v1/exhibitor/booth/request-booth', [
+        ->post('/api/v1/exhibitor/booth/request-booth', [
             'booth_id' => $booth->id,
             'company_id' => $company->id,
             'reason_for_booking' => 'We need a booth for our product demonstration.',
+            'products_file' => $this->createProductCatalogFile([
+                ['name', 'price', 'description'],
+                ['Product Demonstration Kit', '1250.00', 'Products presented at the exhibition booth.'],
+            ]),
+        ], [
+            'Accept' => 'application/json',
         ])
         ->assertSuccessful()
         ->assertJsonPath('status', true);
@@ -40,6 +47,14 @@ test('exhibitor can submit a booth booking request for an assigned company', fun
         'company_id' => $company->id,
         'system_user_id' => $exhibitor->id,
         'status' => Status::PENDING->value,
+    ]);
+
+    $boothRequest = BoothRequest::query()->sole();
+
+    $this->assertDatabaseHas('booth_products', [
+        'booth_request_id' => $boothRequest->id,
+        'name' => 'Product Demonstration Kit',
+        'price' => '1250.00',
     ]);
 });
 

@@ -48,7 +48,7 @@ final class BoothBookingWithProductsService
                 ->usingFileName('products_catalog.xlsx')
                 ->toMediaCollection('products_catalog');
 
-            return $boothRequest->load(['products', 'services', 'company.logoMedia', 'company.bannerMedia']);
+            return $boothRequest->load(['products', 'services', 'company.logoMedia', 'company.galleryMedia']);
         });
     }
 
