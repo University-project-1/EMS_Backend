@@ -10,27 +10,30 @@ class BoothPolicy
 {
     public function viewLeads(SystemUser $systemUser, Booth $booth): bool
     {
-        return $this->manageInvitations($systemUser, $booth) || $systemUser->type === SystemUserType::ADMIN ;
+        return $this->manageInvitations($systemUser, $booth);
     }
 
-    public function viewReviews(SystemUser $user, Booth $booth): bool
+    public function viewReviews(SystemUser $systemUser, Booth $booth): bool
     {
-        return $user->companies()
-            ->whereKey($booth->company_id)
-            ->exists();
+        return $this->manageInvitations($systemUser, $booth);
     }
+
     public function manageInvitations(SystemUser $systemUser, Booth $booth): bool
     {
-        return $systemUser->booths()->where('booths.id', $booth->id)->exists()
-            || $booth->company_id && $systemUser->companies()->where('company_id', $booth->company_id)->exists();
+        if ($systemUser->type === SystemUserType::ADMIN) {
+            return true;
+        }
+
+        return $systemUser->booths()->whereKey($booth->getKey())->exists()
+            || ($booth->company_id && $systemUser->companies()->whereKey($booth->company_id)->exists());
     }
 
     public function viewAny(SystemUser $systemUser): bool
     {
-        return $systemUser->type === SystemUserType::EXHIBITOR || $systemUser->type === SystemUserType::ADMIN;
+        return false;
     }
-
-    public function view(SystemUser $systemUser, Booth $booth): bool
+    
+  public function view(SystemUser $systemUser, Booth $booth): bool
     {
         return $this->manageInvitations($systemUser, $booth);
     }
