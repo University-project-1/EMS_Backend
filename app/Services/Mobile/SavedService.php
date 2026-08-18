@@ -16,6 +16,7 @@ class SavedService
     public function toggleSave(Model $model): void
     {
         $user = auth('mobile')->user();
+
         $saved = $user->savedItems()
             ->where('savedable_type', $model::class)
             ->where('savedable_id', $model->id)

@@ -14,7 +14,7 @@ use App\Http\Requests\SystemUser\Exhibitor\StoreBoothRequestRequest;
 use App\Http\Resources\SystemUser\Shared\BoothRequestResource;
 use App\Http\Resources\SystemUser\Shared\BoothResource;
 use App\Models\Booth;
-use App\Services\SystemUser\Exhibitor\BoothRequestService;
+use App\Services\SystemUser\Exhibitor\BoothBookingWithProductsService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Http\Request;
@@ -25,8 +25,9 @@ use Spatie\QueryBuilder\QueryBuilder;
 class BoothController extends Controller
 {
     public function __construct(
-        private readonly BoothRequestService $boothRequestService,
-    ){}
+        private readonly BoothBookingWithProductsService $boothBookingWithProductsService,
+    ) {}
+
     /**
      * all
      */
@@ -40,36 +41,42 @@ class BoothController extends Controller
     #[QueryParameter('filter[max_area]', 'Filter booths by maximum area', required: false, type: 'number')]
     #[QueryParameter('include', 'Include related resources (company, hall)', required: false, type: 'string')]
     #[QueryParameter('sort', 'Sort results by field (price, area). Prefix with - for descending order', required: false, type: 'string')]
-    public function index(){
+    public function index()
+    {
         $booths = QueryBuilder::for(Booth::class)
             ->allowedFilters(
                 AllowedFilter::exact('number'),
                 AllowedFilter::exact('hall_id'),
                 AllowedFilter::exact('hall_type', 'hall.type'),
-                AllowedFilter::custom('booked', new BookedBoothFilter()),
-                AllowedFilter::custom('min_price', new MinFilter(), 'price'),
-                AllowedFilter::custom('max_price', new MaxFilter(), 'price'),
-                AllowedFilter::custom('min_area', new MinFilter(), 'area'),
-                AllowedFilter::custom('max_area', new MaxFilter(), 'area')
+                AllowedFilter::custom('booked', new BookedBoothFilter),
+                AllowedFilter::custom('min_price', new MinFilter, 'price'),
+                AllowedFilter::custom('max_price', new MaxFilter, 'price'),
+                AllowedFilter::custom('min_area', new MinFilter, 'area'),
+                AllowedFilter::custom('max_area', new MaxFilter, 'area')
             )
             ->allowedIncludes('company', 'hall')
             ->allowedSorts('price', 'area')
             ->get();
+
         return successResponse(
             data: BoothResource::collection($booths),
             message: __('booth.list_success'),
         );
     }
+
     /**
      * show
      */
-    public function show(Booth $booth){
+    public function show(Booth $booth)
+    {
         $booth->loadMissing(['hall', 'company']);
+
         return successResponse(
             data: new BoothResource($booth),
             message: __('booth.show_success'),
         );
     }
+
     /**
      * request booth booking
      */
@@ -80,13 +87,19 @@ class BoothController extends Controller
         $companyDto = isset($validated['new_company'])
             ? CompanyDTO::fromRequest($validated['new_company'])
             : null;
-        $boothRequest = $this->boothRequestService->confirmBoothBooking($request->user('system'), $dto, $companyDto);
+        $boothRequest = $this->boothBookingWithProductsService->book(
+            $request->user('system'),
+            $dto,
+            $companyDto,
+            $request->file('products_file'),
+        );
 
         return successResponse(
             data: new BoothRequestResource($boothRequest),
             message: 'booking confirmed successfully, needs admin confirmation',
         );
     }
+
     /**
      * My booths
      */

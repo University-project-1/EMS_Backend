@@ -45,6 +45,11 @@ class BoothRequest extends Model implements HasMedia
         return $this->hasMany(BoothRequestService::class, 'request_id');
     }
 
+    public function products(): HasMany
+    {
+        return $this->hasMany(BoothProduct::class);
+    }
+
     public function attachedServices()
     {
         return $this->belongsToMany(

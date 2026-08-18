@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Mobile\AnnouncementController;
 use App\Http\Controllers\Api\V1\Mobile\AuthController;
 use App\Http\Controllers\Api\V1\Mobile\BoothController;
+use App\Http\Controllers\Api\V1\Mobile\BoothProductController;
 use App\Http\Controllers\Api\V1\Mobile\BusCatalogController;
 use App\Http\Controllers\Api\V1\Mobile\CompanyController;
 use App\Http\Controllers\Api\V1\Mobile\EventController;
@@ -67,6 +68,8 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
     // booths
     Route::prefix('booth/')->group(function () {
         Route::get('', [BoothController::class, 'index']);
+        Route::get('{booth}/products', [BoothProductController::class, 'index']);
+        Route::get('products', [BoothProductController::class, 'allProducts']);
         Route::get('{booth}', [BoothController::class, 'show']);
     });
 

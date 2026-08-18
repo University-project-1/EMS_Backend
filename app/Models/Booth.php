@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\Status;
 use App\Observers\BoothObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -10,11 +11,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[ObservedBy([BoothObserver::class])]
 #[Fillable(['hall_id', 'company_id', 'qr_token', 'number', 'svg_id', 'area', 'price'])]
@@ -55,6 +57,18 @@ class Booth extends Model implements HasMedia
         return $this->hasOne(BoothRequest::class)->latestOfMany();
     }
 
+    public function approvedBoothRequest(): HasOne
+    {
+        return $this->hasOne(BoothRequest::class)
+            ->where('status', Status::APPROVED->value)
+            ->latestOfMany();
+    }
+
+    public function products(): HasManyThrough
+    {
+        return $this->hasManyThrough(BoothProduct::class, BoothRequest::class);
+    }
+
     public function leads(): MorphMany
     {
         return $this->morphMany(Lead::class, 'leadable');
@@ -75,7 +89,8 @@ class Booth extends Model implements HasMedia
         return $this->morphMany(Saved::class, 'savedable');
     }
 
-    public function invitations() : MorphMany{
+    public function invitations(): MorphMany
+    {
         return $this->morphMany(Invitation::class, 'inviteable');
     }
 }
