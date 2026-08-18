@@ -6,6 +6,7 @@ use App\Enum\Status;
 use App\Models\Company;
 use App\Models\EventHall;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\Support\CreatesActors;
 
 uses(RefreshDatabase::class, CreatesActors::class);
@@ -37,6 +38,31 @@ test('visitor event list includes approved events and excludes pending events', 
         ->assertJsonCount(1, 'data.data')
         ->assertJsonPath('data.data.0.id', $approvedEvent->id)
         ->assertJsonPath('data.data.0.title', 'Approved visitor event');
+});
+
+test('visitor event show includes the company logo', function (): void {
+    $visitor = $this->createVisitor();
+    $company = createVisitorEventCompany();
+    $eventHall = EventHall::query()->first();
+
+    if (! $eventHall instanceof EventHall) {
+        $eventHall = EventHall::query()->create([
+            'number' => 'SHOW-HALL-'.Str::uuid(),
+            'area' => 120,
+            'price_per_hour' => 100,
+        ]);
+    }
+    $event = $company->events()->create(visitorEventAttributes(
+        eventHallId: $eventHall->id,
+        title: 'Company Event Details',
+        status: Status::APPROVED,
+    ));
+
+    $this->actingAs($visitor, 'mobile')
+        ->getJson("/api/v1/visitor/events/{$event->id}")
+        ->assertOk()
+        ->assertJsonPath('data.eventable.id', $company->id)
+        ->assertJsonStructure(['data' => ['eventable' => ['logo']]]);
 });
 
 function createVisitorEventCompany(): Company
