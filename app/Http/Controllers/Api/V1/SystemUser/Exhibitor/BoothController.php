@@ -26,7 +26,8 @@ class BoothController extends Controller
 {
     public function __construct(
         private readonly BoothRequestService $boothRequestService,
-    ){}
+    ) {}
+
     /**
      * all
      */
@@ -40,36 +41,42 @@ class BoothController extends Controller
     #[QueryParameter('filter[max_area]', 'Filter booths by maximum area', required: false, type: 'number')]
     #[QueryParameter('include', 'Include related resources (company, hall)', required: false, type: 'string')]
     #[QueryParameter('sort', 'Sort results by field (price, area). Prefix with - for descending order', required: false, type: 'string')]
-    public function index(){
+    public function index()
+    {
         $booths = QueryBuilder::for(Booth::class)
             ->allowedFilters(
                 AllowedFilter::exact('number'),
                 AllowedFilter::exact('hall_id'),
                 AllowedFilter::exact('hall_type', 'hall.type'),
-                AllowedFilter::custom('booked', new BookedBoothFilter()),
-                AllowedFilter::custom('min_price', new MinFilter(), 'price'),
-                AllowedFilter::custom('max_price', new MaxFilter(), 'price'),
-                AllowedFilter::custom('min_area', new MinFilter(), 'area'),
-                AllowedFilter::custom('max_area', new MaxFilter(), 'area')
+                AllowedFilter::custom('booked', new BookedBoothFilter),
+                AllowedFilter::custom('min_price', new MinFilter, 'price'),
+                AllowedFilter::custom('max_price', new MaxFilter, 'price'),
+                AllowedFilter::custom('min_area', new MinFilter, 'area'),
+                AllowedFilter::custom('max_area', new MaxFilter, 'area')
             )
             ->allowedIncludes('company', 'hall')
             ->allowedSorts('price', 'area')
             ->get();
+
         return successResponse(
             data: BoothResource::collection($booths),
             message: __('booth.list_success'),
         );
     }
+
     /**
      * show
      */
-    public function show(Booth $booth){
+    public function show(Booth $booth)
+    {
         $booth->loadMissing(['hall', 'company']);
+
         return successResponse(
             data: new BoothResource($booth),
             message: __('booth.show_success'),
         );
     }
+
     /**
      * request booth booking
      */
@@ -87,6 +94,7 @@ class BoothController extends Controller
             message: 'booking confirmed successfully, needs admin confirmation',
         );
     }
+
     /**
      * My booths
      */
@@ -97,6 +105,7 @@ class BoothController extends Controller
             ->allowedFilters(
                 AllowedFilter::custom('accessible', new AccessibleBoothsFilter($request->user('system'))),
             )
+            ->accessibleBy($request->user('system'))
             ->whereRelation('boothRequests', 'status', Status::APPROVED->value)
             ->with(['company', 'hall', 'boothRequests' => fn ($query) => $query
                 ->where('status', Status::APPROVED->value)
@@ -104,6 +113,7 @@ class BoothController extends Controller
             ])
             ->latest()
             ->paginate(request()->query('per_page', 5));
+
         return successResponse(
             data: BoothResource::collection($booths),
             message: __('booth.list_success')
