@@ -32,13 +32,15 @@ class BoothRequestController extends Controller
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS pending_requests', [Status::PENDING->value])
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS approved_requests', [Status::APPROVED->value])
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS rejected_requests', [Status::REJECTED->value])
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS canceled_requests', [Status::CANCELED->value])
             ->first();
 
-        $result =  [
+        $result = [
             'total_requests' => (int) $stats->total_requests,
             'pending_requests' => (int) $stats->pending_requests,
             'approved_requests' => (int) $stats->approved_requests,
             'rejected_requests' => (int) $stats->rejected_requests,
+            'canceled_requests' => (int) $stats->canceled_requests,
         ];
 
         return successResponse(
@@ -59,15 +61,13 @@ class BoothRequestController extends Controller
     public function index()
     {
         $boothRequests = QueryBuilder::for(BoothRequest::class)
-        ->with('company:id,name')
-        ->allowedFilters(
-            'company.name',
-            AllowedFilter::exact('status'),
-            AllowedFilter::custom('created_date', new DateFilter(), 'created_at'),
-        )
-        ->allowedSorts('created_at')
-        ->paginate(request()->query('per_page', 15));
-
+            ->with('company:id,name')
+            ->allowedFilters('company.name',
+                AllowedFilter::exact('status'),
+                AllowedFilter::custom('created_date', new DateFilter, 'created_at'),
+            )
+            ->allowedSorts('created_at')
+            ->paginate(request()->query('per_page', 15));
 
         return successResponse(
             data: BoothRequestResource::collection($boothRequests),

@@ -56,6 +56,7 @@ Route::prefix('admin')->group(function () {
                 Route::patch('/reject/{boothRequest}', [BoothRequestController::class, 'reject']);
             });
 
+            Route::patch('/{booth}/cancel', [BoothController::class, 'cancelBooking']);
             Route::get('/', [BoothController::class, 'index']);
             Route::get('/{booth}', [BoothController::class, 'show']);
             Route::patch('/{booth}', [BoothController::class, 'update']);

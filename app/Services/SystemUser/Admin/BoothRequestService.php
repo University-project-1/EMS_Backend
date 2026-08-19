@@ -12,6 +12,7 @@ use App\Services\Shared\QrCodeService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -63,7 +64,7 @@ class BoothRequestService
             );
 
             $booth->clearMediaCollection('qr_code');
-            \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory('booths/'.$booth->id.'/qr_code');
+            Storage::disk('public')->deleteDirectory('booths/'.$booth->id.'/qr_code');
             $booth->addMediaFromString($this->qrCodeService->generateSvg($token))
                 ->usingFileName("{$token}.svg")
                 ->toMediaCollection('qr_code');
@@ -98,6 +99,38 @@ class BoothRequestService
             });
 
             return $updated;
+        });
+    }
+
+    public function cancelApprovedBooking(Booth $booth): BoothRequest
+    {
+        return DB::transaction(function () use ($booth): BoothRequest {
+            $booth = Booth::query()
+                ->whereKey($booth->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $boothRequest = BoothRequest::query()
+                ->where('booth_id', $booth->getKey())
+                ->where('status', Status::APPROVED->value)
+                ->latest('id')
+                ->lockForUpdate()
+                ->first();
+
+            if ($boothRequest === null || (int) $booth->company_id !== (int) $boothRequest->company_id) {
+                throw new HttpException(400, __('validation.invalid_status'));
+            }
+
+            $boothRequest->update(['status' => Status::CANCELED]);
+            $booth->update([
+                'company_id' => null,
+                'qr_token' => null,
+            ]);
+
+            $booth->clearMediaCollection('qr_code');
+            Storage::disk('public')->deleteDirectory('booths/'.$booth->id.'/qr_code');
+
+            return $boothRequest;
         });
     }
 
