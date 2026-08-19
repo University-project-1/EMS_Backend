@@ -24,12 +24,25 @@ it('builds report notifications for database and FCM only', function (): void {
 it('serializes numeric notification target IDs as integers for the API', function (): void {
     $notification = new DatabaseNotification([
         'id' => 'a1f9c67e-9ed8-4b7d-b513-b4982033b1c3',
-        'data' => ['target_id' => '14'],
+        'data' => [
+            'type' => 'review_created',
+            'title' => 'notifications.review_created_title',
+            'body' => 'notifications.review_created_body',
+            'target_id' => '14',
+            'reviewable_type' => 'App\\Models\\Booth',
+            'reviewable_id' => 9,
+            'rating' => 5,
+        ],
     ]);
 
     $payload = (new NotificationResource($notification))->toArray(new Request);
 
-    expect($payload['target_id'])->toBeInt()->toBe(14);
+    expect($payload['target_id'])->toBeInt()->toBe(14)
+        ->and($payload['data'])->toBe([
+            'reviewable_type' => 'App\\Models\\Booth',
+            'reviewable_id' => 9,
+            'rating' => 5,
+        ]);
 });
 
 it('builds review notifications for database and FCM only', function (): void {

@@ -4,6 +4,7 @@ namespace App\Http\Resources\Shared;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Arr;
 
 class NotificationResource extends JsonResource
 {
@@ -22,6 +23,7 @@ class NotificationResource extends JsonResource
             'title' => __($this->data['title'] ?? ''),
             'body' => __($this->data['body'] ?? ''),
             'target_id' => is_numeric($targetId) ? (int) $targetId : $targetId,
+            'data' => Arr::except($this->data, ['type', 'title', 'body', 'target_id']),
             'read_at' => $this->read_at,
             'created_at' => $this->created_at,
         ];
