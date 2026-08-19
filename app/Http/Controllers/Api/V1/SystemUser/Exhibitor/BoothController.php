@@ -15,9 +15,11 @@ use App\Http\Resources\SystemUser\Shared\BoothRequestResource;
 use App\Http\Resources\SystemUser\Shared\BoothResource;
 use App\Models\Booth;
 use App\Services\SystemUser\Exhibitor\BoothRequestService;
+use App\Services\SystemUser\Exhibitor\DashboardService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -26,6 +28,7 @@ class BoothController extends Controller
 {
     public function __construct(
         private readonly BoothRequestService $boothRequestService,
+        private readonly DashboardService $dashboardService,
     ) {}
 
     /**
@@ -93,6 +96,16 @@ class BoothController extends Controller
             data: new BoothRequestResource($boothRequest),
             message: 'booking confirmed successfully, needs admin confirmation',
         );
+    }
+
+    /**
+     * Booth statistics
+     */
+    public function statistics(Request $request, Booth $booth)
+    {
+        Gate::authorize('viewLeads', $booth);
+
+        return successResponse($this->dashboardService->boothStatistics($booth, $request->user('system')),);
     }
 
     /**

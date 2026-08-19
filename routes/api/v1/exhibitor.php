@@ -66,6 +66,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::get('/', [BoothController::class, 'index']);
             Route::get('/my', [BoothController::class, 'ownedBooths']);
             Route::post('request-booth', [BoothController::class, 'book'])->middleware('throttle:booth_request');
+            Route::get('/{booth}/statistics', [BoothController::class, 'statistics'])->name('exhibitor.booths.statistics');
             Route::get('/{booth}', [BoothController::class, 'show']);
             Route::get('/{booth}/invitations', [InvitationController::class, 'boothInvitations']);
             Route::post('/{booth}/invitations', [InvitationController::class, 'storeForBooth']);

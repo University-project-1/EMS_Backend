@@ -4,5 +4,11 @@ namespace App\Interfaces;
 
 interface FcmNotification
 {
-  public function toFcm(object $notifiable);
+    /**
+     * @return array{
+     *     notification: array{title: string, body: string},
+     *     data: array<string, string>
+     * }
+     */
+    public function toFcm(object $notifiable): array;
 }
