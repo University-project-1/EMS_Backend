@@ -16,6 +16,7 @@ return new class extends Migration
             $table->text('comment')->nullable();
             $table->timestamps();
             $table->unique(['user_id', 'reviewable_type', 'reviewable_id']);
+            $table->index(['reviewable_type', 'reviewable_id', 'user_id']);
         });
     }
 

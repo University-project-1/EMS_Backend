@@ -10,6 +10,7 @@ use App\Models\Event;
 use App\Models\Review;
 use App\Notifications\SystemUser\Exhibitor\NewReviewNotification;
 use App\Services\Shared\NotificationRecipientResolver;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
@@ -55,28 +56,56 @@ class ReviewService
         });
     }
 
-    public function boothReviews(Booth $booth)
+    public function boothReviews(Booth $booth, int $perPage)
     {
         if ($booth->company_id === null) {
             return throw new ModelNotFoundException;
         }
         $reviweCount = $booth->reviews()->count();
         $avgRating = round($booth->reviews()->avg('rating'), 1);
-        $reviews = $booth->reviews()->latest()->with('user.media')->cursorPaginate(10);
+
         return [
-            'reviews' => $reviews,
+            ...$this->reviewData($booth, $perPage),
             'avgRating' => $avgRating,
-            'reviweCount' => $reviweCount
+            'reviweCount' => $reviweCount,
         ];
     }
 
-    public function eventReviews(Event $event)
+    public function eventReviews(Event $event, int $perPage)
     {
         if ($event->status != Status::APPROVED) {
             return throw new ModelNotFoundException;
         }
 
-        return $event->reviews()->latest()->with('user.media')->cursorPaginate(10);
+        return $this->reviewData($event, $perPage);
+    }
+
+    private function reviewData(Booth|Event $reviewable, int $perPage): array
+    {
+        $currentUserId = auth('mobile')->id();
+        $currentUserReview = $currentUserId
+            ? $reviewable->reviews()
+                ->where('user_id', $currentUserId)
+                ->with('user.media')
+                ->first()
+            : null;
+
+        $perPage = $this->validatedPerPage($perPage);
+
+        $reviews = $reviewable->reviews()
+            ->when(
+                $currentUserReview,
+                fn (Builder $query) => $query->whereKeyNot($currentUserReview->getKey())
+            )
+            ->latest()
+            ->orderByDesc('id')
+            ->with('user.media')
+            ->cursorPaginate($perPage);
+
+        return [
+            'currentUserReview' => $currentUserReview,
+            'reviews' => $reviews,
+        ];
     }
 
     public function deleteReview(Review $review)
@@ -88,6 +117,12 @@ class ReviewService
 
     public function reviews(Model $reviewable, int $perPage = 15)
     {
+        return $this->reviewQuery($reviewable)
+            ->paginate($this->validatedPerPage($perPage));
+    }
+
+    private function reviewQuery(Model $reviewable): QueryBuilder
+    {
         return QueryBuilder::for(Review::query()->whereMorphedTo('reviewable', $reviewable))
             ->allowedFilters(
                 AllowedFilter::custom('search', new ReviewSearchFilter),
@@ -95,8 +130,13 @@ class ReviewService
             )
             ->allowedSorts('created_at', 'rating')
             ->defaultSort('-created_at')
-            ->with('user.media')
-            ->paginate($perPage);
+            ->orderByDesc('id')
+            ->with('user.media');
+    }
+
+    private function validatedPerPage(int $perPage): int
+    {
+        return min(max($perPage, 1), 100);
     }
 
     public function getStatistics(Booth|Event $reviewable): array
