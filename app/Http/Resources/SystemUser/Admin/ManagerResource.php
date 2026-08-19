@@ -20,7 +20,7 @@ class ManagerResource extends JsonResource
             'email' => $this->email,
             'avatar' => $this->getFirstMediaUrl('avatar') ?: null,
             'companies_count' => $this->whenCounted('companies'),
-            'booths_count' => $this->whenCounted('booths'),
+            'booths_count' => $this->when(isset($this->booths_count), $this->booths_count),
             'portfolios' => CompanyDirectoryResource::collection($this->whenLoaded('companies')),
         ];
     }
