@@ -6,6 +6,7 @@ use App\Enum\Status;
 use App\Models\Invitation;
 use App\Models\SystemUser;
 use App\Notifications\SystemUser\Exhibitor\InvitationNotification;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -39,8 +40,9 @@ class InvitationService
 
     public function approve(Invitation $invitation): void
     {
-        DB::transaction(function () use ($invitation) {
-            $lockedInvitation = Invitation::where('id', $invitation->id)->lockForUpdate()->first();
+        DB::transaction(function () use ($invitation): void {
+            $lockedInvitations = $this->lockInvitationGroup($invitation);
+            $lockedInvitation = $lockedInvitations->firstWhere('id', $invitation->id);
 
             if (! $lockedInvitation || ! $lockedInvitation->isValid()) {
                 throw new HttpException(410, __('errors.invalid_or_expired_token'));
@@ -54,17 +56,27 @@ class InvitationService
             $lockedInvitation->inviteable->systemUsers()->syncWithoutDetaching([
                 $user->id => [
                     'assigned_by' => $lockedInvitation->sender_id,
-                    'created_at' => now()
+                    'created_at' => now(),
                 ],
             ]);
             $lockedInvitation->update(['status' => Status::APPROVED]);
+            $this->deletePendingInvitations($lockedInvitation);
         });
     }
 
     public function reject(Invitation $invitation): void
     {
-        $this->check($invitation);
-        $invitation->update(['status' => Status::REJECTED]);
+        DB::transaction(function () use ($invitation): void {
+            $lockedInvitations = $this->lockInvitationGroup($invitation);
+            $lockedInvitation = $lockedInvitations->firstWhere('id', $invitation->id);
+
+            if (! $lockedInvitation || ! $lockedInvitation->isValid()) {
+                throw new HttpException(410, __('errors.invalid_or_expired_token'));
+            }
+
+            $lockedInvitation->update(['status' => Status::REJECTED]);
+            $this->deletePendingInvitations($lockedInvitation);
+        });
     }
 
     public function delete(Invitation $invitation): void
@@ -101,5 +113,27 @@ class InvitationService
         }
 
         return true;
+    }
+
+    private function lockInvitationGroup(Invitation $invitation): Collection
+    {
+        return Invitation::query()
+            ->where('inviteable_type', $invitation->inviteable_type)
+            ->where('inviteable_id', $invitation->inviteable_id)
+            ->where('email', $invitation->email)
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get();
+    }
+
+    private function deletePendingInvitations(Invitation $invitation): void
+    {
+        Invitation::query()
+            ->where('inviteable_type', $invitation->inviteable_type)
+            ->where('inviteable_id', $invitation->inviteable_id)
+            ->where('email', $invitation->email)
+            ->where('status', Status::PENDING)
+            ->whereKeyNot($invitation->getKey())
+            ->delete();
     }
 }
