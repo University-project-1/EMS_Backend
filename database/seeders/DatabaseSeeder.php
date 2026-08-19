@@ -30,9 +30,9 @@ final class DatabaseSeeder extends Seeder
                 EventSeeder::class,
                 LeadSeeder::class,
                 SavedSeeder::class,
-                NotificationSeeder::class,
                 ReportSeeder::class,
                 ReviewSeeder::class,
+                NotificationSeeder::class,
             ]);
         }
 
