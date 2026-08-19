@@ -30,6 +30,7 @@ return new class extends Migration
                 'start_at',
                 'end_at',
             ]);
+            $table->index(['eventable_type', 'eventable_id', 'status']);
         });
     }
 

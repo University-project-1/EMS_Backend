@@ -14,6 +14,7 @@ return new class extends Migration
             $table->morphs('leadable');
             $table->timestamp('created_at');
             $table->unique(['user_id', 'leadable_type', 'leadable_id']);
+            $table->index(['leadable_type', 'leadable_id', 'created_at']);
         });
     }
 

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('status')->default('pending');
             $table->timestamp('expires_at');
             $table->timestamps();
+            $table->index(['inviteable_type', 'inviteable_id', 'status']);
         });
     }
 
