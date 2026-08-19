@@ -5547,6 +5547,16 @@
                 "tags": [
                     "Visitor/Leads"
                 ],
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of events per page (maximum 100)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "",
