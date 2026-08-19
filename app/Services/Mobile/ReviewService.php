@@ -144,12 +144,20 @@ class ReviewService
         $statistics = $reviewable->reviews()
             ->selectRaw('COUNT(*) as total_reviews')
             ->selectRaw('COALESCE(AVG(rating), 0) as average_rating')
+            ->selectRaw('SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as one_star_reviews')
+            ->selectRaw('SUM(CASE WHEN rating = 2 THEN 1 ELSE 0 END) as two_star_reviews')
+            ->selectRaw('SUM(CASE WHEN rating = 3 THEN 1 ELSE 0 END) as three_star_reviews')
+            ->selectRaw('SUM(CASE WHEN rating = 4 THEN 1 ELSE 0 END) as four_star_reviews')
             ->selectRaw('SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) as five_star_reviews')
             ->first();
 
         return [
             'total_reviews' => (int) $statistics->total_reviews,
             'average_rating' => round((float) $statistics->average_rating, 1),
+            'one_star_reviews' => (int) $statistics->one_star_reviews,
+            'two_star_reviews' => (int) $statistics->two_star_reviews,
+            'three_star_reviews' => (int) $statistics->three_star_reviews,
+            'four_star_reviews' => (int) $statistics->four_star_reviews,
             'five_star_reviews' => (int) $statistics->five_star_reviews,
         ];
     }

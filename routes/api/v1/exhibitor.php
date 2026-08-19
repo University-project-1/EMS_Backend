@@ -136,6 +136,8 @@ Route::prefix('exhibitor')->group(function () {
 
         // reviews
         Route::prefix('reviews')->group(function () {
+            Route::get('event/{event}/statistics', [ReviewController::class, 'eventStatistics']);
+            Route::get('booth/{booth}/statistics', [ReviewController::class, 'boothStatistics']);
             Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
             Route::get('booth/{booth}', [ReviewController::class, 'boothReviews']);
             Route::get('reviewer/{review}', [ReviewController::class, 'reviewerDetails']);
