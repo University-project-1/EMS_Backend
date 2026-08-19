@@ -62,6 +62,8 @@ class BoothRequestService
                 fn (BoothRequest $conflictingRequest) => $conflictingRequest->update(['status' => Status::REJECTED])
             );
 
+            $booth->clearMediaCollection('qr_code');
+            \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory('booths/'.$booth->id.'/qr_code');
             $booth->addMediaFromString($this->qrCodeService->generateSvg($token))
                 ->usingFileName("{$token}.svg")
                 ->toMediaCollection('qr_code');

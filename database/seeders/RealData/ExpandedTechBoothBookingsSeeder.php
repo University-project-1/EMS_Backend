@@ -61,6 +61,7 @@ final class ExpandedTechBoothBookingsSeeder extends Seeder
         $token = 'B-'.$request->booth_id.'-'.Str::random(10);
         $booth->update(['qr_token' => $token]);
         $booth->clearMediaCollection('qr_code');
+        \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory('booths/'.$booth->id.'/qr_code');
         $booth->addMediaFromString(app(QrCodeService::class)->generateSvg($token))->usingFileName($token.'.svg')->toMediaCollection('qr_code');
     }
 }
