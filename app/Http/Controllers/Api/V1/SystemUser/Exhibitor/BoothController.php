@@ -105,9 +105,7 @@ class BoothController extends Controller
     {
         Gate::authorize('viewLeads', $booth);
 
-        return successResponse(
-            $this->dashboardService->boothStatistics($booth, $request->user('system')),
-        );
+        return successResponse($this->dashboardService->boothStatistics($booth, $request->user('system')),);
     }
 
     /**
@@ -120,6 +118,7 @@ class BoothController extends Controller
             ->allowedFilters(
                 AllowedFilter::custom('accessible', new AccessibleBoothsFilter($request->user('system'))),
             )
+            ->accessibleBy($request->user('system'))
             ->whereRelation('boothRequests', 'status', Status::APPROVED->value)
             ->with(['company', 'hall', 'boothRequests' => fn ($query) => $query
                 ->where('status', Status::APPROVED->value)

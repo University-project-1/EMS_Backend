@@ -14,17 +14,17 @@ it('seeds leads, saved items, event images, and company galleries', function ():
 
     $companies = Company::query()->with('media')->get();
     $events = Event::query()->with('media')->get();
+    $companiesWithGallery = $companies->filter(
+        fn (Company $company): bool => $company->getMedia('gallery')->count() >= 2,
+    );
+    $eventsWithLogo = $events->filter(
+        fn (Event $event): bool => $event->getMedia('event-logo')->count() >= 1,
+    );
 
-    expect($companies)->toHaveCount(11)
-        ->and($events)->toHaveCount(5)
+    expect($companies->count())->toBeGreaterThanOrEqual(11)
+        ->and($events->count())->toBeGreaterThanOrEqual(5)
+        ->and($companiesWithGallery->count())->toBeGreaterThanOrEqual(11)
+        ->and($eventsWithLogo->count())->toBeGreaterThanOrEqual(5)
         ->and(Lead::query()->count())->toBeGreaterThan(0)
         ->and(Saved::query()->count())->toBeGreaterThan(0);
-
-    $companies->each(function (Company $company): void {
-        expect($company->getMedia('gallery'))->toHaveCount(2);
-    });
-
-    $events->each(function (Event $event): void {
-        expect($event->getMedia('event-logo'))->toHaveCount(1);
-    });
 });

@@ -1,0 +1,29 @@
+
+   INFO  Seeding database.  
+
+Missing local avatar for Mohamed Al-aeinia at C:\laragon\www\EMS_Backend\database\assets/people/users/mohamed-al-aeinia/avatar
+Missing local avatar for Mohammed Ayyash at C:\laragon\www\EMS_Backend\database\assets/people/users/mohammed-ayyash/avatar
+Missing local avatar for Abdelrahman Saleh at C:\laragon\www\EMS_Backend\database\assets/people/users/abdelrahman-saleh/avatar
+Missing local avatar for Marah Aljumaat at C:\laragon\www\EMS_Backend\database\assets/people/users/marah-aljumaat/avatar
+Missing local avatar for Yehya Msouty at C:\laragon\www\EMS_Backend\database\assets/people/users/yehya-msouty/avatar
+Missing local avatar for Majd Alhariri at C:\laragon\www\EMS_Backend\database\assets/people/users/majd-alhariri/avatar
+Missing local avatar for Muhammed Mubaker at C:\laragon\www\EMS_Backend\database\assets/people/users/muhammed-mubaker/avatar
+Missing local avatar for Ayman Durra at C:\laragon\www\EMS_Backend\database\assets/people/users/ayman-durra/avatar
+Missing local avatar for Ghufran Sbiai at C:\laragon\www\EMS_Backend\database\assets/people/users/ghufran-sbiai/avatar
+Missing local avatar for Albatool Saramejo at C:\laragon\www\EMS_Backend\database\assets/people/users/albatool-saramejo/avatar
+Missing local avatar for Abdulmalek Rajab at C:\laragon\www\EMS_Backend\database\assets/people/users/abdulmalek-rajab/avatar
+Missing local avatar for Motaz Al Masri at C:\laragon\www\EMS_Backend\database\assets/people/users/motaz-al-masri/avatar
+Missing local avatar for Ghaith AlHallak at C:\laragon\www\EMS_Backend\database\assets/people/users/ghaith-alhallak/avatar
+Missing local avatar for Yasmeen Al rajleh at C:\laragon\www\EMS_Backend\database\assets/people/users/yasmeen-al-rajleh/avatar
+Missing local avatar for Mohamad Fadi Kaso at C:\laragon\www\EMS_Backend\database\assets/people/users/mohamad-fadi-kaso/avatar
+Missing local avatar for Mohamed Anas Abo Alzahab at C:\laragon\www\EMS_Backend\database\assets/people/users/mohamed-anas-abo-alzahab/avatar
+Missing local avatar for Mahmoud Matrawy at C:\laragon\www\EMS_Backend\database\assets/people/users/mahmoud-matrawy/avatar
+Missing local avatar for Aya Mahbob Alhara at C:\laragon\www\EMS_Backend\database\assets/people/users/aya-mahbob-alhara/avatar
+Missing local avatar for Mohammad Suleman at C:\laragon\www\EMS_Backend\database\assets/people/users/mohammad-suleman/avatar
+Missing local avatar for Sidra Atiya at C:\laragon\www\EMS_Backend\database\assets/people/users/sidra-atiya/avatar
+Missing local avatar for Tala Hallak at C:\laragon\www\EMS_Backend\database\assets/people/users/tala-hallak/avatar
+Missing local avatar for Rowan Al Sheikh Ali at C:\laragon\www\EMS_Backend\database\assets/people/users/rowan-al-sheikh-ali/avatar
+Missing local avatar for Amjad Al Barazi at C:\laragon\www\EMS_Backend\database\assets/people/users/amjad-al-barazi/avatar
+Missing local avatar for Mhamad Hamza Alattar at C:\laragon\www\EMS_Backend\database\assets/people/users/mhamad-hamza-alattar/avatar
+Missing local avatar for Abeer Al Otri at C:\laragon\www\EMS_Backend\database\assets/people/users/abeer-al-otri/avatar
+25 approved ordinary users still need locally verified avatar assets.
