@@ -6,6 +6,7 @@ use App\Enum\RequestRejectionReason;
 use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\BoothRequest;
+use App\Notifications\SystemUser\Exhibitor\BoothPaymentReminderNotification;
 use App\Notifications\SystemUser\Exhibitor\BoothRequestStatusNotification;
 use App\Services\Shared\NotificationRecipientResolver;
 use App\Services\Shared\QrCodeService;
@@ -80,6 +81,17 @@ class BoothRequestService
         });
 
         return $boothRequest;
+    }
+
+    public function sendPaymentReminder(BoothRequest $boothRequest): void
+    {
+        if ($boothRequest->status !== Status::PENDING) {
+            throw new HttpException(400, __('validation.invalid_status'));
+        }
+
+        $boothRequest->loadMissing(['systemUser', 'booth']);
+
+        Notification::send($boothRequest->systemUser, new BoothPaymentReminderNotification($boothRequest));
     }
 
     public function reject(BoothRequest $boothRequest)

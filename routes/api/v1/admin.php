@@ -53,6 +53,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/stats', [BoothRequestController::class, 'statistics']);
                 Route::get('/{boothRequest}', [BoothRequestController::class, 'show']);
                 Route::post('/approve/{boothRequest}', [BoothRequestController::class, 'approve']);
+                Route::post('/payment-reminder/{boothRequest}', [BoothRequestController::class, 'sendPaymentReminder']);
                 Route::patch('/reject/{boothRequest}', [BoothRequestController::class, 'reject']);
             });
 

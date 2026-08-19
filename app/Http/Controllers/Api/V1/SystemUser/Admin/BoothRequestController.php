@@ -115,6 +115,19 @@ class BoothRequestController extends Controller
     }
 
     /**
+     * Send payment reminder for an approved request.
+     */
+    public function sendPaymentReminder(BoothRequest $boothRequest)
+    {
+        $this->boothRequestService->sendPaymentReminder($boothRequest);
+
+        return successResponse(
+            data: null,
+            message: 'payment reminder sent successfully',
+        );
+    }
+
+    /**
      * reject request
      */
     public function reject(BoothRequest $boothRequest)
