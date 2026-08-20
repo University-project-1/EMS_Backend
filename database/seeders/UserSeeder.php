@@ -93,5 +93,10 @@ class UserSeeder extends Seeder
         if(is_file($wasemAvatar)){
             $wasem->copyMedia($wasemAvatar)->toMediaCollection('user-avatars');
         }
+
+        $ZNAvatar = database_path('assets/zealnoun.png');
+        if(is_file($ZNAvatar)){
+            $ZN->copyMedia($ZNAvatar)->toMediaCollection('user-avatars');
+        }
     }
 }
