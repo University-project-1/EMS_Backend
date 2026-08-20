@@ -12,7 +12,7 @@ use Tests\Support\CreatesActors;
 
 uses(RefreshDatabase::class, CreatesActors::class);
 
-test('admin can send a queued payment reminder for an approved booth request', function (): void {
+test('admin can send a queued payment reminder for a pending booth request', function (): void {
     Notification::fake();
 
     $admin = $this->createAdministrator();
@@ -34,7 +34,7 @@ test('admin can send a queued payment reminder for an approved booth request', f
         'company_id' => $company->id,
         'system_user_id' => $exhibitor->id,
         'final_price' => 500,
-        'status' => Status::APPROVED,
+        'status' => Status::PENDING,
     ]);
 
     $this->actingAs($admin, 'system')
@@ -49,7 +49,7 @@ test('admin can send a queued payment reminder for an approved booth request', f
     );
 });
 
-test('admin cannot send a payment reminder for a non-approved booth request', function (): void {
+test('admin cannot send a payment reminder for an approved booth request', function (): void {
     Notification::fake();
 
     $admin = $this->createAdministrator();
@@ -70,7 +70,7 @@ test('admin cannot send a payment reminder for a non-approved booth request', fu
         'company_id' => $company->id,
         'system_user_id' => $exhibitor->id,
         'final_price' => 500,
-        'status' => Status::PENDING,
+        'status' => Status::APPROVED,
     ]);
 
     $this->actingAs($admin, 'system')

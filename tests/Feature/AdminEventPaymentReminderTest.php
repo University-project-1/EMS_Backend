@@ -12,7 +12,7 @@ use Tests\Support\CreatesActors;
 
 uses(RefreshDatabase::class, CreatesActors::class);
 
-test('admin can send a queued payment reminder for an approved event', function (): void {
+test('admin can send a queued payment reminder for a pending event', function (): void {
     Notification::fake();
 
     $admin = $this->createAdministrator();
@@ -22,7 +22,7 @@ test('admin can send a queued payment reminder for an approved event', function 
         'area' => 1000,
         'price_per_hour' => 500,
     ]);
-    $event = paymentReminderEvent($exhibitor->getKey(), $eventHall->getKey());
+    $event = paymentReminderEvent($exhibitor->getKey(), $eventHall->getKey(), Status::PENDING);
 
     $this->actingAs($admin, 'system')
         ->postJson("/api/v1/admin/events/requests/{$event->id}/payment-reminder")
@@ -36,7 +36,7 @@ test('admin can send a queued payment reminder for an approved event', function 
     );
 });
 
-test('admin cannot send a payment reminder for a non-approved event', function (): void {
+test('admin cannot send a payment reminder for an approved event', function (): void {
     Notification::fake();
 
     $admin = $this->createAdministrator();
@@ -46,7 +46,7 @@ test('admin cannot send a payment reminder for a non-approved event', function (
         'area' => 1000,
         'price_per_hour' => 500,
     ]);
-    $event = paymentReminderEvent($exhibitor->getKey(), $eventHall->getKey(), Status::PENDING);
+    $event = paymentReminderEvent($exhibitor->getKey(), $eventHall->getKey(), Status::APPROVED);
 
     $this->actingAs($admin, 'system')
         ->postJson("/api/v1/admin/events/requests/{$event->id}/payment-reminder")
