@@ -52,7 +52,7 @@ class InvitationController extends Controller
         $this->invitationService->check($invitation);
 
         return successResponse(
-            data: new InvitaionResource($invitation->load(['sender', 'inviteable'])),
+            data: new InvitaionResource($invitation->load(['sender', 'inviteable', 'sender.media'])),
             message: __('invitation.show_success'),
         );
     }
