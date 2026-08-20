@@ -61,6 +61,26 @@ class ReviewController extends Controller
     }
 
     /**
+     * Event review statistics.
+     */
+    public function eventStatistics(Event $event)
+    {
+        Gate::authorize('viewReviews', $event);
+
+        return successResponse($this->reviewService->getStatistics($event));
+    }
+
+    /**
+     * Booth review statistics.
+     */
+    public function boothStatistics(Booth $booth)
+    {
+        Gate::authorize('viewReviews', $booth);
+
+        return successResponse($this->reviewService->getStatistics($booth));
+    }
+
+    /**
      * show reviewer details
      */
     public function reviewerDetails(Review $review)

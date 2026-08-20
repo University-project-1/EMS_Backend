@@ -8,6 +8,7 @@ use App\Http\Resources\Mobile\ScanHistoryResource;
 use App\Http\Resources\Shared\LeadResource;
 use App\Services\Mobile\LeadService;
 use Dedoc\Scramble\Attributes\Group;
+use Dedoc\Scramble\Attributes\QueryParameter;
 
 #[Group('Visitor/Leads')]
 class LeadController extends Controller
@@ -27,6 +28,7 @@ class LeadController extends Controller
     /**
      * Leads history.
      */
+    #[QueryParameter('per_page', 'Number of events per page (maximum 100)', required: false, type: 'integer')]
     public function index()
     {
         $leads = request()
@@ -34,7 +36,8 @@ class LeadController extends Controller
             ->leads()
             ->with('leadable')
             ->latest()
-            ->get();
+            ->cursorPaginate(request()->integer('per_page', 10));
+
         return successResponse(ScanHistoryResource::collection($leads));
     }
 }

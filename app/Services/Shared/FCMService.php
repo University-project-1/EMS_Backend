@@ -13,7 +13,6 @@ class FCMService
      */
     public function store(array $data, string $guardName): void
     {
-        /** @var SystemUser|User|null $authenticatedUser */
         $authenticatedUser = auth($guardName)->user();
 
         abort_unless($authenticatedUser instanceof SystemUser || $authenticatedUser instanceof User, 401);

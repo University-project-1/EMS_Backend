@@ -38,6 +38,9 @@ Route::prefix('exhibitor')->group(function () {
     // nearest events
     Route::get('events/nearest', [EventController::class, 'nearest'])->name('exhibitor.events.nearest');
 
+    // announcments
+    Route::get('announcements', [AnnouncementController::class, 'index']);
+
     Route::middleware(['auth:system', 'type.exhibitor', 'verified'])->group(function () {
         // store fcm token
         Route::post('fcm/register-token', [FCMController::class, 'store'])
@@ -56,6 +59,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::get('/{hall}', [HallController::class, 'show']);
         });
 
+        // booth requests
         Route::prefix('booth-requests')->group(function () {
             Route::get('/', [BoothRequestController::class, 'index']);
         });
@@ -65,6 +69,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::get('/', [BoothController::class, 'index']);
             Route::get('/my', [BoothController::class, 'ownedBooths']);
             Route::post('request-booth', [BoothController::class, 'book'])->middleware('throttle:booth_request');
+            Route::get('/{booth}/statistics', [BoothController::class, 'statistics'])->name('exhibitor.booths.statistics');
             Route::get('/{booth}', [BoothController::class, 'show']);
             Route::get('/{booth}/invitations', [InvitationController::class, 'boothInvitations']);
             Route::post('/{booth}/invitations', [InvitationController::class, 'storeForBooth']);
@@ -91,10 +96,10 @@ Route::prefix('exhibitor')->group(function () {
             Route::delete('{invitation}', [InvitationController::class, 'destroy']);
         });
 
-        // announcments
-        Route::get('announcements', [AnnouncementController::class, 'index']);
+        
         Route::get('services', [ServiceController::class, 'index']);
 
+        // leads
         Route::prefix('leads')->group(function () {
             Route::get('/booths/{booth}', [LeadController::class, 'boothLeads']);
             Route::get('/events/{event}', [LeadController::class, 'eventLeads']);
@@ -133,8 +138,10 @@ Route::prefix('exhibitor')->group(function () {
 
         // reviews
         Route::prefix('reviews')->group(function () {
+            Route::get('event/{event}/statistics', [ReviewController::class, 'eventStatistics']);
+            Route::get('booth/{booth}/statistics', [ReviewController::class, 'boothStatistics']);
             Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
-            Route::get('booht/{booth}', [ReviewController::class, 'boothReviews']);
+            Route::get('booth/{booth}', [ReviewController::class, 'boothReviews']);
             Route::get('reviewer/{review}', [ReviewController::class, 'reviewerDetails']);
         });
     });

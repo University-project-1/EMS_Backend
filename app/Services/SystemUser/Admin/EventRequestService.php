@@ -7,6 +7,8 @@ use App\Enum\Status;
 use App\Models\Company;
 use App\Models\Event;
 use App\Models\EventHall;
+use App\Notifications\SystemUser\Exhibitor\EventCancellationNotification;
+use App\Notifications\SystemUser\Exhibitor\EventPaymentReminderNotification;
 use App\Notifications\SystemUser\Exhibitor\EventRequestStatusNotification;
 use App\Services\Shared\NotificationRecipientResolver;
 use App\Services\Shared\QrCodeService;
@@ -92,6 +94,41 @@ class EventRequestService
 
                 $this->notifyConflictingEventOwners($conflictingEvents);
             });
+        });
+    }
+
+    public function sendPaymentReminder(Event $event): void
+    {
+        if ($event->status !== Status::PENDING) {
+            throw new HttpException(400, __('validation.invalid_status'));
+        }
+
+        Notification::send($this->notificationRecipients->eventOwners($event)->filter()->unique('id'), new EventPaymentReminderNotification($event));
+    }
+    public function cancelApprovedEvent(Event $event): Event
+    {
+        return DB::transaction(function () use ($event): Event {
+            EventHall::query()->whereKey($event->event_hall_id)->lockForUpdate()->firstOrFail();
+            $event->refresh();
+
+            if ($event->status !== Status::APPROVED) {
+                throw new HttpException(400, __('validation.invalid_status'));
+            }
+
+            $event->update([
+                'status' => Status::CANCELED,
+                'qr_token' => null,
+            ]);
+            $event->clearMediaCollection('qr_code');
+
+            DB::afterCommit(function () use ($event): void {
+                Notification::send(
+                    $this->notificationRecipients->eventOwners($event)->filter()->unique('id'),
+                    new EventCancellationNotification($event),
+                );
+            });
+
+            return $event;
         });
     }
 

@@ -33,5 +33,13 @@ return [
     'company_event_created_body' => 'A company you are interested in has created the event :title.',
     'organizer_event_created_title' => 'New Event From an Organizer You Follow',
     'organizer_event_created_body' => 'An organizer you are interested in has created the event :title.',
+    'booth_payment_reminder_title' => 'Payment Required for Booth Booking',
+    'booth_payment_reminder_body' => 'Your approved booth booking requires payment to be confirmed.',
+    'event_payment_reminder_title' => 'Payment Required for Event',
+    'event_payment_reminder_body' => 'Your event ":title" requires payment to be confirmed.',
+    'event_canceled_title' => 'Event Canceled',
+    'event_canceled_body' => 'Your event ":title" has been canceled and the event hall is available again.',
+    'booth_canceled_title' => 'Booth Booking Canceled',
+    'booth_canceled_body' => 'Your booth booking has been canceled and is no longer assigned to your company.',
     'booth_label' => 'Booth :number',
 ];

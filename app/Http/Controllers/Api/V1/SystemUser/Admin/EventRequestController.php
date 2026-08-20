@@ -56,7 +56,7 @@ class EventRequestController extends Controller
             ->allowedFilters(
                 AllowedFilter::partial('title'),
                 AllowedFilter::exact('status'),
-                AllowedFilter::custom('created_date', new DateFilter(), 'created_at'),
+                AllowedFilter::custom('created_date', new DateFilter, 'created_at'),
             )
             ->allowedSorts('created_at')
             ->allowedIncludes('eventable', 'speakers')
@@ -99,6 +99,32 @@ class EventRequestController extends Controller
         $this->eventRequestService->approve($event);
 
         return successResponse();
+    }
+
+    /**
+     * Send payment reminder
+     */
+    public function sendPaymentReminder(Event $event)
+    {
+        $this->eventRequestService->sendPaymentReminder($event);
+
+        return successResponse(
+            data: null,
+            message: 'payment reminder sent successfully',
+        );
+    }
+
+    /**
+     * Cancel approved event.
+     */
+    public function cancel(Event $event)
+    {
+        $this->eventRequestService->cancelApprovedEvent($event);
+
+        return successResponse(
+            data: null,
+            message: 'event canceled successfully',
+        );
     }
 
     /**

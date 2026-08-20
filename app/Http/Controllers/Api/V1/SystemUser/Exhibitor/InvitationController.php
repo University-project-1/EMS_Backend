@@ -22,7 +22,10 @@ class InvitationController extends Controller
     public function companyInvitations(Company $company)
     {
         Gate::authorize('manageInvitations', $company);
-        $invitations = $company->invitations()->with('sender')->latest()->paginate(10);
+        $invitations = $company->invitations()->uniquePerEmail()
+            ->with('sender')
+            ->latest()
+            ->paginate(10);
 
         return successResponse(
             data: InvitaionResource::collection($invitations),
@@ -33,7 +36,10 @@ class InvitationController extends Controller
     public function boothInvitations(Booth $booth)
     {
         Gate::authorize('manageInvitations', $booth);
-        $invitations = $booth->invitations()->with('sender')->latest()->paginate(5);
+        $invitations = $booth->invitations()->uniquePerEmail()
+            ->with('sender')
+            ->latest()
+            ->paginate(5);
 
         return successResponse(
             data: InvitaionResource::collection($invitations),
@@ -46,7 +52,7 @@ class InvitationController extends Controller
         $this->invitationService->check($invitation);
 
         return successResponse(
-            data: new InvitaionResource($invitation->load(['sender', 'inviteable'])),
+            data: new InvitaionResource($invitation->load(['sender', 'inviteable', 'sender.media'])),
             message: __('invitation.show_success'),
         );
     }

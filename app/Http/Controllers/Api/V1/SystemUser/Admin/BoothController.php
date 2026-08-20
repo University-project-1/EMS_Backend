@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Admin\UpdateBoothRequest;
 use App\Http\Resources\SystemUser\Shared\BoothResource;
 use App\Models\Booth;
+use App\Services\SystemUser\Admin\BoothRequestService;
 use App\Services\SystemUser\Admin\UpdateBoothService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
@@ -20,6 +21,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 class BoothController extends Controller
 {
     public function __construct(
+        private readonly BoothRequestService $boothRequestService,
         private readonly UpdateBoothService $updateBoothService,
     ) {}
 
@@ -66,6 +68,19 @@ class BoothController extends Controller
         return successResponse(
             data: new BoothResource($booth),
             message: __('booth.show_success'),
+        );
+    }
+
+    /**
+     * Cancel approved booking
+     */
+    public function cancelBooking(Booth $booth)
+    {
+        $this->boothRequestService->cancelApprovedBooking($booth);
+
+        return successResponse(
+            data: null,
+            message: 'booth booking canceled successfully',
         );
     }
 

@@ -25,9 +25,8 @@ class LeadController extends Controller
         Gate::authorize('viewLeads', $booth);
 
         $statistics = $this->leadService->getLeadStatistics($booth);
-        $statistics['visitors'] = LeadResource::collection($statistics['visitors'])
-            ->response()
-            ->getData(true);
+        $statistics['visitors'] = LeadResource::collection($statistics['visitors']);
+            
 
         return successResponse($statistics);
     }

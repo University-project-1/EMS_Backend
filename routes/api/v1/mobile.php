@@ -75,7 +75,7 @@ Route::prefix('visitor')->middleware('auth:mobile')->group(function () {
         Route::get('/', [CompanyController::class, 'index']);
         Route::get('/{company}', [CompanyController::class, 'show']);
     });
-
+    
     // eventHall
     Route::prefix('eventHall/')->group(function () {
         Route::get('', [EventHallController::class, 'index'])->name('visitor.event_halls.index');

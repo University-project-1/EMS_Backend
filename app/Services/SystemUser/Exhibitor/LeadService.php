@@ -24,9 +24,9 @@ class LeadService
     private function getLatestVisitors(Model $leadable)
     {
         return $leadable->leads()
-            ->with('user:id,first_name,last_name,phone,job')
+            ->with('user')
             ->orderByDesc('created_at')
-            ->paginate(5);
+            ->paginate(10);
     }
 
     private function getWeeklyStats(Model $leadable): array

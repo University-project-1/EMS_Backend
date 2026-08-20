@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('reason_for_booking')->nullable();
             $table->timestamps();
             $table->softDeletes();
+            $table->index(['booth_id', 'status']);
         });
     }
 

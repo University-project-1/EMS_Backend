@@ -55,11 +55,12 @@ class LookupController extends Controller
         $user = Auth::guard('system')->user();
 
         $booths = Cache::remember("lookup_booths_user_{$user->id}", now()->addMinutes(15), function () use ($user) {
-            $baseQuery = Booth::query();
+            $baseQuery = Booth::query()->whereNotNull('company_id');
             (new AccessibleBoothsFilter($user))($baseQuery, null, '');
 
             $models = QueryBuilder::for($baseQuery)
                 ->select(['id', 'number'])
+                ->whereRelation('boothRequests', 'status', Status::APPROVED->value)
                 ->with(['company:id,name'])
                 ->allowedFilters(
                     AllowedFilter::custom('search', new LookupSearchFilter),
@@ -82,7 +83,7 @@ class LookupController extends Controller
         $user = Auth::guard('system')->user();
 
         $events = Cache::remember("lookup_events_user_{$user->id}", now()->addMinutes(15), function () use ($user) {
-            $baseQuery = Event::query()->accessibleBy($user);
+            $baseQuery = Event::query()->where('status', Status::APPROVED)->accessibleBy($user);
 
             $models = QueryBuilder::for($baseQuery)
                 ->select(['id', 'title'])

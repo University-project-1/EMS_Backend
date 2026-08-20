@@ -21,7 +21,15 @@ class InvitaionResource extends JsonResource
             'email' => $this->email,
             'status' => $this->status,
             'token' => $this->when($this->status === 'pending', $this->token),
-            'is_user_exists' => SystemUser::where('email', $this->email)->exists(),
+            'is_user_exists' => SystemUser::where('email', $this->email)->whereNotNull('email_verified_at')->exists(),
+            'is_logged_in' => SystemUser::query()
+                ->where('email', $this->email)
+                ->whereHas('tokens', function ($query): void {
+                    $query
+                        ->where('revoked', false)
+                        ->where('expires_at', '>', now());
+                })
+                ->exists(),
             'expires_at' => $this->expires_at,
             'is_expired' => $this->expires_at < now() && $this->status === 'pending',
 
