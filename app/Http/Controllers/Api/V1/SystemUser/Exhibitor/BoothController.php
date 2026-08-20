@@ -14,12 +14,8 @@ use App\Http\Requests\SystemUser\Exhibitor\StoreBoothRequestRequest;
 use App\Http\Resources\SystemUser\Shared\BoothRequestResource;
 use App\Http\Resources\SystemUser\Shared\BoothResource;
 use App\Models\Booth;
-<<<<<<< HEAD
-use App\Services\SystemUser\Exhibitor\BoothBookingWithProductsService;
-=======
 use App\Services\SystemUser\Exhibitor\BoothRequestService;
 use App\Services\SystemUser\Exhibitor\DashboardService;
->>>>>>> 7f51b4f523f97c18830534f41bea30e938789129
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Http\Request;
@@ -31,12 +27,8 @@ use Spatie\QueryBuilder\QueryBuilder;
 class BoothController extends Controller
 {
     public function __construct(
-<<<<<<< HEAD
-        private readonly BoothBookingWithProductsService $boothBookingWithProductsService,
-=======
         private readonly BoothRequestService $boothRequestService,
         private readonly DashboardService $dashboardService,
->>>>>>> 7f51b4f523f97c18830534f41bea30e938789129
     ) {}
 
     /**
@@ -111,8 +103,6 @@ class BoothController extends Controller
         );
     }
 
-<<<<<<< HEAD
-=======
     /**
      * Booth statistics
      */
@@ -123,7 +113,6 @@ class BoothController extends Controller
         return successResponse($this->dashboardService->boothStatistics($booth, $request->user('system')),);
     }
 
->>>>>>> 7f51b4f523f97c18830534f41bea30e938789129
     /**
      * My booths
      */

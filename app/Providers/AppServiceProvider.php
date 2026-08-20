@@ -145,7 +145,7 @@ class AppServiceProvider extends ServiceProvider
         ));
 
         RateLimiter::for('volunteer-application', fn (Request $request) => $this->limitPerHour(
-            attempts: 3,
+            attempts: 5,
             request: $request,
             message: 'rate_limit.volunteer_application',
         ));

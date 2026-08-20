@@ -33,27 +33,11 @@ final class DatabaseSeeder extends Seeder
                 ReportSeeder::class,
                 ReviewSeeder::class,
                 NotificationSeeder::class,
+                VolunteerApplicationSeeder::class,
             ]);
         }
 
         $this->call([
-            AnnouncementSeeder::class,
-            PassportSeeder::class,
-            UserSeeder::class,
-            CompanySeeder::class,
-            ServiceSeeder::class,
-            BusCatalogsSeeder::class,
-            HallSeeder::class,
-            FacilitySeeder::class,
-            BoothSeeder::class,
-            BoothRequestSeeder::class,
-            EventSeeder::class,
-            LeadSeeder::class,
-            SavedSeeder::class,
-            ReportSeeder::class,
-            ReviewSeeder::class,
-            NotificationSeeder::class,
-            VolunteerApplicationSeeder::class,
             RealData\FilteredConnectionUsersSeeder::class,
             RealData\FilteredConnectionUsersMediaSeeder::class,
             RealData\RealTechPeopleSeeder::class,
