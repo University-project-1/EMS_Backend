@@ -26,7 +26,7 @@ class LeadService
         return $leadable->leads()
             ->with('user')
             ->orderByDesc('created_at')
-            ->paginate(5);
+            ->paginate(10);
     }
 
     private function getWeeklyStats(Model $leadable): array
