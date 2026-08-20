@@ -38,6 +38,9 @@ Route::prefix('exhibitor')->group(function () {
     // nearest events
     Route::get('events/nearest', [EventController::class, 'nearest'])->name('exhibitor.events.nearest');
 
+    // announcments
+    Route::get('announcements', [AnnouncementController::class, 'index']);
+
     Route::middleware(['auth:system', 'type.exhibitor', 'verified'])->group(function () {
         // store fcm token
         Route::post('fcm/register-token', [FCMController::class, 'store'])
@@ -93,8 +96,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::delete('{invitation}', [InvitationController::class, 'destroy']);
         });
 
-        // announcments
-        Route::get('announcements', [AnnouncementController::class, 'index']);
+        
         Route::get('services', [ServiceController::class, 'index']);
 
         // leads

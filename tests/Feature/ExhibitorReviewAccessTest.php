@@ -114,3 +114,35 @@ function reviewAccessEvent(Company $company): Event
 
     return $event;
 }
+
+test('exhibitor event reviews are ordered from newest to oldest by default', function (): void {
+    $company = reviewAccessCompany();
+    $companyMember = $this->createExhibitor();
+    $company->systemUsers()->attach($companyMember->id, ['created_at' => now()]);
+    $event = reviewAccessEvent($company);
+
+    $oldestReview = Review::query()->create([
+        'user_id' => $this->createVisitor()->id,
+        'reviewable_type' => Event::class,
+        'reviewable_id' => $event->id,
+        'rating' => 3,
+        'comment' => 'An older review.',
+        'created_at' => now()->subDays(2),
+        'updated_at' => now()->subDays(2),
+    ]);
+    $newestReview = Review::query()->create([
+        'user_id' => $this->createVisitor()->id,
+        'reviewable_type' => Event::class,
+        'reviewable_id' => $event->id,
+        'rating' => 5,
+        'comment' => 'The newest review.',
+        'created_at' => now()->subDay(),
+        'updated_at' => now()->subDay(),
+    ]);
+
+    $this->actingAs($companyMember, 'system')
+        ->getJson("/api/v1/exhibitor/reviews/event/{$event->id}")
+        ->assertOk()
+        ->assertJsonPath('data.reviews.data.0.id', $newestReview->id)
+        ->assertJsonPath('data.reviews.data.1.id', $oldestReview->id);
+});

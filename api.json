@@ -75,6 +75,9 @@
             "name": "SystemUser/Exhibitor/Events"
         },
         {
+            "name": "SystemUser/Exhibitor/Announcement"
+        },
+        {
             "name": "SystemUser/Exhibitor/BoothRequests"
         },
         {
@@ -82,9 +85,6 @@
         },
         {
             "name": "SystemUser/Exhibitor/Lookup"
-        },
-        {
-            "name": "SystemUser/Exhibitor/Announcement"
         },
         {
             "name": "SystemUser/Exhibitor/Services"
@@ -3198,11 +3198,9 @@
                                 }
                             }
                         }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
                     }
-                }
+                },
+                "security": []
             }
         },
         "/v1/exhibitor/login": {
