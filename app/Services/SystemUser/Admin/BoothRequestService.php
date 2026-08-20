@@ -6,6 +6,7 @@ use App\Enum\RequestRejectionReason;
 use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\BoothRequest;
+use App\Notifications\SystemUser\Exhibitor\BoothCancellationNotification;
 use App\Notifications\SystemUser\Exhibitor\BoothPaymentReminderNotification;
 use App\Notifications\SystemUser\Exhibitor\BoothRequestStatusNotification;
 use App\Services\Shared\NotificationRecipientResolver;
@@ -141,6 +142,13 @@ class BoothRequestService
 
             $booth->clearMediaCollection('qr_code');
             Storage::disk('public')->deleteDirectory('booths/'.$booth->id.'/qr_code');
+
+            DB::afterCommit(function () use ($boothRequest): void {
+                Notification::send(
+                    $this->notificationRecipients->boothRequestRecipients($boothRequest),
+                    new BoothCancellationNotification($boothRequest),
+                );
+            });
 
             return $boothRequest;
         });

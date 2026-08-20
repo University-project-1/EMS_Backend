@@ -4,14 +4,14 @@ namespace App\Notifications\SystemUser\Exhibitor;
 
 use App\Channels\FcmChannel;
 use App\Interfaces\FcmNotification;
-use App\Models\Event;
+use App\Models\BoothRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Queue\SerializesModels;
 
-class EventPaymentReminderNotification extends Notification implements FcmNotification, ShouldQueue
+class BoothCancellationNotification extends Notification implements FcmNotification, ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -19,7 +19,7 @@ class EventPaymentReminderNotification extends Notification implements FcmNotifi
 
     public int $backoff = 60;
 
-    public function __construct(public readonly Event $event) {}
+    public function __construct(public readonly BoothRequest $boothRequest) {}
 
     public function via(object $notifiable): array
     {
@@ -28,29 +28,31 @@ class EventPaymentReminderNotification extends Notification implements FcmNotifi
 
     public function databaseType(object $notifiable): string
     {
-        return 'event_payment_reminder';
+        return 'booth_canceled';
     }
 
     public function toDatabase(object $notifiable): array
     {
         return [
-            'type' => 'event_payment_reminder',
-            'title' => 'notifications.event_payment_reminder_title',
-            'body' => 'notifications.event_payment_reminder_body',
-            'target_id' => $this->event->getKey(),
+            'type' => 'booth_canceled',
+            'title' => 'notifications.booth_canceled_title',
+            'body' => 'notifications.booth_canceled_body',
+            'target_id' => $this->boothRequest->getKey(),
         ];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-        $url = config('app.frontend_url')."/dashboard/events/{$this->event->getKey()}";
+        $this->boothRequest->loadMissing('booth');
+        $boothNumber = $this->boothRequest->booth?->number ?? '#'.$this->boothRequest->booth_id;
+        $url = config('app.frontend_url')."/dashboard/booths/{$this->boothRequest->booth_id}";
 
         return (new MailMessage)
-            ->subject('Payment Required for Your Event')
+            ->subject('Booth Booking Canceled')
             ->greeting('Hello '.$notifiable->name.',')
-            ->line("Your event request for \"{$this->event->title}\" has been partially approved and requires payment.")
-            ->line('Please complete the payment process to confirm your event.')
-            ->action('View Event Details', $url)
+            ->line("Your booking for booth {$boothNumber} has been canceled.")
+            ->line('The booth is no longer assigned to your company.')
+            ->action('View Booth Details', $url)
             ->salutation('Best regards, System Management Team');
     }
 
@@ -59,17 +61,17 @@ class EventPaymentReminderNotification extends Notification implements FcmNotifi
         return [
             'notification' => [
                 'title' => __($this->key('title')),
-                'body' => __($this->key('body'), ['title' => $this->event->title]),
+                'body' => __($this->key('body')),
             ],
             'data' => [
-                'type' => 'event_payment_reminder',
-                'target_id' => (string) $this->event->getKey(),
+                'type' => 'booth_canceled',
+                'target_id' => (string) $this->boothRequest->getKey(),
             ],
         ];
     }
 
     private function key(string $suffix): string
     {
-        return 'notifications.event_payment_reminder_'.$suffix;
+        return 'notifications.booth_canceled_'.$suffix;
     }
 }

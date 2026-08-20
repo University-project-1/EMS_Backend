@@ -5,12 +5,16 @@ use App\Enum\Status;
 use App\Models\BoothRequest;
 use App\Models\Company;
 use App\Models\Hall;
+use App\Notifications\SystemUser\Exhibitor\BoothCancellationNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\Support\CreatesActors;
 
 uses(RefreshDatabase::class, CreatesActors::class);
 
-test('admin can cancel an approved booth booking and release the booth', function (): void {
+test('admin can cancel an approved booth booking and notify the booking owner', function (): void {
+    Notification::fake();
+
     $admin = $this->createAdministrator();
     $company = cancellationCompany();
     $hall = Hall::query()->create([
@@ -47,6 +51,11 @@ test('admin can cancel an approved booth booking and release the booth', functio
         'company_id' => null,
         'qr_token' => null,
     ]);
+    Notification::assertSentTo(
+        $admin,
+        BoothCancellationNotification::class,
+        fn (BoothCancellationNotification $notification): bool => $notification->boothRequest->is($request),
+    );
 });
 
 test('admin cannot cancel a non-approved booth request', function (): void {
