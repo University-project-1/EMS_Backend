@@ -22,8 +22,7 @@ class AnnouncementController extends Controller
         $announcements = QueryBuilder::for($baseQuery)
             ->defaultSort('-created_at')
             ->allowedSorts('title', 'created_at')
-            ->paginate(request()->query('per_page', 5));
-
+            ->get();  
         return successResponse(data: AnnouncementResource::collection($announcements));
     }
 }
