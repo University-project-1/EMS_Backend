@@ -115,6 +115,19 @@ class EventRequestController extends Controller
     }
 
     /**
+     * Cancel approved event.
+     */
+    public function cancel(Event $event)
+    {
+        $this->eventRequestService->cancelApprovedEvent($event);
+
+        return successResponse(
+            data: null,
+            message: 'event canceled successfully',
+        );
+    }
+
+    /**
      * reject request
      */
     public function reject(Event $event)
