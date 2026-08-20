@@ -81,6 +81,12 @@ class AppServiceProvider extends ServiceProvider
             inputs: ['phone'],
         ));
 
+        RateLimiter::for('volunteer-application', fn (Request $request) => $this->limitPerHour(
+            attempts: 3,
+            request: $request,
+            message: 'rate_limit.volunteer_application',
+        ));
+
         RateLimiter::for('password_reset', fn (Request $request) => $this->limitPerMinutes(
             attempts: 5,
             minutes: 15,
@@ -176,6 +182,5 @@ class AppServiceProvider extends ServiceProvider
         $identity ??= 'guest';
 
         return hash('sha256', implode('|', [(string) $identity, $request->ip()]));
-
     }
 }
