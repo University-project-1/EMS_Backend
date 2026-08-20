@@ -118,6 +118,7 @@ Route::prefix('admin')->group(function () {
             Route::get('{event}', [EventRequestController::class, 'show'])->name('admin.event_requests.show');
             Route::post('{event}/approve', [EventRequestController::class, 'approve'])->name('admin.event_requests.approve');
             Route::post('{event}/payment-reminder', [EventRequestController::class, 'sendPaymentReminder'])->name('admin.event_requests.payment_reminder');
+            Route::patch('{event}/cancel', [EventRequestController::class, 'cancel'])->name('admin.event_requests.cancel');
             Route::patch('{event}/reject', [EventRequestController::class, 'reject'])->name('admin.event_requests.reject');
         });
 

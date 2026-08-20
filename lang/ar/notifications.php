@@ -37,6 +37,8 @@ return [
     'booth_payment_reminder_body' => 'حجز الجناح الموافق عليه يحتاج إلى إتمام الدفع لتأكيده.',
     'event_payment_reminder_title' => 'مطلوب دفع رسوم الفعالية',
     'event_payment_reminder_body' => 'فعاليتك ":title" تحتاج إلى إتمام الدفع لتأكيدها.',
+    'event_canceled_title' => 'تم إلغاء الفعالية',
+    'event_canceled_body' => 'تم إلغاء فعاليتك ":title" وأصبحت القاعة متاحة للحجز من جديد.',
     'booth_canceled_title' => 'تم إلغاء حجز الجناح',
     'booth_canceled_body' => 'تم إلغاء حجز الجناح الخاص بك ولم يعد تابعًا لشركتك.',
     'booth_label' => 'البوث رقم :number',
