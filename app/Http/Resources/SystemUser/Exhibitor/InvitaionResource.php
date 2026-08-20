@@ -22,6 +22,7 @@ class InvitaionResource extends JsonResource
             'status' => $this->status,
             'token' => $this->when($this->status === 'pending', $this->token),
             'is_user_exists' => SystemUser::where('email', $this->email)->whereNotNull('email_verified_at' )->exists(),
+            'is_logged_in' => auth('system_user')->check() && auth('system_user')->user()->email === $this->email,
             'expires_at' => $this->expires_at,
             'is_expired' => $this->expires_at < now() && $this->status === 'pending',
 
