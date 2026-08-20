@@ -7,6 +7,7 @@ use App\Enum\Status;
 use App\Models\Company;
 use App\Models\Event;
 use App\Models\EventHall;
+use App\Notifications\SystemUser\Exhibitor\EventPaymentReminderNotification;
 use App\Notifications\SystemUser\Exhibitor\EventRequestStatusNotification;
 use App\Services\Shared\NotificationRecipientResolver;
 use App\Services\Shared\QrCodeService;
@@ -93,6 +94,14 @@ class EventRequestService
                 $this->notifyConflictingEventOwners($conflictingEvents);
             });
         });
+    }
+    public function sendPaymentReminder(Event $event): void
+    {
+        if ($event->status !== Status::PENDING) {
+            throw new HttpException(400, __('validation.invalid_status'));
+        }
+
+        Notification::send($this->notificationRecipients->eventOwners($event)->filter()->unique('id'), new EventPaymentReminderNotification($event));
     }
 
     public function reject(Event $event): void

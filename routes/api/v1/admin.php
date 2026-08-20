@@ -53,9 +53,11 @@ Route::prefix('admin')->group(function () {
                 Route::get('/stats', [BoothRequestController::class, 'statistics']);
                 Route::get('/{boothRequest}', [BoothRequestController::class, 'show']);
                 Route::post('/approve/{boothRequest}', [BoothRequestController::class, 'approve']);
+                Route::post('/payment-reminder/{boothRequest}', [BoothRequestController::class, 'sendPaymentReminder']);
                 Route::patch('/reject/{boothRequest}', [BoothRequestController::class, 'reject']);
             });
 
+            Route::patch('/{booth}/cancel', [BoothController::class, 'cancelBooking']);
             Route::get('/', [BoothController::class, 'index']);
             Route::get('/{booth}', [BoothController::class, 'show']);
             Route::patch('/{booth}', [BoothController::class, 'update']);
@@ -115,6 +117,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/stats', [EventRequestController::class, 'statistics']);
             Route::get('{event}', [EventRequestController::class, 'show'])->name('admin.event_requests.show');
             Route::post('{event}/approve', [EventRequestController::class, 'approve'])->name('admin.event_requests.approve');
+            Route::post('{event}/payment-reminder', [EventRequestController::class, 'sendPaymentReminder'])->name('admin.event_requests.payment_reminder');
             Route::patch('{event}/reject', [EventRequestController::class, 'reject'])->name('admin.event_requests.reject');
         });
 
