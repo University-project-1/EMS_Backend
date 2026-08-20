@@ -2573,6 +2573,31 @@
                 }
             }
         },
+        "/v1/admin/events/requests/{event}/cancel": {
+            "patch": {
+                "operationId": "admin.event_requests.cancel",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'events' order by ordinal_position asc)",
+                "summary": "Cancel approved event",
+                "tags": [
+                    "SystemUser/Admin/EventRequests"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/admin/events/requests/{event}/reject": {
             "patch": {
                 "operationId": "admin.event_requests.reject",
