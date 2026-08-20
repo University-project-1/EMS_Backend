@@ -72,7 +72,7 @@ class BoothController extends Controller
      */
     public function show(Booth $booth)
     {
-        $booth->loadMissing(['hall', 'company']);
+        $booth->loadMissing(['hall', 'company', 'boothRequests']);
 
         return successResponse(
             data: new BoothResource($booth),
