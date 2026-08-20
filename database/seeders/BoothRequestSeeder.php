@@ -107,9 +107,9 @@ class BoothRequestSeeder extends Seeder
             [
                 'booth' => Booth::where('number', '10D-01')->firstOrFail(),
                 'system_user_id' => $elza3eem->id,
-                'status' => Status::REJECTED,
+                'status' => Status::APPROVED,
                 'company_id' => $greenFoods->id,
-                'reason_for_booking' => 'Rejected booth request for 10D-01 from GreenFoods Co.',
+                'reason_for_booking' => 'NOT Rejected booth request for 10D-01 from GreenFoods Co.',
                 'attach_services' => false,
             ],
         ];

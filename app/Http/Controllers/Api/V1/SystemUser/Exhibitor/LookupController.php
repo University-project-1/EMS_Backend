@@ -60,6 +60,7 @@ class LookupController extends Controller
 
             $models = QueryBuilder::for($baseQuery)
                 ->select(['id', 'number'])
+                ->whereRelation('boothRequests', 'status', Status::APPROVED->value)
                 ->with(['company:id,name'])
                 ->allowedFilters(
                     AllowedFilter::custom('search', new LookupSearchFilter),

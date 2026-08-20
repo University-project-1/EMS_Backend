@@ -32,6 +32,7 @@ class BoothRequestController extends Controller
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS pending_requests', [Status::PENDING->value])
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS approved_requests', [Status::APPROVED->value])
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS rejected_requests', [Status::REJECTED->value])
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS canceled_requests', [Status::CANCELED->value])
             ->first();
 
         $result = [
@@ -39,6 +40,7 @@ class BoothRequestController extends Controller
             'pending_requests' => (int) $stats->pending_requests,
             'approved_requests' => (int) $stats->approved_requests,
             'rejected_requests' => (int) $stats->rejected_requests,
+            'canceled_requests' => (int) $stats->canceled_requests,
         ];
 
         return successResponse(
@@ -60,9 +62,7 @@ class BoothRequestController extends Controller
     {
         $boothRequests = QueryBuilder::for(BoothRequest::class)
             ->with('company:id,name')
-            ->withCount('products')
-            ->allowedFilters(
-                'company.name',
+            ->allowedFilters('company.name',
                 AllowedFilter::exact('status'),
                 AllowedFilter::custom('created_date', new DateFilter, 'created_at'),
             )
@@ -111,6 +111,19 @@ class BoothRequestController extends Controller
         return successResponse(
             data: null,
             message: 'booth request approved successfully',
+        );
+    }
+
+    /**
+     * Send payment reminder for an approved request.
+     */
+    public function sendPaymentReminder(BoothRequest $boothRequest)
+    {
+        $this->boothRequestService->sendPaymentReminder($boothRequest);
+
+        return successResponse(
+            data: null,
+            message: 'payment reminder sent successfully',
         );
     }
 

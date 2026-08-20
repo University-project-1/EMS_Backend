@@ -1753,6 +1753,31 @@
                 }
             }
         },
+        "/v1/admin/booths/requests/payment-reminder/{boothRequest}": {
+            "post": {
+                "operationId": "boothRequest.sendPaymentReminder",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booth_requests' order by ordinal_position asc)",
+                "summary": "Send payment reminder for an approved request",
+                "tags": [
+                    "SystemUser/Admin/BoothRequests"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/admin/booths/requests/reject/{boothRequest}": {
             "patch": {
                 "operationId": "boothRequest.reject",
@@ -1760,6 +1785,31 @@
                 "summary": "reject request",
                 "tags": [
                     "SystemUser/Admin/BoothRequests"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/booths/{booth}/cancel": {
+            "patch": {
+                "operationId": "booth.cancelBooking",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
+                "summary": "Cancel approved booking",
+                "tags": [
+                    "SystemUser/Admin/Booths"
                 ],
                 "responses": {
                     "200": {
@@ -2494,6 +2544,31 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/events/requests/{event}/payment-reminder": {
+            "post": {
+                "operationId": "admin.event_requests.payment_reminder",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'events' order by ordinal_position asc)",
+                "summary": "Send payment reminder",
+                "tags": [
+                    "SystemUser/Admin/EventRequests"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -3609,6 +3684,34 @@
                 }
             }
         },
+        "/v1/exhibitor/booth/{booth}/statistics": {
+            "get": {
+                "operationId": "exhibitor.booths.statistics",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
+                "summary": "Booth statistics",
+                "tags": [
+                    "SystemUser/Exhibitor/Booths"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/exhibitor/booth/{booth}": {
             "get": {
                 "operationId": "v1.systemUser.exhibitor.booth.show",
@@ -4296,6 +4399,62 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/reviews/event/{event}/statistics": {
+            "get": {
+                "operationId": "review.eventStatistics",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'events' order by ordinal_position asc)",
+                "summary": "Event review statistics",
+                "tags": [
+                    "SystemUser/Exhibitor/Reviews"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/exhibitor/reviews/booth/{booth}/statistics": {
+            "get": {
+                "operationId": "review.boothStatistics",
+                "description": "\u26a0\ufe0f Cannot generate request documentation: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: ems, SQL: select column_name as `name`, data_type as `type_name`, column_type as `type`, collation_name as `collation`, is_nullable as `nullable`, column_default as `default`, column_comment as `comment`, generation_expression as `expression`, extra as `extra` from information_schema.columns where table_schema = schema() and table_name = 'booths' order by ordinal_position asc)",
+                "summary": "Booth review statistics",
+                "tags": [
+                    "SystemUser/Exhibitor/Reviews"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -5518,6 +5677,16 @@
                 "summary": "Leads history",
                 "tags": [
                     "Visitor/Leads"
+                ],
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of events per page (maximum 100)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {

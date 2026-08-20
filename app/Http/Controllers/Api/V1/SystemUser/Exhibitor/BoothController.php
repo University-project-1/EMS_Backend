@@ -14,10 +14,16 @@ use App\Http\Requests\SystemUser\Exhibitor\StoreBoothRequestRequest;
 use App\Http\Resources\SystemUser\Shared\BoothRequestResource;
 use App\Http\Resources\SystemUser\Shared\BoothResource;
 use App\Models\Booth;
+<<<<<<< HEAD
 use App\Services\SystemUser\Exhibitor\BoothBookingWithProductsService;
+=======
+use App\Services\SystemUser\Exhibitor\BoothRequestService;
+use App\Services\SystemUser\Exhibitor\DashboardService;
+>>>>>>> 7f51b4f523f97c18830534f41bea30e938789129
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -25,7 +31,12 @@ use Spatie\QueryBuilder\QueryBuilder;
 class BoothController extends Controller
 {
     public function __construct(
+<<<<<<< HEAD
         private readonly BoothBookingWithProductsService $boothBookingWithProductsService,
+=======
+        private readonly BoothRequestService $boothRequestService,
+        private readonly DashboardService $dashboardService,
+>>>>>>> 7f51b4f523f97c18830534f41bea30e938789129
     ) {}
 
     /**
@@ -69,7 +80,7 @@ class BoothController extends Controller
      */
     public function show(Booth $booth)
     {
-        $booth->loadMissing(['hall', 'company']);
+        $booth->loadMissing(['hall', 'company', 'boothRequests']);
 
         return successResponse(
             data: new BoothResource($booth),
@@ -100,6 +111,19 @@ class BoothController extends Controller
         );
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * Booth statistics
+     */
+    public function statistics(Request $request, Booth $booth)
+    {
+        Gate::authorize('viewLeads', $booth);
+
+        return successResponse($this->dashboardService->boothStatistics($booth, $request->user('system')),);
+    }
+
+>>>>>>> 7f51b4f523f97c18830534f41bea30e938789129
     /**
      * My booths
      */
@@ -110,6 +134,7 @@ class BoothController extends Controller
             ->allowedFilters(
                 AllowedFilter::custom('accessible', new AccessibleBoothsFilter($request->user('system'))),
             )
+            ->accessibleBy($request->user('system'))
             ->whereRelation('boothRequests', 'status', Status::APPROVED->value)
             ->with(['company', 'hall', 'boothRequests' => fn ($query) => $query
                 ->where('status', Status::APPROVED->value)
@@ -117,6 +142,7 @@ class BoothController extends Controller
             ])
             ->latest()
             ->paginate(request()->query('per_page', 5));
+
         return successResponse(
             data: BoothResource::collection($booths),
             message: __('booth.list_success')

@@ -66,6 +66,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::get('/', [BoothController::class, 'index']);
             Route::get('/my', [BoothController::class, 'ownedBooths']);
             Route::post('request-booth', [BoothController::class, 'book'])->middleware('throttle:booth_request');
+            Route::get('/{booth}/statistics', [BoothController::class, 'statistics'])->name('exhibitor.booths.statistics');
             Route::get('/{booth}', [BoothController::class, 'show']);
             Route::get('/{booth}/invitations', [InvitationController::class, 'boothInvitations']);
             Route::post('/{booth}/invitations', [InvitationController::class, 'storeForBooth']);
@@ -135,6 +136,8 @@ Route::prefix('exhibitor')->group(function () {
 
         // reviews
         Route::prefix('reviews')->group(function () {
+            Route::get('event/{event}/statistics', [ReviewController::class, 'eventStatistics']);
+            Route::get('booth/{booth}/statistics', [ReviewController::class, 'boothStatistics']);
             Route::get('event/{event}', [ReviewController::class, 'eventReviews']);
             Route::get('booth/{booth}', [ReviewController::class, 'boothReviews']);
             Route::get('reviewer/{review}', [ReviewController::class, 'reviewerDetails']);

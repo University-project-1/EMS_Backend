@@ -2,8 +2,8 @@
 
 namespace App\Services\Shared;
 
+use App\Filter\NotificationTypeFilter;
 use Illuminate\Notifications\DatabaseNotification;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -19,15 +19,15 @@ class NotificationService
         $user = $this->user($guardName);
 
         $query = QueryBuilder::for($user->notifications())
-                    ->allowedFilters(
-                        AllowedFilter::exact('type'),
-                    )
-                    ->allowedSorts(
-                        'created_at',
-                    )
-                    ->defaultSort('-created_at');
+            ->allowedFilters(
+                AllowedFilter::custom('type', new NotificationTypeFilter),
+            )
+            ->allowedSorts(
+                'created_at',
+            )
+            ->defaultSort('-created_at');
 
-        if($guardName === 'mobile'){
+        if ($guardName === 'mobile') {
             return $query->cursorPaginate($perPage);
         }
 
@@ -39,15 +39,15 @@ class NotificationService
         $user = $this->user($guardName);
 
         $query = QueryBuilder::for($user->unreadNotifications())
-                    ->allowedFilters(
-                        AllowedFilter::exact('type'),
-                    )
-                    ->allowedSorts(
-                        'created_at',
-                    )
-                    ->defaultSort('-created_at');
+            ->allowedFilters(
+                AllowedFilter::custom('type', new NotificationTypeFilter),
+            )
+            ->allowedSorts(
+                'created_at',
+            )
+            ->defaultSort('-created_at');
 
-        if($guardName === 'mobile'){
+        if ($guardName === 'mobile') {
             return $query->cursorPaginate($perPage);
         }
 
@@ -75,10 +75,11 @@ class NotificationService
         $this->user($guardName)
             ->notifications()
             ->whereNull('read_at')
-            ->update(['read_at' => now(),]);
+            ->update(['read_at' => now()]);
     }
 
-    public function markAsRead(DatabaseNotification $notification,string $guardName): void {
+    public function markAsRead(DatabaseNotification $notification, string $guardName): void
+    {
         $user = $this->user($guardName);
 
         $user->notifications()
@@ -89,9 +90,10 @@ class NotificationService
             ]);
     }
 
-    public function destroy(DatabaseNotification $notification,string $guardName): void {
+    public function destroy(DatabaseNotification $notification, string $guardName): void
+    {
         $user = $this->user($guardName);
-        
+
         $user->notifications()
             ->whereKey($notification->getKey())
             ->delete();

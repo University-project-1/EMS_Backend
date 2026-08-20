@@ -56,6 +56,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | QR Code Base URL
+    |--------------------------------------------------------------------------
+    |
+    | Optional public origin used when QR codes are generated from a local
+    | request, a queue, or the command line. Leave empty to use the current
+    | request host (or APP_URL when no request exists).
+    |
+    */
+
+    'qr_base_url' => env('QR_BASE_URL'),
+
+    'frontend_url' => env('FRONTEND_URL'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

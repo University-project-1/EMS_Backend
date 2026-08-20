@@ -54,10 +54,13 @@ class ManagerDirectoryController extends Controller
             ->allowedFilters('name', 'email', 'phone')
             ->allowedSorts('name', 'created_at')
             ->with('media')
-            ->withCount(['companies', 'booths'])
+            ->withCount('companies')
             ->defaultSort('-created_at')
             ->paginate(request()->query('per_page', 15));
 
+        $managers->getCollection()->each(function (SystemUser $manager): void {
+            $manager->setAttribute('booths_count', Booth::query()->accessibleBy($manager)->count());
+        });
         return successResponse(
             data: ManagerResource::collection($managers),
             message: 'managers retrieved successfully',

@@ -6,12 +6,15 @@ use App\Enum\RequestRejectionReason;
 use App\Enum\Status;
 use App\Models\Booth;
 use App\Models\BoothRequest;
+use App\Notifications\SystemUser\Exhibitor\BoothCancellationNotification;
+use App\Notifications\SystemUser\Exhibitor\BoothPaymentReminderNotification;
 use App\Notifications\SystemUser\Exhibitor\BoothRequestStatusNotification;
 use App\Services\Shared\NotificationRecipientResolver;
 use App\Services\Shared\QrCodeService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -62,6 +65,8 @@ class BoothRequestService
                 fn (BoothRequest $conflictingRequest) => $conflictingRequest->update(['status' => Status::REJECTED])
             );
 
+            $booth->clearMediaCollection('qr_code');
+            Storage::disk('public')->deleteDirectory('booths/'.$booth->id.'/qr_code');
             $booth->addMediaFromString($this->qrCodeService->generateSvg($token))
                 ->usingFileName("{$token}.svg")
                 ->toMediaCollection('qr_code');
@@ -77,6 +82,17 @@ class BoothRequestService
         });
 
         return $boothRequest;
+    }
+
+    public function sendPaymentReminder(BoothRequest $boothRequest): void
+    {
+        if ($boothRequest->status !== Status::PENDING) {
+            throw new HttpException(400, __('validation.invalid_status'));
+        }
+
+        $boothRequest->loadMissing(['systemUser', 'booth']);
+
+        Notification::send($boothRequest->systemUser, new BoothPaymentReminderNotification($boothRequest));
     }
 
     public function reject(BoothRequest $boothRequest)
@@ -96,6 +112,45 @@ class BoothRequestService
             });
 
             return $updated;
+        });
+    }
+
+    public function cancelApprovedBooking(Booth $booth): BoothRequest
+    {
+        return DB::transaction(function () use ($booth): BoothRequest {
+            $booth = Booth::query()
+                ->whereKey($booth->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $boothRequest = BoothRequest::query()
+                ->where('booth_id', $booth->getKey())
+                ->where('status', Status::APPROVED->value)
+                ->latest('id')
+                ->lockForUpdate()
+                ->first();
+
+            if ($boothRequest === null || (int) $booth->company_id !== (int) $boothRequest->company_id) {
+                throw new HttpException(400, __('validation.invalid_status'));
+            }
+
+            $boothRequest->update(['status' => Status::CANCELED]);
+            $booth->update([
+                'company_id' => null,
+                'qr_token' => null,
+            ]);
+
+            $booth->clearMediaCollection('qr_code');
+            Storage::disk('public')->deleteDirectory('booths/'.$booth->id.'/qr_code');
+
+            DB::afterCommit(function () use ($boothRequest): void {
+                Notification::send(
+                    $this->notificationRecipients->boothRequestRecipients($boothRequest),
+                    new BoothCancellationNotification($boothRequest),
+                );
+            });
+
+            return $boothRequest;
         });
     }
 

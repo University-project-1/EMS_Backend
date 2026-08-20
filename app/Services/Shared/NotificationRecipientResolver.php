@@ -19,7 +19,9 @@ class NotificationRecipientResolver
 
     public function eventOwners(Event $event): Collection
     {
-        $event->loadMissing('eventable.systemUsers');
+        if ($event->eventable instanceof Company) {
+            $event->loadMissing('eventable.systemUsers');
+        }
 
         return match (true) {
             $event->eventable instanceof Company => $event->eventable->systemUsers,
