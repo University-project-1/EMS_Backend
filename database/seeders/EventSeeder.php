@@ -125,7 +125,7 @@ class EventSeeder extends Seeder
             ],
         ];
 
-        $eventAssets = ['alawael.png', 'Elba3eth.png', 'RBCs.png', 'RGBs.jpg', 'wasem.png'];
+        $eventAssets = ['alawael.png', 'AlMa3rd.png', 'RBCs.png', 'RGBs.jpg', 'wasem.png'];
 
         foreach ($events as $index => $eventData) {
             $startAt = $eventData['start_at'];

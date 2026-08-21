@@ -41,7 +41,7 @@ class AnnouncementSeeder extends Seeder
                 'title' => 'Elba3eth Tech Sponsorship',
                 'receiver' => 'Exhibitors',
                 'description' => 'We are proud to announce Elba3eth as a technical sponsor. Join their session on hardware automation and embedded systems.',
-                'image_file' => 'Elba3eth.png',
+                'image_file' => 'AlMa3rd.png',
                 'is_active' => true,
             ],
             [
@@ -83,7 +83,7 @@ class AnnouncementSeeder extends Seeder
                 'title' => 'Hardware Prototypes Exhibition',
                 'receiver' => 'all',
                 'description' => 'Explore the latest automated grading machines and color sensor prototypes at the Elba3eth engineering pavilion.',
-                'image_file' => 'Elba3eth.png',
+                'image_file' => 'AlMa3rd.png',
                 'is_active' => true,
             ],
             [

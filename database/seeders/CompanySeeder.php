@@ -231,7 +231,7 @@ class CompanySeeder extends Seeder
             $companyG->copyMedia($companyGLogo)->toMediaCollection('logo');
         }
 
-        $companyHLogo = database_path('assets/Elba3eth.png');
+        $companyHLogo = database_path('assets/AlMa3rd.png');
         if (is_file($companyHLogo)) {
             $companyH->copyMedia($companyHLogo)->toMediaCollection('logo');
         }
@@ -251,7 +251,7 @@ class CompanySeeder extends Seeder
             $companyK->copyMedia($companyKLogo)->toMediaCollection('logo');
         }
 
-        $galleryAssets = ['alawael.png', 'Elba3eth.png', 'elsaadeh.png', 'fawzy.jpg', 'RBCs.png', 'RGBs.jpg', 'wasem.png'];
+        $galleryAssets = ['alawael.png', 'AlMa3rd.png', 'elsaadeh.png', 'fawzy.jpg', 'RBCs.png', 'RGBs.jpg', 'wasem.png'];
         $companies = [$companyA, $companyB, $companyC, $companyD, $companyE, $companyF, $companyG, $companyH, $companyI, $companyJ, $companyK];
 
         foreach ($companies as $index => $company) {

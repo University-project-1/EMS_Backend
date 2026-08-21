@@ -36,6 +36,7 @@ class EventController extends Controller
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending_requests', [Status::PENDING->value])
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as approved_requests', [Status::APPROVED->value])
             ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as rejected_requests', [Status::REJECTED->value])
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as cancelled_requests', [Status::CANCELED->value])
             ->firstOrFail();
 
         return successResponse([
@@ -43,6 +44,7 @@ class EventController extends Controller
             'pending_requests' => (int) $statistics->getAttribute('pending_requests'),
             'approved_requests' => (int) $statistics->getAttribute('approved_requests'),
             'rejected_requests' => (int) $statistics->getAttribute('rejected_requests'),
+            'cancelled_requests' => (int) $statistics->getAttribute('cancelled_requests'),
         ]);
     }
 
