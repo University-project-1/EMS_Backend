@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\SystemUser\Admin\ManagerDirectoryController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ReportController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\ServiceController;
 use App\Http\Controllers\Api\V1\SystemUser\Admin\VisitorController;
+use App\Http\Controllers\Api\V1\SystemUser\Admin\VolunteerApplicationController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ProfileController;
 use App\Http\Controllers\Api\V1\SystemUser\Shared\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
@@ -135,6 +136,16 @@ Route::prefix('admin')->group(function () {
             Route::get('/', [ReportController::class, 'index']);
             Route::post('/{report}/resolved', [ReportController::class, 'resolved']);
             Route::post('/{report}/rejected', [ReportController::class, 'rejected']);
+        });
+
+        // volunteer applications
+        Route::prefix('volunteer-applications')->group(function (): void {
+            Route::get('/', [VolunteerApplicationController::class, 'index'])->name('admin.volunteer-applications.index');
+            Route::get('statistics', [VolunteerApplicationController::class, 'statistics'])->name('admin.volunteer-applications.statistics');
+            Route::get('/{volunteerApplication}', [VolunteerApplicationController::class, 'show'])->name('admin.volunteer-applications.show');
+            Route::patch('/{volunteerApplication}/approve', [VolunteerApplicationController::class, 'approve'])->name('admin.volunteer-applications.approve');
+            Route::patch('/{volunteerApplication}/reject', [VolunteerApplicationController::class, 'reject'])->name('admin.volunteer-applications.reject');
+            Route::get('/{volunteerApplication}/cv', [VolunteerApplicationController::class, 'showCv'])->name('admin.volunteer-applications.cv');
         });
 
         // notifications

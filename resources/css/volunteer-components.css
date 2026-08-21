@@ -1,0 +1,122 @@
+.volunteer-hero-content {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.volunteer-brand {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1.35rem;
+    max-width: 49rem;
+}
+
+.volunteer-brand-logo {
+    width: 7.5rem;
+    height: 7.5rem;
+    flex: 0 0 auto;
+    padding: .5rem;
+    object-fit: contain;
+    border-radius: 1.75rem;
+    background: #fff;
+    box-shadow: 0 .875rem 2rem rgba(92, 50, 141, .15);
+}
+
+.volunteer-brand--received {
+    display: grid;
+    place-items: center;
+    width: 100%;
+}
+
+.volunteer-brand--received .volunteer-brand-logo {
+    width: 8.75rem;
+    height: 8.75rem;
+    margin: 0 auto;
+    border-radius: 2rem;
+}
+
+.volunteer-language-switcher {
+    display: inline-flex;
+    flex: 0 0 auto;
+    overflow: hidden;
+    border: 1px solid rgba(92, 50, 141, .18);
+    border-radius: .75rem;
+    background: rgba(255, 255, 255, .88);
+    box-shadow: 0 .5rem 1.25rem rgba(40, 93, 91, .08);
+}
+
+.volunteer-language-switcher a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3.5rem;
+    min-height: 2.5rem;
+    padding: .375rem .75rem;
+    color: var(--volunteer-purple);
+    font-size: .86rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color .18s, background-color .18s;
+}
+
+.volunteer-language-switcher a:hover,
+.volunteer-language-switcher a:focus-visible {
+    color: var(--volunteer-teal);
+    background: #eff9f8;
+    outline: none;
+}
+
+.volunteer-language-switcher a.is-active {
+    color: #fff;
+    background: var(--volunteer-purple);
+}
+
+.volunteer-received-header {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    justify-items: center;
+}
+
+.volunteer-received-header .volunteer-language-switcher {
+    position: absolute;
+    top: 0;
+    inset-inline-end: 0;
+}
+
+@media (max-width: 45rem) {
+    .volunteer-hero-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .volunteer-brand {
+        align-items: flex-start;
+        gap: .9rem;
+    }
+
+    .volunteer-brand-logo {
+        width: 5.25rem;
+        height: 5.25rem;
+        border-radius: 1.25rem;
+    }
+
+    .volunteer-brand--received .volunteer-brand-logo {
+        width: 7rem;
+        height: 7rem;
+        border-radius: 1.5rem;
+    }
+
+    .volunteer-language-switcher {
+        align-self: flex-end;
+    }
+
+    .volunteer-received-header .volunteer-language-switcher {
+        position: static;
+        align-self: center;
+    }
+}
