@@ -123,6 +123,7 @@ Route::prefix('exhibitor')->group(function () {
             Route::get('statistics', [EventController::class, 'statistics'])->name('exhibitor.events.statistics');
             Route::get('', [EventController::class, 'index'])->name('exhibitor.events.index');
             Route::post('', [EventController::class, 'store'])->middleware('throttle:event_request');
+            Route::get('{event}', [EventController::class, 'show'])->name('exhibitor.events.show');
         });
 
         // notifications

@@ -34,7 +34,7 @@ class EventPolicy
      */
     public function view(SystemUser $systemUser, Event $event): bool
     {
-        return false;
+        return $this->isOwner($systemUser, $event) || $systemUser->type === SystemUserType::ADMIN;
     }
 
     /**

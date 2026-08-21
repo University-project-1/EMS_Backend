@@ -72,6 +72,8 @@ class BoothController extends Controller
      */
     public function show(Booth $booth)
     {
+        Gate::authorize('view', $booth);
+        
         $booth->loadMissing(['hall', 'company', 'boothRequests']);
 
         return successResponse(

@@ -9,12 +9,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SystemUser\Exhibitor\EventCalendarRequest;
 use App\Http\Requests\SystemUser\Exhibitor\StoreEventRequest;
 use App\Http\Resources\Shared\EventResource;
+use App\Http\Resources\SystemUser\Exhibitor\EventResource as ExhibitorEventResource;
 use App\Models\Event;
 use App\Services\SystemUser\Exhibitor\EventService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -64,6 +66,16 @@ class EventController extends Controller
             ->paginate(5);
 
         return successResponse(EventResource::collection($events));
+    }
+
+    /**
+     * show 
+     */
+    public function show(Event $event){
+        
+        Gate::authorize('view', $event);
+
+        return successResponse(ExhibitorEventResource::make($event));
     }
 
     /**
