@@ -20,7 +20,14 @@ class ReportSeeder extends Seeder
 
         $events = Event::where('status', Status::APPROVED)->get();
 
-        $booths = Booth::whereNotNull('company_id')->get();
+        $booths = Booth::query()
+            ->whereNotNull('company_id')
+            ->whereHas('boothRequests', function ($query): void {
+                $query
+                    ->where('status', Status::APPROVED->value)
+                    ->whereColumn('booth_requests.company_id', 'booths.company_id');
+            })
+            ->get();
 
         $admins = SystemUser::query()
             ->where('type', SystemUserType::ADMIN)

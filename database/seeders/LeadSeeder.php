@@ -30,6 +30,11 @@ class LeadSeeder extends Seeder
             ->whereNotNull('company_id')
             ->whereNotNull('qr_token')
             ->whereHas('company', fn ($query) => $query->where('status', Status::APPROVED))
+            ->whereHas('boothRequests', function ($query): void {
+                $query
+                    ->where('status', Status::APPROVED->value)
+                    ->whereColumn('booth_requests.company_id', 'booths.company_id');
+            })
             ->get()
             ->keyBy('number');
 

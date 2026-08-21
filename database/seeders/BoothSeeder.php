@@ -2,12 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Enum\Status;
 use App\Models\Booth;
-use App\Models\Company;
 use App\Models\Hall;
-use App\Models\SystemUser;
-use App\Services\Shared\QrCodeService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use LogicException;
@@ -15,22 +11,6 @@ use LogicException;
 class BoothSeeder extends Seeder
 {
     private const PRICE_PER_SQUARE_METRE = 25.0;
-
-    /**
-     * @var array<string, array{company: string, system_user: string, assigned_by: ?string}>
-     */
-    private const ASSIGNMENTS = [
-        '2C-01' => ['company' => 'Dar Al feker', 'system_user' => 'Elcoach', 'assigned_by' => 'Fawzy'],
-        '10D-01' => ['company' => 'GreenFoods Co.', 'system_user' => 'Elza3eem', 'assigned_by' => 'Fawzy'],
-        '11F-01' => ['company' => 'Dar Al feker', 'system_user' => 'Elcoach', 'assigned_by' => 'Fawzy'],
-        '25B-01' => ['company' => 'GreenFoods Co.', 'system_user' => 'Fawzy', 'assigned_by' => null],
-        '25B-02' => ['company' => 'Metro Tech Labs', 'system_user' => 'Elza3eem', 'assigned_by' => 'Fawzy'],
-        '26E-01' => ['company' => 'Al-Noor Publishing House', 'system_user' => 'Elcoach', 'assigned_by' => 'Fawzy'],
-        '26E-02' => ['company' => 'Cedar Build Works', 'system_user' => 'Elza3eem', 'assigned_by' => 'Fawzy'],
-        '36JD-01' => ['company' => 'Meridian Health Alliance', 'system_user' => 'Fawzy', 'assigned_by' => 'Elcoach'],
-        '36JD-02' => ['company' => 'Atlas Commerce Hub', 'system_user' => 'Elcoach', 'assigned_by' => 'Elza3eem'],
-        '8K-01' => ['company' => 'SkyPoint Tourism Ventures', 'system_user' => 'Elza3eem', 'assigned_by' => 'Fawzy'],
-    ];
 
     /** @var list<float> */
     private const HALL_1_AREAS = [
@@ -121,21 +101,8 @@ class BoothSeeder extends Seeder
         $definitions = $this->boothDefinitions();
         $hallNumbers = array_values(array_unique(array_column($definitions, 'hall_number')));
         $halls = Hall::query()->whereIn('number', $hallNumbers)->get()->keyBy('number');
-        $companies = Company::query()
-            ->whereIn('name', array_unique(array_column(self::ASSIGNMENTS, 'company')))
-            ->get()
-            ->keyBy('name');
-        $systemUserNames = array_filter([
-            ...array_column(self::ASSIGNMENTS, 'system_user'),
-            ...array_column(self::ASSIGNMENTS, 'assigned_by'),
-        ]);
-        $systemUsers = SystemUser::query()
-            ->whereIn('name', array_unique($systemUserNames))
-            ->get()
-            ->keyBy('name');
 
-        DB::transaction(function () use ($companies, $definitions, $halls, $systemUsers): void {
-            $boothsByNumber = [];
+        DB::transaction(function () use ($definitions, $halls): void {
             $seededBoothIds = [];
 
             foreach ($definitions as $definition) {
@@ -145,66 +112,25 @@ class BoothSeeder extends Seeder
                     throw new LogicException("Missing hall {$definition['hall_number']} for booth seeding.");
                 }
 
-                $assignment = self::ASSIGNMENTS[$definition['number']] ?? null;
-                $company = null;
-
-                if ($assignment !== null) {
-                    $company = $companies->get($assignment['company']);
-
-                    if (! $company instanceof Company) {
-                        throw new LogicException("Missing company {$assignment['company']} for booth seeding.");
-                    }
-                }
-
                 $booth = Booth::withTrashed()->firstOrNew([
                     'hall_id' => $hall->id,
                     'number' => $definition['number'],
                 ]);
                 $booth->fill([
-                    'company_id' => $company?->id,
+                    'company_id' => null,
                     'area' => $definition['area'],
                     'price' => $definition['area'] * self::PRICE_PER_SQUARE_METRE,
                     'svg_id' => $definition['number'],
+                    'qr_token' => null,
                 ]);
-                $booth->qr_token = $company?->status === Status::APPROVED
-                    ? 'B-SEED-'.$definition['number']
-                    : null;
                 $booth->deleted_at = null;
                 $booth->save();
-                $this->syncQrCodeMedia($booth, $company);
+                $booth->clearMediaCollection('qr_code');
 
-                $boothsByNumber[$definition['number']] = $booth;
                 $seededBoothIds[] = $booth->id;
             }
 
             DB::table('booth_system_users')->whereIn('booth_id', $seededBoothIds)->delete();
-
-            $pivotRows = [];
-
-            foreach (self::ASSIGNMENTS as $boothNumber => $assignment) {
-                $booth = $boothsByNumber[$boothNumber] ?? null;
-                $systemUser = $systemUsers->get($assignment['system_user']);
-                $assignedBy = $assignment['assigned_by'] === null
-                    ? null
-                    : $systemUsers->get($assignment['assigned_by']);
-
-                if (! $booth instanceof Booth || ! $systemUser instanceof SystemUser) {
-                    throw new LogicException("Missing booth or system user for assignment {$boothNumber}.");
-                }
-
-                if ($assignment['assigned_by'] !== null && ! $assignedBy instanceof SystemUser) {
-                    throw new LogicException("Missing assigning system user for booth {$boothNumber}.");
-                }
-
-                $pivotRows[] = [
-                    'booth_id' => $booth->id,
-                    'system_user_id' => $systemUser->id,
-                    'assigned_by' => $assignedBy?->id,
-                    'created_at' => now(),
-                ];
-            }
-
-            DB::table('booth_system_users')->insert($pivotRows);
         });
     }
 
@@ -278,18 +204,5 @@ class BoothSeeder extends Seeder
                 'area' => $area,
             ];
         }
-    }
-
-    private function syncQrCodeMedia(Booth $booth, ?Company $company): void
-    {
-        $booth->clearMediaCollection('qr_code');
-
-        if (! $company instanceof Company || $company->status !== Status::APPROVED || $booth->qr_token === null) {
-            return;
-        }
-
-        $booth->addMediaFromString(app(QrCodeService::class)->generateSvg($booth->qr_token))
-            ->usingFileName("{$booth->qr_token}.svg")
-            ->toMediaCollection('qr_code');
     }
 }

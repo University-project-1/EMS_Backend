@@ -15,7 +15,16 @@ class SavedSeeder extends Seeder
     {
         $users = User::query()->orderBy('id')->get();
         $events = Event::query()->where('status', Status::APPROVED)->orderByDesc('id')->take(2)->get();
-        $booths = Booth::query()->whereNotNull('company_id')->orderByDesc('id')->take(2)->get();
+        $booths = Booth::query()
+            ->whereNotNull('company_id')
+            ->whereHas('boothRequests', function ($query): void {
+                $query
+                    ->where('status', Status::APPROVED->value)
+                    ->whereColumn('booth_requests.company_id', 'booths.company_id');
+            })
+            ->orderByDesc('id')
+            ->take(2)
+            ->get();
 
         foreach ($users as $user) {
             foreach ($events as $event) {
